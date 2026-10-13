@@ -361,5 +361,4 @@ secrets
 # Manual
 cache/
 secure-review-*
-ASK.md
-Godot_Resources/
+ASK*.md
