@@ -19,14 +19,6 @@ jobs:
         with:
           # Discord webhook URL
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          # Discord Webhook ID (ignored if `webhook_url` is set)
-          #id: # optional
-          # Discord Webhook token (ignored if `webhook_url` is set)
-          #token: # optional
-          # Overwrite repository name with a custom one
-          repo_name: Wizards Towers
-          # Hide the full GitHub username
-          censor_username: true
           # Toggle whether to show repo links on the webhook event
           hide_links: false
           # Color of the Discord embed
