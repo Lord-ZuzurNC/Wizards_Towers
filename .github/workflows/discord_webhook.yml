@@ -26,8 +26,8 @@ jobs:
           # Overwrite repository name with a custom one
           repo_name: Wizards Towers
           # Hide the full GitHub username
-          #censor_username: # optional
+          censor_username: false
           # Toggle whether to show repo links on the webhook event
-          #hide_links: # optional
+          hide_links: false
           # Color of the Discord embed
           color: fa5a41
