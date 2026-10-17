@@ -12,11 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      #- name: Send Discord Notification
-      #  run: |
-      #    curl -H "Content-Type: application/json" \
-      #         -d '{"content": "A new commit has been pushed to the repository!"}' \
-      #         ${{ secrets.DISCORD_WEBHOOK_URL }}
       - name: discord-webhook
       # You may pin to the exact commit or the version.
       # uses: johnnyhuy/actions-discord-git-webhook@ba54912b26910da886c9095317d6da6182a87224
@@ -29,7 +24,7 @@ jobs:
           # Discord Webhook token (ignored if `webhook_url` is set)
           #token: # optional
           # Overwrite repository name with a custom one
-          repo_name: FireWizard the FireMage
+          repo_name: Wizards Towers
           # Hide the full GitHub username
           #censor_username: # optional
           # Toggle whether to show repo links on the webhook event
