@@ -323,11 +323,11 @@ package-lock.json
 .impeccable/
 security-audit-skill/
 
-# Aikido review
-aikido*
-
 # Gortex
 .gortex/
+
+# Aikido review
+aikido*
 
 # Manual
 cache/
