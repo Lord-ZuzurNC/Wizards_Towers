@@ -1,0 +1,19 @@
+- name: discord-webhook
+  # You may pin to the exact commit or the version.
+  # uses: johnnyhuy/actions-discord-git-webhook@ba54912b26910da886c9095317d6da6182a87224
+  uses: johnnyhuy/actions-discord-git-webhook@v1.0.0
+  with:
+    # Discord webhook URL
+    webhook_url: https://discord.com/api/webhooks/1560767601343463525/cEAVme91_qRQStpYJyIvAQiexdRpod7UvH8BjxmK3SFXqHh5YlIxLvbwN6mNfwpFsEsS
+    # Discord Webhook ID (ignored if `webhook_url` is set)
+    id: # optional
+    # Discord Webhook token (ignored if `webhook_url` is set)
+    token: # optional
+    # Overwrite repository name with a custom one
+    repo_name: FireWizard the FireMage
+    # Hide the full GitHub username
+    # censor_username: # optional
+    # Toggle whether to show repo links on the webhook event
+    # hide_links: # optional
+    # Color of the Discord embed
+    color: FA5A41
