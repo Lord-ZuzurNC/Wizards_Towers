@@ -22,18 +22,10 @@ The two Effect slots are optional and **ordered**: `Chain → Split` is not the 
 **A spell may contain at most one Artifact.**
 Artifacts are the floor-bound runes catalogued in `ARTIFACTS.md`, and no spell may stack two of them.
 
-## Range was removed, and this is where it went
+## Reach
 
-Range used to be an attribute with its own slot, and it was cut because it was doing no work.
-
-The reasons it failed are worth recording, because they make a good test for any future attribute.
-An Aura is centred on the caster by definition, so pairing it with a long Range meant nothing.
-A Self range had no user except an Aura or a Mend, so half of its eight runes existed to serve one Shape.
-Worst of all, a player could pay for distance the chosen Shape was incapable of using, which is a trap rather than a decision.
-
-But the axis underneath it — **does this spell reach out, or does it happen where I stand** — is real, and the Shape table below now carries it as a **Reach** column.
-Reach is not chosen.
-It is a property of the Shape the player already picked, and it is printed so the player can see it.
+Reach is **not chosen**.
+It is a property of the Shape rune the player already picked, printed so the player can see it.
 
 | Reach      | Meaning                                                           |
 | ---------- | ----------------------------------------------------------------- |
@@ -63,9 +55,6 @@ One rune, one behaviour, three magnitudes.
 A rune at legendary rarity is stronger than one at common, but it also weighs more, so it pushes the spell's cost bar further.
 A wizard cannot simply fill five slots with legendaries and expect to cast the result.
 
-⚠️ Note the phrasing above, because it matters.
-Write **"a rune at legendary rarity"**, never "a legendary rune" — that exact phrase is banned by the glossary, because it was the old name for what is now an **Artifact**.
-
 **Weight is the cost pressure, not the power.**
 A rune with weight 3 and a rune with weight 3 cost the same to include even if one is far more useful in a given build.
 That is the lever that makes a cheap spell worth building.
@@ -82,35 +71,32 @@ Shape decides the geometry of the spell: what the magic *is* when it leaves the 
 It is the slot with the strongest influence on how a spell feels to use, and the one players will recognise first.
 It is also the slot that now determines Reach, since Range no longer exists.
 
-| Rune            | Reach  | What it does                                                                                                                                    | Weight | Notes                                                                                           |
-| --------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------- |
-| **Bolt**        | ranged | A single fast projectile that strikes the first thing it touches.                                                                               | 1      | The cheapest shape. The default of every new wizard.                                            |
-| **Lance**       | ranged | A slower, heavier projectile that pierces the first target and continues.                                                                       | 2      | Rewards lining enemies up.                                                                      |
-| **Spray**       | melee  | A wide cone of short-lived fragments in front of the caster.                                                                                    | 2      | Damage falls off sharply with distance.                                                         |
-| **Slash**       | melee  | A short forward arc with heavy penetration, striking everything in the arc at once.                                                             | 2      | Melee Reach forces the wizard into danger, and that is the price of its penetration.            |
-| **Beam**        | ranged | A continuous line that persists while held, striking everything along it.                                                                       | 3      | Consumes mana per tick rather than per cast.                                                    |
-| **Nova**        | self   | A ring expanding outward from the caster, striking everything it passes.                                                                        | 3      | Cannot be aimed. Hits enemies and rival wizards without discrimination.                         |
-| **Orb**         | ranged | A slow floating sphere that drifts forward and detonates on contact or expiry.                                                                  | 3      | The only shape that can be outrun.                                                              |
-| **Seed**        | placed | A dormant mark on the ground that triggers when anything steps on it.                                                                           | 3      | Survives logout. The village-defence shape.                                                     |
-| **Footprints**  | self   | A trail of the spell laid down behind the wizard as they walk, following their path.                                                            | 3      | Harms the caster if they double back onto it. The only shape drawn by movement, not by aim. Under `Eternal`, the far end goes dormant beyond the owner's range while the near stretch stays live. |
-| **Boulder**     | ranged | A large sphere that rolls straight ahead, shrinking as it travels.                                                                              | 3      | Stops dead against a building. Strongest at point-blank, spent by the end of its roll.          |
-| **Trident**     | ranged | Three simultaneous linear strikes: one forward, one at forty-five degrees each side.                                                            | 3      | Very fast. Covers an escape angle without demanding precise aim.                                |
-| **Rain**        | placed | A column of falling strikes over a target area.                                                                                                 | 4      | Needs a flat target. Useless against a single moving enemy.                                     |
-| **Wall**        | placed | A standing barrier of the chosen element, blocking movement and damaging on contact.                                                            | 4      | Defensive, and the best shape for holding a village gate.                                       |
-| **Aura**        | self   | A radius centred on the caster that persists and affects everything inside it.                                                                  | 4      | Moves with the wizard, which its Reach now states rather than making the player pay for it.     |
-| **Tether**      | ranged | A line binding the caster to one target, applying the spell to both ends.                                                                       | 4      | Breaks at a distance. The only shape that damages its owner by design.                          |
-| **Satellite**   | self   | Three orbiting bodies circling the wizard, each detonating on contact with an enemy.                                                            | 4      | The caster is immune to their own satellites. The only shape that fights while the wizard runs. |
-| **Swarm**       | ranged | Several small homing fragments that each seek a different target.                                                                               | 5      | Splits its power across however many targets exist.                                             |
-| **Vortex**      | placed | A pulling field that drags enemies toward its centre while it lasts.                                                                            | 5      | Deals little damage alone. Devastating with a second Effect.                                    |
-| **Tempest**     | placed | A wide area struck by sparse, randomly placed bolts for as long as the shape lasts. It hits weakly but with a lot of rapid shots on the ground. | 5      | Hits the caster too. Unreliable against one target, incapable of missing a crowd.               |
-| **Judgement**   | placed | A single immense stationary strike on one point, after a visible delay.                                                                         | 6      | The heaviest single-target shape. Telegraphed and avoidable.                                    |
-| **Bombardment** | placed | A wide area bombarded by falling masses, each exploding where it lands. It is slow, explosive and have very few hits.                           | 6      | By far the best shape against buildings. The siege shape, and the reason a village needs walls. |
+| Rune            | Reach  | What it does                                                                                                          | Weight | Notes                                                                                                                                                                                             |
+| --------------- | ------ | --------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bolt**        | ranged | A single fast projectile that strikes the first thing it touches.                                                     | 1      | The cheapest shape. The default of every new wizard.                                                                                                                                              |
+| **Lance**       | ranged | A slower, heavier projectile that pierces the first target and continues.                                             | 2      | Rewards lining enemies up.                                                                                                                                                                        |
+| **Spray**       | melee  | A wide cone of short-lived fragments in front of the caster.                                                          | 2      | Damage falls off sharply with distance.                                                                                                                                                           |
+| **Slash**       | melee  | A short forward arc with heavy penetration, striking everything in the arc at once.                                   | 2      | Melee Reach forces the wizard into danger, and that is the price of its penetration.                                                                                                              |
+| **Beam**        | ranged | A continuous line that persists while held, striking everything along it.                                             | 3      | Consumes mana per tick rather than per cast.                                                                                                                                                      |
+| **Nova**        | self   | A ring expanding outward from the caster, striking everything it passes.                                              | 3      | Cannot be aimed. Hits enemies and rival wizards without discrimination.                                                                                                                           |
+| **Orb**         | ranged | A slow floating sphere that drifts forward and detonates on contact or expiry.                                        | 3      | The only shape that can be outrun.                                                                                                                                                                |
+| **Seed**        | placed | A dormant mark on the ground that triggers when anything steps on it.                                                 | 3      | Survives logout. The village-defence shape.                                                                                                                                                       |
+| **Footprints**  | self   | A trail of the spell laid down behind the wizard as they walk, following their path.                                  | 3      | Harms the caster if they double back onto it. The only shape drawn by movement, not by aim. Under `Eternal`, the far end goes dormant beyond the owner's range while the near stretch stays live. |
+| **Boulder**     | ranged | A large sphere that rolls straight ahead, shrinking as it travels.                                                    | 3      | Stops dead against a building. Strongest at point-blank, spent by the end of its roll.                                                                                                            |
+| **Trident**     | ranged | Three simultaneous linear strikes: one forward, one at forty-five degrees each side.                                  | 3      | Very fast. Covers an escape angle without demanding precise aim.                                                                                                                                  |
+| **Pool**        | placed | A patch of ground that holds the spell for a time, striking whatever stands in it.                                    | 3      | The cheapest placed shape. Wants `Lingering`, and is close to pointless with `Instant`.                                                                                                           |
+| **Rain**        | placed | A column of falling strikes over a target area.                                                                       | 4      | Needs a flat target. Useless against a single moving enemy.                                                                                                                                       |
+| **Wall**        | placed | A standing barrier of the chosen element, blocking movement and damaging on contact.                                  | 4      | Defensive, and the best shape for holding a village gate.                                                                                                                                         |
+| **Aura**        | self   | A radius centred on the caster that persists and affects everything inside it.                                        | 4      | Moves with the wizard, which its Reach now states rather than making the player pay for it.                                                                                                       |
+| **Tether**      | ranged | A line binding the caster to one target, applying the spell to both ends.                                             | 4      | Breaks at a distance. The only shape that damages its owner by design.                                                                                                                            |
+| **Satellite**   | self   | Three orbiting bodies circling the wizard, each detonating on contact with an enemy.                                  | 4      | The caster is immune to their own satellites. The only shape that fights while the wizard runs.                                                                                                   |
+| **Swarm**       | ranged | Several small homing fragments that each seek a different target.                                                     | 5      | Splits its power across however many targets exist.                                                                                                                                               |
+| **Vortex**      | placed | A pulling field that drags enemies toward its centre while it lasts.                                                  | 5      | Deals little damage alone. Devastating with a second Effect.                                                                                                                                      |
+| **Judgement**   | placed | A single immense stationary strike on one point, after a visible delay.                                               | 6      | The heaviest single-target shape. Telegraphed and avoidable.                                                                                                                                      |
+| **Bombardment** | placed | A wide area bombarded by falling masses, each exploding where it lands. It is slow, explosive and have very few hits. | 6      | By far the best shape against buildings. The siege shape, and the reason a village needs walls.                                                                                                   |
 
 **Reach distribution:** 4 self, 2 melee, 8 ranged, 7 placed.
 
-That spread is the argument for cutting Range.
-Every Shape already carried a reach, and the slot was only ever letting a player contradict it.
-AQ.Ab8RN6Iixgj59LXR9Vx85c9CQN4W6eFzsOHWfK0JSRafaRh4-Q
 ## Element
 
 Element gives the spell its nature.
@@ -220,53 +206,20 @@ Three mandatory slots, and two optional Effect slots that are ordered and may no
 | Plus one Effect                    | 2 058 × 35      | 72 030          |
 | Plus two ordered, distinct Effects | 2 058 × 35 × 34 | 2 449 020       |
 
-Removing Range divided the space by exactly eight, because that is how many Range runes there were.
-A deleted slot costs its own option count, no more and no less, which is a useful thing to know before adding another one.
-
-That is the right trade.
 A smaller space where every choice means something beats a larger one padded out with combinations nobody would ever build.
-Two and a half million spells, times three rarities per rune, remains far more than any player can survey.
+Two and a half million spells, times three rarities per rune, is far more than any player can survey.
 
 ## Notes for balancing
 
-**The weights are a first pass and they are the knob to turn.**
-Every number in the weight columns is a guess made for internal consistency, not from play.
-Expect to change them all once a cost bar exists and a single fight can be measured.
-
-⚠️ **`Tempest` and `Bombardment` still overlap heavily.**
-Both are wide placed areas with randomised impact points, and renaming them did not change that.
-They are separated only by `Bombardment` damaging buildings and `Tempest` hitting the caster, which is thin.
-Pushing them apart would help: `Bombardment` slow and few and devastating, `Tempest` fast and many and weak.
-
-**`Footprints` with `Eternal` is resolved, and the resolution is general.**
-`Eternal` only acts within range of its owner, so a trail laid across the map simply switches off beyond that limit.
-As the wizard walks on, the far end of the trail goes dormant while the near stretch stays live.
-No length cap and no special case are needed — the Duration rune's own constraint does the work.
-That is worth noting as a pattern: a well-scoped Duration rule removes the need for per-Shape exceptions.
+**The weight columns are a first pass.**
+Expect to retune them once a cost bar exists and a single fight can be measured.
 
 **Three runes are deliberately overpowered and should be watched first.**
 `Hunger` on a Swarm, `Detonate` after any lingering element, and `Eternal` with `Growth` are the combinations most likely to break early testing.
-`Eternal` is less dangerous than it was, now that it only acts near its owner.
 
 **Three runes are deliberately almost useless alone.**
 `Anchor`, `Growth` and `Detonate` do nothing without a partner, and that is intended: they are the runes that teach a player that Effect order matters.
 
-**Names changed since the first draft, and why.**
-
-| Was            | Now              | Reason                                                                           |
-| -------------- | ---------------- | -------------------------------------------------------------------------------- |
-| Monolith       | **Judgement**    | Collided with **the Monolith**, the central tower. Outright ban.                   |
-| Echo           | **Reprise**      | Collided with **echo**, the floor defender. Outright ban.                          |
-| Decay          | **Waning**       | Collided with **decay**, the per-season weakening. Outright ban.                   |
-| Silence        | **Null**         | Confusable with the Effect rune **Mute**. Not banned, just bad.                    |
-| Thunderstorm   | **Tempest**      | Named an element the Element slot does not control.                                |
-| Snowball       | **Boulder**      | Same reason. "A Snowball made of Ember" had no answer.                             |
-| Meteor         | **Bombardment**  | Same reason.                                                                       |
-| Tof            | **Rust**         | Not an English word, and unguessable from its spelling. Mechanic kept unchanged.    |
-
-**Two runes were deleted outright.**
-
-`Patient`, a Duration rune, armed a spell until a condition was met — which the **Seed** Shape already does, so it charged for a behaviour the player had usually already bought.
-
-`Nitroglycerin`, an Element, marked on the first strike and detonated on the second.
-That is `Mark` followed by `Detonate`, assembled from the two Effect slots, so an Element was doing an Effect's job and making two Effect runes redundant whenever it was equipped.
+**`Pool` and `Rain` need watching.**
+Both are placed area shapes, and `Pool` at weight 3 is cheaper than `Rain` at 4.
+They are separated by `Rain` striking from above in bursts while `Pool` holds the ground continuously, which is a real difference only if `Lingering` and `Instant` feel distinct in play.
