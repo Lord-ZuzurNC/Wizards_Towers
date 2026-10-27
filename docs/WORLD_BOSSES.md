@@ -52,39 +52,39 @@ What is designed below, per boss, is how the fight itself behaves when several w
 
 ## Summary table
 
-| Name                   | Attack type | health | power | mana pool | magic defence | speed | luck | Season               | Where it stands                    |
-| ---------------------- | ----------- | ------ | ----- | --------- | -------------- | ----- | ---- | --------------------- | ----------------------------------- |
-| The Harrow              | melee       | 5200   | 320   | 400       | 220            | 90    | 10   | Spring                 | Village outskirts, roaming          |
-| The Tallyman            | magic       | 4800   | 310   | 900       | 230            | 115   | 20   | Spring, Summer         | Trade roads between villages        |
-| The Rootbound Colossus  | melee       | 6000   | 340   | 300       | 260            | 70    | 8    | Spring, persists after | The Deep Fen                        |
-| The Leaden Saint        | magic       | 5400   | 330   | 1200      | 300            | 85    | 12   | Summer                 | Sunfall Mesa                        |
-| The Breach-Warden       | magic       | 7000   | 360   | 1000      | 280            | 95    | 14   | All seasons            | The Outer Ring, at the Monolith base |
-| The Collector           | magic       | 5600   | 320   | 1100      | 240            | 100   | 18   | Autumn                 | Ruins of the Fourth Spire           |
-| The Twin Omen           | magic       | 5000   | 300   | 1300      | 220            | 100   | 15   | Summer                 | The Rift Glade                      |
-| The Riven Maw           | melee       | 12000  | 620   | 2000      | 420            | 110   | 25   | Winter only            | The Deep Rift                       |
-| Stormcaller Roost       | magic       | 6500   | 350   | 1400      | 230            | 130   | 16   | Autumn                 | The Shattered Crag                  |
-| The Drowned King        | melee       | 5800   | 335   | 500       | 250            | 60    | 10   | Summer                 | The Sunken Mire                     |
-| Fortune's Thief         | magic       | 4900   | 305   | 950       | 215            | 120   | 30   | All seasons            | Wherever a treasure just opened     |
-| The Nightfall Reaper    | magic       | 5300   | 345   | 850       | 235            | 140   | 14   | Autumn, Winter         | The Umbral Wood                     |
-| The Hollow Choir        | magic       | 5700   | 325   | 1600      | 245            | 100   | 20   | Winter                 | The Frozen Choir                    |
+| Name                   | Attack type | health | power | mana pool | magic defence | speed | luck | Season                 | Where it stands                      |
+| ---------------------- | ----------- | ------ | ----- | --------- | ------------- | ----- | ---- | ---------------------- | ------------------------------------ |
+| The Harrow             | melee       | 5200   | 320   | 400       | 220           | 90    | 10   | Spring                 | Village outskirts, roaming           |
+| The Tallyman           | magic       | 4800   | 310   | 900       | 230           | 115   | 20   | Spring, Summer         | Trade roads between villages         |
+| The Rootbound Colossus | melee       | 6000   | 340   | 300       | 260           | 70    | 8    | Spring, persists after | The Deep Fen                         |
+| The Leaden Saint       | magic       | 5400   | 330   | 1200      | 300           | 85    | 12   | Summer                 | Sunfall Mesa                         |
+| The Breach-Warden      | magic       | 7000   | 360   | 1000      | 280           | 95    | 14   | All seasons            | The Outer Ring, at the Monolith base |
+| The Collector          | magic       | 5600   | 320   | 1100      | 240           | 100   | 18   | Autumn                 | Ruins of the Fourth Spire            |
+| The Twin Omen          | magic       | 5000   | 300   | 1300      | 220           | 100   | 15   | Summer                 | The Rift Glade                       |
+| The Riven Maw          | melee       | 12000  | 620   | 2000      | 420           | 110   | 25   | Winter only            | The Deep Rift                        |
+| Stormcaller Roost      | magic       | 6500   | 350   | 1400      | 230           | 130   | 16   | Autumn                 | The Shattered Crag                   |
+| The Drowned King       | melee       | 5800   | 335   | 500       | 250           | 60    | 10   | Summer                 | The Sunken Mire                      |
+| Fortune's Thief        | magic       | 4900   | 305   | 950       | 215           | 120   | 30   | All seasons            | Wherever a treasure just opened      |
+| The Nightfall Reaper   | magic       | 5300   | 345   | 850       | 235           | 140   | 14   | Autumn, Winter         | The Umbral Wood                      |
+| The Hollow Choir       | magic       | 5700   | 325   | 1600      | 245           | 100   | 20   | Winter                 | The Frozen Choir                     |
 
 ## Crowd versus solo: quick index
 
-| Boss                   | What a crowd gets                                                              |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| The Harrow              | Indifferent to numbers, but every minute it survives costs a village's crops.   |
-| The Tallyman            | A race: whoever's damage triggers its flight condition first decides the fight. |
-| The Rootbound Colossus  | Rewards an early, decisive group kill before its growth compounds further.      |
-| The Leaden Saint        | Rewards a coordinated swap from Stone to raw power once it cracks.              |
-| The Breach-Warden       | Indifferent alone, but it actively drags nearby floor raiders into the fight.   |
-| The Collector           | Punishes whichever wizard in the group is carrying the most Artifacts.          |
-| The Twin Omen           | Punishes solo play directly, by forcing a split-attention fight on one wizard.  |
-| The Riven Maw           | Requires a group; its late phases outscale almost any solo wizard's output.     |
-| Stormcaller Roost       | Punishes a crowd outright, its pulses scale with how many stand in range.       |
-| The Drowned King        | Punishes a crowd softly, by locking the fight to whoever last struck it.        |
-| Fortune's Thief         | Rewards a wizard with high luck, punishes one who gambles and loses the roll.   |
-| The Nightfall Reaper    | Punishes bystanders directly, hitting everyone who is not the lead attacker.    |
-| The Hollow Choir        | Rewards a disciplined group, overwhelms an uncoordinated one with its adds.     |
+| Boss                   | What a crowd gets                                                               |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| The Harrow             | Indifferent to numbers, but every minute it survives costs a village's crops.   |
+| The Tallyman           | A race: whoever's damage triggers its flight condition first decides the fight. |
+| The Rootbound Colossus | Rewards an early, decisive group kill before its growth compounds further.      |
+| The Leaden Saint       | Rewards a coordinated swap from Stone to raw power once it cracks.              |
+| The Breach-Warden      | Indifferent alone, but it actively drags nearby floor raiders into the fight.   |
+| The Collector          | Punishes whichever wizard in the group is carrying the most Artifacts.          |
+| The Twin Omen          | Punishes solo play directly, by forcing a split-attention fight on one wizard.  |
+| The Riven Maw          | Requires a group; its late phases outscale almost any solo wizard's output.     |
+| Stormcaller Roost      | Punishes a crowd outright, its pulses scale with how many stand in range.       |
+| The Drowned King       | Punishes a crowd softly, by locking the fight to whoever last struck it.        |
+| Fortune's Thief        | Rewards a wizard with high luck, punishes one who gambles and loses the roll.   |
+| The Nightfall Reaper   | Punishes bystanders directly, hitting everyone who is not the lead attacker.    |
+| The Hollow Choir       | Rewards a disciplined group, overwhelms an uncoordinated one with its adds.     |
 
 ## Bosses
 
@@ -500,12 +500,12 @@ The contract states that season "drives... world boss strength" without specifyi
 **General rule, proposed.**
 A world boss that is present across more than one season, or that persists indefinitely, has its `health`, `power` and `magic_defence` multiplied by a compounding seasonal scalar each time the run advances a season while it remains alive:
 
-| Season transition crossed | Compounding multiplier | Effective multiplier from spring |
-| -------------------------- | ----------------------- | ---------------------------------- |
-| None (still in its first season) | ×1.00                  | ×1.00                               |
-| Into summer                | ×1.25                  | ×1.25                               |
-| Into autumn                | ×1.25                  | ×1.56                               |
-| Into winter                 | ×1.25                  | ×1.95                               |
+| Season transition crossed        | Compounding multiplier | Effective multiplier from spring |
+| -------------------------------- | ---------------------- | -------------------------------- |
+| None (still in its first season) | ×1.00                  | ×1.00                            |
+| Into summer                      | ×1.25                  | ×1.25                            |
+| Into autumn                      | ×1.25                  | ×1.56                            |
+| Into winter                      | ×1.25                  | ×1.95                            |
 
 This mirrors the compounding shape of echo decay, `-20%` per season, but growing instead of shrinking, at `+25%` per season.
 
