@@ -295,7 +295,7 @@ Phase 2 begins once that binding resolves: the Twin Omen becomes fully engageabl
 
 **What makes this fight different.**
 This is the one boss built entirely around the game's existing echo-defends-the-capital mechanic.
-Fighting it means trusting an echo, decayed by however many seasons have passed, to hold a village alone while its owner is occupied elsewhere, with no way to intervene until the fight ends.
+Fighting it means trusting an echo to hold a village alone while its owner is occupied elsewhere, with no way to intervene until the fight ends.
 
 **Drops.**
 The baseline gold, XP and reincarnation point award, plus an Anchor-attribute rune, fitting for a boss whose whole identity is tying two fixed points together.
@@ -317,7 +317,7 @@ A group can designate one member to fight the Twin Omen while leaving their own 
 - **Season:** winter only
 - **Where it stands:** the Deep Rift, a chasm that only opens in winter
 
-The Riven Maw erupts from a chasm that does not exist until winter, a vast, ice-locked enemy built as the run's final-season threat for wizards not yet ready for Floor 49.
+The Riven Maw erupts from a chasm that does not exist until winter, a vast, ice-locked enemy built as the run's final-season threat for wizards not yet ready for the roof.
 It is the strongest entry on this list by a wide margin and is never present outside winter at all.
 
 **Phases.**
@@ -507,10 +507,8 @@ A world boss that is present across more than one season, or that persists indef
 | Into autumn                      | ×1.25                  | ×1.56                            |
 | Into winter                      | ×1.25                  | ×1.95                            |
 
-This mirrors the compounding shape of echo decay, `-20%` per season, but growing instead of shrinking, at `+25%` per season.
-
 **Season-locked bosses are exempt.**
-The Harrow, the Leaden Saint, the Collector, the Twin Omen, the Riven Maw, Stormcaller Roost, the Drowned King and the Hollow Choir only ever exist in a single season each, so they never cross a season boundary while alive, and their table stats are their final stats as given.
+The Harrow, the Leaden Saint, the Collector, the Twin Omen, the Riven Maw, Stormcaller Roost, the Drowned King, and the Hollow Choir only ever exist in a single season each, so they never cross a season boundary while alive, and their table stats are their final stats as given.
 
 **Multi-season or persistent bosses use the scalar.**
 The Tallyman, the Breach-Warden, Fortune's Thief and the Nightfall Reaper apply the compounding scalar above for every season boundary they survive.
