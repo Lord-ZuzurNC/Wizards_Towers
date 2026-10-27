@@ -30,13 +30,12 @@ A maze is instanced and safe from other wizards, exactly like a combat dungeon.
 Entering one **breaks a level-1 wizard's peace shield permanently**, the same as entering any dungeon, so a newcomer cannot farm mazes from behind invulnerability.
 That is a real cost for a level-1 wizard, and it is meant to be: a maze is a decision, not a freebie.
 
-The designer's own examples, kept here in his own words because they set the tone:
-a pattern to get a door open, having the right rune so the wizard needs to find it, walking on an invisible path.
-Everything in section 3 is an elaboration of that short list, built to use this game's own systems rather than generic riddles.
+The three core examples: a pattern to get a door open, having the right rune so the wizard needs to find it, walking on an invisible path.
+Everything in section 3 elaborates on that list, built from this game's own systems rather than generic riddles.
 
 ### Personally unsolvable versus globally unsolvable
 
-The designer has said that an unsolvable maze **is not an issue, there are other dungeons**.
+An unsolvable maze is not an issue on its own: there are other dungeons.
 That is true for one specific kind of unsolvable and false for another, and the distinction is load-bearing for everything that follows.
 
 A maze that is **personally** unsolvable, because a given wizard lacks the rune, the level, or the Element it demands, is good design.
@@ -47,7 +46,7 @@ A maze that is **globally** unsolvable, because the world itself never generated
 No amount of playing fixes it, no amount of levelling fixes it, and the maze sits there forever as a room nobody can ever open.
 That is not a difficulty choice, it is a generation bug wearing a difficulty choice's clothes.
 
-⬜ **Open question, and the recommendation this document makes about it.**
+⬜ **Open question.**
 Whichever mechanic keys a maze to a specific rune, Element or Artifact must be paired with a **world-generation constraint**: the required rune must be guaranteed to exist somewhere in that world, obtainable by some means, before the maze is allowed to generate with that requirement.
 Concretely, that means checking the requirement against the world's actual rune and Artifact distribution at generation time, and re-rolling the maze's requirement if the check fails.
 This is not yet decided anywhere in the design documents, and it should be, before any rune-keyed mechanic ships.
@@ -58,7 +57,6 @@ This is not yet decided anywhere in the design documents, and it should be, befo
 
 Authored puzzle content is the most expensive content per minute of play in this project.
 An enigma — the generic kind, not this game's `maze` — is authored once and solved once: a player who has seen the answer knows it forever, and tells everyone else.
-This is a solo project built by a non-developer, so that arithmetic is not a nitpick, it is close to the whole argument.
 
 The fix is a strict preference: build mazes whose **shape** is authored once but whose **solution** is **generated fresh per world**.
 A pattern lock where generation picks the pattern.
@@ -82,21 +80,21 @@ At least 22 reusable primitives, the pieces assembled mazes in section 4 are bui
 | Mechanic                       | What the player does                                                                                                      | Authored part                                                        | Generated part                                                                 | Spoiler-proof?              | Notes                                                                                                                                                 |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Rune-Key Door**               | Presents a rune they hold to a lock that opens for exactly one rune.                                                       | The door, the room, the permanent-this-visit fail state.              | Which single rune, attribute plus name, the lock accepts.                       | Yes                           | Needs the generation guarantee from section 1, or it risks being globally unsolvable.                                                                  |
-| **Attribute Sequence Lock**     | Touches five motifs, one per rune attribute, on a panel in the order the room hints at.                                    | The panel, the five motifs, the hinting method.                       | The correct order of the five attributes, 120 possibilities.                    | Yes                           | Pure logic, owns nothing, so it is always personally solvable.                                                                                          |
+| **Attribute Sequence Lock**     | Touches four motifs, one per rune attribute, on a panel in the order the room hints at.                                    | The panel, the four motifs, the hinting method.                       | The correct order of the four attributes, 24 possibilities.                    | Yes                           | Pure logic, owns nothing, so it is always personally solvable.                                                                                          |
 | **Cost-Bar Threshold Gate**     | Casts or holds a spell so their own cost bar's fill lands inside a marked band on a gate.                                  | The gate, the visible band, the hold interaction.                     | Where the band sits on the bar.                                                 | Partial                       | Knowing to aim the bar is strategy, not an answer, since the band moves per instance.                                                                   |
 | **Effect-Order Plates**        | Pulls two Effect-tagged levers in sequence, since the order changes the outcome.                                           | The two-lever room, the two differing outcomes.                       | Which outcome is correct, so which lever goes first.                            | Yes                           | Teaches the Effect1-then-Effect2 ordering rule without requiring ownership of either Effect rune.                                                       |
 | **Element Resonance Gate**     | Casts the one Element the obstacle resonates with to clear it.                                                             | The obstacle, its visual tell.                                        | Which of the twelve Elements it responds to.                                    | Yes                           | Hard for a Grimoire with no matching Element, but common Elements are purchasable, so a fallback is cheap to guarantee.                                 |
-| **Invisible Safe-Tile Path**   | Crosses a floor where only some tiles are safe, found from an environmental tell, not a guess.                             | The room, the soft penalty, the tell mechanism.                       | Which tiles are safe.                                                           | Yes                           | The designer's own named example. Keep the penalty a reset, never damage.                                                                               |
+| **Invisible Safe-Tile Path**   | Crosses a floor where only some tiles are safe, found from an environmental tell, not a guess.                             | The room, the soft penalty, the tell mechanism.                       | Which tiles are safe.                                                           | Yes                           | Keep the penalty a reset, never damage.                                                                               |
 | **Light/Shadow Corridor**      | Casts Gloom or Radiance to flip a corridor's state, since the path is only walkable in one state per segment.              | The corridor, the two states, the toggle object.                      | Which segments need light and which need shadow.                                | Yes                           | Needs a decided fallback for a wizard holding neither element; see section 6.                                                                           |
 | **Mana Budget Gauntlet**       | Crosses a chain of doors, each consuming a fixed fraction of the current mana pool, without running dry mid-chain.          | The chain, the soft stuck-until-regen fail.                           | Door count and the fraction each demands.                                       | Partial                       | Soft-fails on purpose, since mana-stones are too precious to be the fix for a bad plan.                                                                 |
-| **Echo Mirror Chamber**        | Changes something about their own loadout so an inert mirror of themself crosses a stat threshold the room checks.         | The chamber, the threshold check, the fact the mirror never attacks.  | Which stat and which threshold.                                                 | Yes                           | The threshold reads the player's live stat block, so it cannot be memorised from someone else's solve.                                                 |
+| **Echo Mirror Chamber**        | Changes something about their own loadout so a mirror image of themself crosses a stat threshold the room checks.         | The chamber, the threshold check, the fact the mirror never attacks.  | Which stat and which threshold.                                                 | Yes                           | The mirror is an image, not the wizard's actual echo: it reads the player's live stat block, never fights, and never persists beyond the room.                                                 |
 | **Weight-Matching Scale**      | Places rune tokens on a balance until both sides match a target, using each rune's real weight.                           | The scale, the room, the offered token set.                           | The target weight and the matching subset.                                      | Yes                           | A quiet lesson in rune weight for a player who has not reached spellcrafting depth.                                                                     |
 | **Gold Toll Pedestals**        | Deposits exact gold amounts on pedestals in order, refunded on a wrong guess.                                              | The pedestals, the refund-on-fail rule.                               | The amounts and the order.                                                      | Partial                       | Cap the amounts low, or a wealthy wizard simply buys through what should be a puzzle.                                                                   |
 | **Haste Timing Gate**          | Times a dash through a closing gate, using a self-cast Haste effect or a tightly judged approach at base speed.            | The gate's closing rhythm, the two valid approaches.                  | The rhythm's period and offset.                                                 | Yes                           | Keep the non-Haste path real, or a wizard with no Haste rune is personally locked out of a pure timing test.                                            |
 | **Season Dial Room**           | Sets a dial to the current season's icon, then performs a further generated action.                                       | The dial, the four icons, the further-action slot.                    | The further action only.                                                        | No, for the dial alone        | Four seasons is a small, public, shared fact. Never ship this as the only step; see section 6.                                                          |
 | **Reprise Delay Switch**       | Throws a switch that fires once immediately and again, weaker, after a delay, and must use both pulses.                   | The switch, the two-pulse behaviour, the gate it feeds.                | The delay length and the gate's re-close speed.                                 | Yes                           | Named for the Effect rune Reprise, its idea reused as level geometry rather than spellcraft.                                                            |
 | **Tether Anchor Walk**         | Stays within a tether's range of a moving anchor while crossing a hazard, resetting the room if it snaps.                  | The hazard, the anchor's path shape, the snap-and-reset rule.          | The anchor's speed and the tether's maximum range.                              | Yes                           | A soft-fail room, consistent with testing thought rather than survival.                                                                                 |
-| **Symbol Pattern Lock**        | Reproduces a symbol pattern shown once elsewhere in the maze onto a door lock.                                             | The lock, the display mechanism.                                      | The pattern itself.                                                              | Yes                           | The designer's own named example. Keep it to four or six symbols, testing memory, not tedium.                                                           |
+| **Symbol Pattern Lock**        | Reproduces a symbol pattern shown once elsewhere in the maze onto a door lock.                                             | The lock, the display mechanism.                                      | The pattern itself.                                                              | Yes                           | Keep it to four or six symbols, testing memory, not tedium.                                                           |
 | **Rune Memory Match**          | Flips tile pairs bearing rune icons from the same attribute family until every pair is matched.                            | The grid, the same-attribute matching rule.                           | The tile layout.                                                                 | Yes                           | Owns nothing, recognises only, so it is safe content for a level-1 wizard.                                                                              |
 | **Mad-Libs Rune Riddle**       | Reads a templated riddle whose blank names a generated rune, and acts on the answer.                                       | The riddle template, the delivery mechanism.                          | Which rune fills the blank.                                                      | Partial                       | Write the template generic enough to scan naturally for any of the current 77 runes.                                                                    |
 | **Mana-Stone Toll Choice**     | Chooses between spending a mana-stone for an instant shortcut or solving a harder free puzzle.                             | The choice, the harder puzzle's shape.                                | The harder puzzle's specific solution.                                          | Yes, for the puzzle option    | Spend this rarely. Mazes should not quietly expect the one resource a low-combat wizard needs most.                                                     |
@@ -108,14 +106,14 @@ At least 22 reusable primitives, the pieces assembled mazes in section 4 are bui
 | **Vortex Platform Pull**       | Casts a Vortex-shaped spell, if they hold one, to drag floating platforms into a crossable line.                          | The platforms, the gap.                                               | The target arrangement.                                                         | Yes                           | Vortex is rare and heavy. Gating a whole maze behind owning it is a hard personal lock; see section 6.                                                  |
 | **Luck Ledger Deduction**      | Examines a ledger of past, fictional outcomes and deduces which option is weighted favourably.                            | The ledger format, the deduction rule.                                | The numbers in the ledger and which option they point to.                       | Yes                           | Named for luck but rolls nothing in front of the player. A reading puzzle about luck, not a luck check.                                                 |
 
-That is 26 mechanics, four more than the floor the brief asks for, deliberately — this is the list to cut down from, not the final roster.
+That is 26 mechanics — this is the list to cut down from, not the final roster.
 
 ---
 
 ## 4. Assembled mazes
 
 Twelve mazes, each combining two or three mechanics from section 3.
-Difficulty is a convenience scale invented for this document — Low, Medium, High, Very high — not a tier defined anywhere in `CONTENT CONTRACT.md`.
+Difficulty uses four qualitative bands — Low, Medium, High, Very high — not a tier scale defined anywhere in `CONTENT CONTRACT.md`.
 Rewards are described qualitatively, not in numbers, because the XP curve behind `wizard_level` is itself an open design question (glossary item 32.5).
 No maze rewards an Artifact: Artifacts are bound to Monolith floors, never to a dungeon, and that stays true for a maze too.
 
@@ -150,7 +148,7 @@ A maze built around the idea that magic has texture: fire undoes ice, cold undoe
 A maze that is honest about being personally gated, and says so to the player rather than hiding it: a notice at the entrance states the Grimoire requirement before the peace shield breaks.
 
 - **Stage 1 — the threshold.** A lock checking the wizard currently has at least three filled Grimoire positions, meaning wizard level 3 or higher. Below that, the maze politely refuses entry and the peace shield is untouched.
-- **Stage 2 — the mirror chamber.** An inert mirror echo of the wizard's current loadout stands opposite a sealed exit. Swapping a weapon or a Grimoire spell changes the mirror's resulting stat, and the exit opens once a generated stat threshold is crossed.
+- **Stage 2 — the mirror chamber.** A mirror image of the wizard's current loadout stands opposite a sealed exit — not the wizard's actual echo. Swapping a weapon or a Grimoire spell changes the mirror's resulting stat, and the exit opens once a generated stat threshold is crossed.
 
 **Difficulty:** Medium-high.
 **Reward:** medium-large XP, a small amount of RP, consistent with the glossary's statement that dungeons grant RP.
@@ -196,7 +194,7 @@ Built to prove that `Season Dial Room` cannot carry a maze alone — see section
 
 *Mechanics: Tether Anchor Walk + Haste Timing Gate.*
 
-A platforming-leaning maze, the closest thing in this roster to testing reflexes rather than deduction, included because the brief's own list of mechanics should not be purely cerebral.
+A platforming-leaning maze, the closest thing in this roster to testing reflexes rather than deduction.
 
 - **Stage 1 — the chasm.** A moving anchor and a tether; straying too far snaps it and resets the room, never damages.
 - **Stage 2 — the final gate.** A closing gate crossed either with a self-cast Haste effect or with careful timing at base speed.
@@ -220,7 +218,7 @@ The teaching maze: everything here is about recognising rune attributes, and not
 
 *Mechanics: Decay Clock Room + Mana-Stone Toll Choice.*
 
-A late-run, higher-stakes maze, and the one place in this document where the brief's "most expensive content" warning applies hardest — this is the one to prototype most carefully before building more like it.
+A late-run, higher-stakes maze; prototype it carefully before building more like it.
 
 - **Stage 1 — the reliquary.** A room that weakens the wizard's stats on a compounding curve for as long as they linger, resetting fully the moment they step out. A generated logic puzzle must be solved inside before the curve bites too deep.
 - **Stage 2 — the choice.** An exit offering a mana-stone shortcut or a second, harder generated puzzle for free.
@@ -232,7 +230,7 @@ A late-run, higher-stakes maze, and the one place in this document where the bri
 
 *Mechanics: North Wall Cipher + Effect-Order Plates.*
 
-The maze that most depends on a decision outside this document: entering must snapshot the North Wall at that instant, or the puzzle inside shifts as floors change hands outside.
+Entering must snapshot the North Wall at that instant; otherwise the puzzle shifts as floors change hands outside while it is in progress.
 
 - **Stage 1 — the archive hall.** A snapshot of the North Wall, taken at entry, gives an ordering of names or floor numbers used as a cipher key for the next door.
 - **Stage 2 — the vault.** Two Effect-tagged levers whose correct order is partly determined by the cipher just solved.
@@ -268,9 +266,9 @@ A deduction-heavy maze pitched as a late-run finale: nothing here is a luck roll
 
 *Mechanics: Attribute Sequence Lock + Reprise Delay Switch + Effect-Order Plates.*
 
-The capstone of this batch, the only maze in the roster using three mechanics rather than two, pitched as rare, memorable, and expensive to author exactly once, which is why the roster has only one of these.
+The capstone of this batch, the only maze in the roster using three mechanics rather than two: rare and memorable by design.
 
-- **Stage 1 — the five motifs.** An Attribute Sequence Lock, generated order, opening onto the switch hall.
+- **Stage 1 — the four motifs.** An Attribute Sequence Lock, generated order, opening onto the switch hall.
 - **Stage 2 — the switch hall.** A Reprise Delay Switch whose second, weaker pulse must be caught before the gate it feeds re-closes.
 - **Stage 3 — the final vault.** Effect-Order Plates, generated outcome, guarding the exit chest.
 
@@ -296,9 +294,8 @@ Four seasons is a small, shared, public fact, and setting a dial to the current 
 It is still listed in section 3 because it is a good **texture** mechanic — a free, thematic first step — but it must never be the only step in a maze that uses it, which is why `4.6 The Seasonal Clockwork` pairs it with a mechanic that supplies the actual generated difficulty.
 
 **Blunt recommendation on single-use content.**
-None of the 26 mechanics above is proposed as genuinely single-use — every one keeps a generated part that regenerates per world, by design, because that is this document's whole thesis.
+None of the 26 mechanics above is proposed as genuinely single-use — every one keeps a generated part that regenerates per world, by design.
 If the designer still wants a hand-authored, never-regenerated riddle as a one-time showpiece — a launch easter egg, a lore moment with a fixed, memorable answer — that is a legitimate thing to want, but it should be budgeted honestly: build **at most one** across the entire project, and treat it as marketing or lore content, not as a maze category.
-A solo, non-developer project cannot afford a second one.
 Every hour spent on a puzzle that dies the moment one player posts the answer is an hour not spent on a mechanic from section 3 that keeps earning its cost for the life of the game.
 
 ---
@@ -308,7 +305,7 @@ Every hour spent on a puzzle that dies the moment one player posts the answer is
 **The generation-guarantee question is the most important open item in this whole document, and it is unresolved.**
 ⬜ Section 1 recommends that any rune-, Element- or Artifact-keyed mechanic — `Rune-Key Door`, `Element Resonance Gate`, `Vortex Platform Pull` most directly — must check against the world's actual generated rune and Artifact distribution before it is allowed to spawn with that requirement.
 Nobody has decided whether this check happens, or how.
-Shipping any of those three mechanics before this is decided risks exactly the dead-content failure the designer flagged.
+Shipping any of those three mechanics before this is decided risks exactly the dead-content failure described in section 1.
 
 **`Light/Shadow Corridor` has no decided fallback for a wizard holding neither Gloom nor Radiance.**
 ⬜ Either guarantee one of the two is cheaply obtainable everywhere, the way `Element Resonance Gate`'s notes argue for common Elements generally, or give the corridor a manual torch-and-crystal interaction that does not require owning either rune.
@@ -325,8 +322,8 @@ It is a mistake if a future designer builds a maze that uses it as the only gate
 **`Gold Toll Pedestals` favours a wealthy wizard over a clever one, which cuts against the whole point of a non-combat puzzle source.**
 Recommend capping the toll amounts low enough that a mid-run wizard's typical gold holdings cannot simply be thrown at the puzzle instead of solving it.
 
-**`Echo Mirror Chamber`'s name risks colliding with the real echo system, the floor defender snapshot, even though the mechanic never fights and never persists.**
-⬜ Worth a rename pass before this reaches a glossary entry, the way four other names were already renamed in `RUNES.md` to avoid exactly this kind of collision.
+**`Echo Mirror Chamber`'s name risks colliding with the real echo system, the floor defender snapshot, even though the mechanic is a mirror image that never fights and never persists.**
+⬜ Worth a rename pass before this reaches a glossary entry, to avoid the collision entirely.
 
 **Whether a maze grants RP at all is inherited from an open glossary item, not decided here.**
 `GLOSSARY.md` lists dungeons as an RP source alongside wizard kills, world bosses and floors, and this document has assumed that a maze, being a dungeon, inherits that.
@@ -335,7 +332,5 @@ Recommend capping the toll amounts low enough that a mid-run wizard's typical go
 **No reward number in section 4 is a real number.**
 They are relative — small, medium, large — because the XP curve behind `wizard_level` is explicitly open, glossary item 32.5, and inventing numbers here would be answering a design question this document is not allowed to answer.
 
-**On the quality bar the brief set:**
-honestly, the mechanics that lean hardest on this game's own systems — `Weight-Matching Scale`, `Chain Lever Cascade`, `North Wall Cipher`, `Grimoire Position Lock`, `Decay Clock Room` — are also the ones with no equivalent in a generic puzzle game, and they are the strongest entries in section 3 for exactly that reason.
-`Symbol Pattern Lock` and `Invisible Safe-Tile Path` are the designer's own named examples and belong in the document regardless, but on their own they would work in almost any game; they earn their place here by being cheap, reliable building blocks to combine with the more game-specific mechanics, not by being distinctive on their own.
-That is an honest trade-off, not a flaw: a maze made entirely of bespoke mechanics would be slower and more expensive to build than this solo project can sustain.
+**The strongest entries in section 3 lean hardest on this game's own systems:** `Weight-Matching Scale`, `Chain Lever Cascade`, `North Wall Cipher`, `Grimoire Position Lock`, `Decay Clock Room` have no equivalent in a generic puzzle game.
+`Symbol Pattern Lock` and `Invisible Safe-Tile Path` would work in almost any game, but earn their place here as cheap, reliable building blocks combined with the more game-specific mechanics.

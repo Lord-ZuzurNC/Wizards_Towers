@@ -539,10 +539,9 @@ That combination could produce an un-killable enemy on a world where nobody both
 The contract gives world bosses a flat luck of 15 with no explicit `+` or "may go well above," unlike health, power and magic defence.
 Fortune's Thief at luck 30 and the Rootbound Colossus at luck 8 both sit well outside a `±25%` band around that number; they were written for mechanical reasons tied to each boss's identity, but whether the `±25%` discipline is meant to bind world boss luck too is not stated anywhere, and is flagged here rather than assumed.
 
-**"Immune to one rune attribute" was read as "immune to one Element."**
-The brief's wording is ambiguous between the five rune attributes (Shape, Range, Element, Duration, Effect) and a specific rune within the Element attribute.
-The Leaden Saint was written against the latter reading, since a boss immune to an entire attribute category, for example "immune to all Range runes," does not translate into a coherent combat mechanic the way an elemental immunity does.
-⬜ If the designer intended literal attribute-wide immunity, the Leaden Saint's mechanic needs to be rewritten.
+**The Leaden Saint's immunity is read as immune to one Element, a single rune within the Element attribute, not immune to the whole attribute category.**
+Whole-attribute immunity, for example "immune to all Shape runes," does not translate into a coherent combat mechanic the way an elemental immunity does.
+⬜ If whole-attribute immunity is the intended reading instead, the Leaden Saint's mechanic needs to be rewritten.
 
 **Drop rates are stated only in relative terms, never as numbers.**
 "Elevated," "standard" and "highest on this list" describe intent, not a tuned probability, because the contract gives no baseline mana-stone or life-stone drop rate for any source, world bosses included, only the run-wide target of 3-5 mana-stones and 2-3 life-stones across every source combined.
