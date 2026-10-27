@@ -22,7 +22,7 @@ The tier numbers are fixed by the project contract.
 A deviation of up to ±25 % is allowed per enemy to give it character, and the **Notes** column says why whenever a stat sits at the edge of its range.
 `magic defence` and `luck` only vary meaningfully from **elite** upward: below that the tier's base number is too small for the tolerance band to contain another whole number, so critters sit at luck 1 and magic defence 2, and common enemies at luck 2.
 
-⬜ `mana pool` is not fixed per tier by the contract. The values below give a magic-attack enemy a larger pool than a melee enemy of the same tier, and are unratified.
+`mana pool` is not fixed per tier: a magic-attack enemy carries a larger pool than a melee enemy of the same tier, since a melee enemy needs only a small reserve while a caster must sustain repeated casts.
 
 The **Behaviour** column states the one thing a player must do differently to beat that enemy.
 
@@ -68,20 +68,20 @@ Bandit camps, pack beasts, undead stragglers, and the first enemies that punish 
 Tier baseline: health 200, power 18, magic defence 12, speed 100, luck 3.
 Supports that must die first, enemies that punish a specific gap in a wizard's kit, and the first entries genuinely dangerous solo.
 
-| Name                 | Atk type | health | power | mana pool | magic defence | speed | luck | Behaviour                                                                                                                 | Notes                                                                      |
-| -------------------- | -------- | -----: | ----: | --------: | ------------: | ----: | ---: | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Orc Berserker        | melee    |    180 |    22 |        10 |            10 |   110 |    3 | Attacks faster as its own health drops, so burst damage beats a slow grind against it.                                    | Power at the top of its range to pay for the self-enrage.                  |
-| Orc Shaman           | magic    |    170 |    19 |        70 |            12 |    95 |    3 | Shields the nearest ally before attacking, so killing it first denies the whole pack its damage reduction.                | Support-first priority target.                                             |
-| Troll Bruiser        | melee    |    240 |    20 |         8 |            15 |    80 |    3 | Regenerates a slice of health every few seconds unless a wizard's burst outpaces the regeneration.                        | ⬜ Regeneration rate undecided. Health and magic defence top of range.      |
-| Swamp Hydra Pup      | melee    |    210 |    18 |        15 |            12 |   100 |    3 | **Regrows lost health whenever it takes fire damage**, so a wizard relying on fire fights a losing battle.                | Its own specificity, the mirror of the Shambling Corpse.                   |
-| Necromancer Acolyte  | magic    |    160 |    17 |        85 |            11 |    95 |    3 | Raises a Skeleton Hand every time its own cast completes, so it must die before its retinue grows out of hand.            | ⬜ Summon cadence undecided. Health at the bottom of range: a glass cannon. |
-| Barrow Wight         | magic    |    190 |    18 |        60 |            13 |    90 |    3 | Drains a slice of the wizard's mana pool on every hit, crippling a low-level wizard far more than a late one.             | Dangerous early, trivial later, since mana pool grows with level.          |
-| Will-o'-Wisp Herald  | magic    |    150 |    17 |        75 |            12 |   120 |    3 | Never commits to a fight and lures a wizard toward a den of other fae, vanishing the moment it is seriously threatened.   | Lowest health and highest speed in the tier: a lure, not a brawler.        |
-| Fae Duelist          | melee    |    180 |    19 |        20 |            12 |   105 |    4 | Relies on favourable rolls for crippling critical strikes, making the fight swingy and rewarding a decisive finish.       | **Luck 4**, the only veteran above the tier's flat 3.                      |
-| Stone Golem Ward     | melee    |    250 |    18 |         5 |            15 |    75 |    3 | Barely moves from its post and leans on raw magic defence to outlast attackers, rewarding sustained damage over burst.    | Health and magic defence top of range, speed bottom: a chokepoint guard.   |
-| Arc Construct        | magic    |    170 |    20 |        55 |            11 |   100 |    3 | Arcs its bolt to a second nearby target, making it far more dangerous alongside another enemy than alone.                 | Power at the top of range for the chain-damage read.                       |
-| Flame Wisp Elemental | magic    |    190 |    19 |        65 |            12 |   110 |    3 | Leaves a trail of fire wherever it moves, so a wizard must fight it in bursts rather than chase it through its own trail. | Seasonal arc: see the season table.                                        |
-| Frost Warden         | magic    |    200 |    18 |        60 |            14 |    85 |    3 | Freezes the ground in a slowly growing ring, so a wizard must break away before the ring closes off every escape route.   | Seasonal arc: see the season table.                                        |
+| Name                 | Atk type | health | power | mana pool | magic defence | speed | luck | Behaviour                                                                                                                 | Notes                                                                           |
+| -------------------- | -------- | -----: | ----: | --------: | ------------: | ----: | ---: | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Orc Berserker        | melee    |    180 |    22 |        10 |            10 |   110 |    3 | Attacks faster as its own health drops, so burst damage beats a slow grind against it.                                    | Power at the top of its range to pay for the self-enrage.                       |
+| Orc Shaman           | magic    |    170 |    19 |        70 |            12 |    95 |    3 | Shields the nearest ally before attacking, so killing it first denies the whole pack its damage reduction.                | Support-first priority target.                                                  |
+| Troll Bruiser        | melee    |    240 |    20 |         8 |            15 |    80 |    3 | Regenerates a slice of health every few seconds unless a wizard's burst outpaces the regeneration.                        | Regeneration rate to be tuned later. Health and magic defence top of range.     |
+| Swamp Hydra Pup      | melee    |    210 |    18 |        15 |            12 |   100 |    3 | **Regrows lost health whenever it takes fire damage**, so a wizard relying on fire fights a losing battle.                | Its own specificity, the mirror of the Shambling Corpse.                        |
+| Necromancer Acolyte  | magic    |    160 |    17 |        85 |            11 |    95 |    3 | Raises a Skeleton Hand every time its own cast completes, so it must die before its retinue grows out of hand.            | Summon cadence on its own sheet. Health at the bottom of range: a glass cannon. |
+| Barrow Wight         | magic    |    190 |    18 |        60 |            13 |    90 |    3 | Drains a slice of the wizard's mana pool on every hit, crippling a low-level wizard far more than a late one.             | Dangerous early, trivial later, since mana pool grows with level.               |
+| Will-o'-Wisp Herald  | magic    |    150 |    17 |        75 |            12 |   120 |    3 | Never commits to a fight and lures a wizard toward a den of other fae, vanishing the moment it is seriously threatened.   | Lowest health and highest speed in the tier: a lure, not a brawler.             |
+| Fae Duelist          | melee    |    180 |    19 |        20 |            12 |   105 |    4 | Relies on favourable rolls for crippling critical strikes, making the fight swingy and rewarding a decisive finish.       | **Luck 4**, the only veteran above the tier's flat 3.                           |
+| Stone Golem Ward     | melee    |    250 |    18 |         5 |            15 |    75 |    3 | Barely moves from its post and leans on raw magic defence to outlast attackers, rewarding sustained damage over burst.    | Health and magic defence top of range, speed bottom: a chokepoint guard.        |
+| Arc Construct        | magic    |    170 |    20 |        55 |            11 |   100 |    3 | Arcs its bolt to a second nearby target, making it far more dangerous alongside another enemy than alone.                 | Power at the top of range for the chain-damage read.                            |
+| Flame Wisp Elemental | magic    |    190 |    19 |        65 |            12 |   110 |    3 | Leaves a trail of fire wherever it moves, so a wizard must fight it in bursts rather than chase it through its own trail. | Seasonal arc: see the season table.                                             |
+| Frost Warden         | magic    |    200 |    18 |        60 |            14 |    85 |    3 | Freezes the ground in a slowly growing ring, so a wizard must break away before the ring closes off every escape route.   | Seasonal arc: see the season table.                                             |
 
 ## Elite — dangerous alone, lethal in a pair
 
@@ -105,7 +105,7 @@ The "strong enemy" of a dungeon, maze, or Monolith floor, distinct from the auth
 
 | Name                | Atk type | health | power | mana pool | magic defence | speed | luck | Behaviour                                                                                                                                                   | Notes                                                                    |
 | ------------------- | -------- | -----: | ----: | --------: | ------------: | ----: | ---: | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| The Hollow King     | magic    |   1000 |    65 |       250 |            45 |    95 |    8 | **Summons a wave of Skeleton Guards** whenever its own health crosses each quarter threshold, demanding crowd control over a burst race.                    | ⬜ Wave size and cap undecided; uncapped waves would drag the fight out.  |
+| The Hollow King     | magic    |   1000 |    65 |       250 |            45 |    95 |    8 | **Summons a wave of Skeleton Guards** whenever its own health crosses each quarter threshold, demanding crowd control over a burst race.                    | Wave size and cap live on its own sheet.                                 |
 | Ironclad Warbeast   | melee    |   1125 |    70 |        20 |            50 |    80 |    6 | Telegraphs a charge on a fixed timer that must be dodged outright, since tanking it costs most of a wizard's health.                                        | Health, power and magic defence all top of range; a likely overtune.     |
 | Archfae Trickster   | magic    |    750 |    58 |       280 |            35 |   120 |   10 | Spawns illusory decoys that mimic its own attack pattern, so a wizard must learn its tell to pick the real target out of the copies.                        | Health bottom of range, luck and speed top: a trickster, not a tank.     |
 | Molten Titan        | magic    |   1050 |    72 |       200 |            38 |    90 |    7 | Erupts in a wide area pulse that melts the surrounding terrain, forcing constant repositioning rather than a fixed stance.                                  | Seasonal arc: see the season table.                                      |
@@ -143,11 +143,12 @@ Each entry's arc is stated below rather than left to a general rule.
 
 The Flame Wisp and the Frost Warden are deliberate opposites: one fades exactly as the other arrives, so autumn is the only season both are on the map at once.
 
-⬜ Permafrost Wyrm, Molten Titan and Mire Elemental follow the same pattern by extension rather than by explicit decision.
+**A `weak` season applies -20 % to every stat, a `strong` season +20 %.**
+`appears` and `present` are the baseline, and `absent` means the enemy does not spawn at all that season.
 
-⬜ Whether ordinary non-seasonal enemy stats drift upward across a run has not been decided. A flat multiplier at each season boundary is the simplest implementation if they should.
+The gold a village loses when a crop row is finished by Cabbage Grub, Wild Boar or The Rootbound Elder is defined with the crop rules, in `UPGRADES_VILLAGE.md`.
 
-⬜ The gold a village loses when a crop row is finished by Cabbage Grub, Wild Boar or The Rootbound Elder has no formula yet.
+⬜ Whether ordinary non-seasonal enemy stats drift upward across a run has not been decided.
 
 ## Counts
 
@@ -170,3 +171,10 @@ Ironclad Warbeast does the same across three stats, which is defensible for a du
 **Likely underpowered.**
 Marsh Leech Swarm has the lowest `power` in its tier and a slow-building payoff, so in a short fight it reads as merely weak; it needs either a faster drain or a visible warning.
 Necromancer Acolyte's low health is meant to reward focus-fire, but if Skeleton Hands arrive faster than a wizard clears them the intended read inverts from "kill it fast" into "it is already too late".
+
+**Accepted repetition.**
+Permafrost Wyrm, Molten Titan and Mire Elemental reuse the Flame Wisp and Frost Warden seasonal pattern.
+They sit in different tiers and climb in strength, so the overlap is acceptable — not every entry can be unique.
+
+**Worth watching.**
+Tiny Shattered Colossus at speed 40 is slower than anything else here and can simply be walked away from, which risks making the Shattered Colossus's death-split a non-event rather than a second fight.
