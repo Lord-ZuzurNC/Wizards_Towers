@@ -52,7 +52,7 @@ One rune, one behaviour, three magnitudes.
 | **rare**      | ×1.6       | ×1.4              |
 | **legendary** | ×2.5       | ×2.0              |
 
-A rune at legendary rarity is stronger than one at common, but it also weighs more, so it pushes the spell's cost bar further.
+A rune at legendary rarity is stronger than one at common, but it also weighs more, so it pushes the spell's weight bar further.
 A wizard cannot simply fill five slots with legendaries and expect to cast the result.
 
 **Weight is the cost pressure, not the power.**
@@ -167,7 +167,7 @@ As a rule of thumb: the first Effect modifies the spell, and the second Effect m
 | **Haste**     | The spell increases the target's speed while it lasts.                                         | 3      | On an Aura, the best escape in the game.                           |
 | **Mark**      | The spell tags the target, and the wizard's next spell against them is stronger.               | 3      | Rewards planning two casts ahead.                                  |
 | **Waning**    | The spell becomes weaker the longer it persists, but starts far stronger.                      | 3      | The front-loaded option. Good with Instant, absurd with Brief.     |
-| **Sacrifice** | The spell costs health in addition to mana, and hits far harder for it.                        | 3      | Cheap on the cost bar, expensive on the wizard.                    |
+| **Sacrifice** | The spell costs health in addition to mana, and hits far harder for it.                        | 3      | Cheap on the weight bar, expensive on the wizard.                  |
 | **Greed**     | The spell deals more damage the more gold the caster is carrying.                              | 3      | Makes a rich wizard a target worth killing.                        |
 | **Patience**  | The spell deals more damage the longer it has been since the wizard last cast anything.        | 3      | Punishes spam. Rewards the single prepared strike.                 |
 | **Spite**     | The spell resolves once more, free, if it kills the caster.                                    | 3      | The last word. Can take a rival down with you.                     |
@@ -212,7 +212,7 @@ Two and a half million spells, times three rarities per rune, is far more than a
 ## Notes for balancing
 
 **The weight columns are a first pass.**
-Expect to retune them once a cost bar exists and a single fight can be measured.
+Expect to retune them once the weight bar is implemented and a single fight can be measured.
 
 **Three runes are deliberately overpowered and should be watched first.**
 `Hunger` on a Swarm, `Detonate` after any lingering element, and `Eternal` with `Growth` are the combinations most likely to break early testing.
