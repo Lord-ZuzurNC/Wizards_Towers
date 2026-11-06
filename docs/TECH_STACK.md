@@ -6,12 +6,12 @@ Where a decision is deferred it carries ⬜ and says what would settle it.
 
 ## Engine and language
 
-| Choice      | Decision                        | Notes                                                                           |
-| ----------- | ------------------------------- | ------------------------------------------------------------------------------- |
-| Engine      | **Godot 4.7.2 stable**          | Pinned. See `GUIDELINES.md`.                                                     |
-| Language    | **GDScript**, statically typed  | Static typing is mandatory, not optional — see below.                            |
-| Linting     | `gdlint` / `gdformat`           | From `godot-gdscript-toolkit`, pip-installable, runs in CI.                        |
-| Second lang | **none**                        | No C#, no GDExtension, until a measured bottleneck demands one.                   |
+| Choice      | Decision                       | Notes                                                           |
+| ----------- | ------------------------------ | --------------------------------------------------------------- |
+| Engine      | **Godot 4.7.2 stable**         | Pinned. See `GUIDELINES.md`.                                    |
+| Language    | **GDScript**, statically typed | Static typing is mandatory, not optional — see below.           |
+| Linting     | `gdlint` / `gdformat`          | From `godot-gdscript-toolkit`, pip-installable, runs in CI.     |
+| Second lang | **none**                       | No C#, no GDExtension, until a measured bottleneck demands one. |
 
 **Static typing is mandatory because of who reviews this code.**
 The project's author reads code but does not write it, so errors must surface at parse time rather than at runtime in front of fifty players.
@@ -23,13 +23,13 @@ A typed GDScript codebase gives most of C#'s review safety with none of its buil
 Square tiles, cardinal movement, buildings drawn with a visible façade.
 This is the Pokémon-style oblique view, and it is **not** isometric.
 
-| Property        | This project                      | True isometric would be              |
-| --------------- | --------------------------------- | ------------------------------------ |
-| Tile shape      | square                            | diamond, 2:1                          |
-| Movement        | cardinal                          | diagonal-aligned                      |
-| Ground circles  | drawn as circles                  | drawn as ellipses                     |
-| Aiming          | direct mouse-to-world              | needs inverse projection              |
-| Depth sorting   | Godot `Y-sort`                     | per-tile depth ordering               |
+| Property       | This project          | True isometric would be  |
+| -------------- | --------------------- | ------------------------ |
+| Tile shape     | square                | diamond, 2:1             |
+| Movement       | cardinal              | diagonal-aligned         |
+| Ground circles | drawn as circles      | drawn as ellipses        |
+| Aiming         | direct mouse-to-world | needs inverse projection |
+| Depth sorting  | Godot `Y-sort`        | per-tile depth ordering  |
 
 Three reasons this view and not another.
 
@@ -51,11 +51,11 @@ Client and server branch on `OS.has_feature("dedicated_server")`.
 
 Three export targets:
 
-| Target                | Output                | Purpose                       |
-| --------------------- | --------------------- | ----------------------------- |
-| Windows client        | `.exe`                | Players.                       |
-| Linux client          | x86_64 binary          | Players.                       |
-| Linux dedicated server| x86_64 headless binary | Runs the world.                |
+| Target                 | Output                 | Purpose         |
+| ---------------------- | ---------------------- | --------------- |
+| Windows client         | `.exe`                 | Players.        |
+| Linux client           | x86_64 binary          | Players.        |
+| Linux dedicated server | x86_64 headless binary | Runs the world. |
 
 ## Authority model
 
@@ -80,10 +80,10 @@ A client that could set a number could set its own gold, and one cheater ends a 
 
 **SQLite only at launch.**
 
-| Store             | Holds                                                                            | Lifetime        |
-| ----------------- | -------------------------------------------------------------------------------- | --------------- |
-| `accounts.db`     | Accounts, reincarnation points, talents, cosmetics, owned skins.                  | Forever.         |
-| `world_<id>.db`   | One file per world: the map seed, villages, towers, floors, echoes, inventories, gold, spells, the run clock. | One run, 8 days. |
+| Store           | Holds                                                                                                         | Lifetime         |
+| --------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `accounts.db`   | Accounts, reincarnation points, talents, cosmetics, owned skins.                                              | Forever.         |
+| `world_<id>.db` | One file per world: the map seed, villages, towers, floors, echoes, inventories, gold, spells, the run clock. | One run, 8 days. |
 
 Why this and not more.
 A single authoritative server process serialises every write, which is the workload SQLite is best at.
@@ -169,11 +169,11 @@ Scope is the wizard's body and robes only — never weapons, because a wizard vi
 
 ## Release
 
-| Channel           | Role                                           |
-| ----------------- | ---------------------------------------------- |
-| GitHub Releases   | Primary. Matches the source-available posture.  |
-| itch.io           | Player-facing home for a noncommercial build.   |
-| Steam             | Rejected. Its model expects commercial distribution. |
+| Channel         | Role                                                 |
+| --------------- | ---------------------------------------------------- |
+| GitHub Releases | Primary. Matches the source-available posture.       |
+| itch.io         | Player-facing home for a noncommercial build.        |
+| Steam           | Rejected. Its model expects commercial distribution. |
 
 Linux is distributed as a binary in an archive first.
 ⬜ Whether to add an AppImage, and later a Flatpak, is a convenience decision to revisit once there are players.
