@@ -55,9 +55,10 @@ A level-1 wizard who steps through a dungeon entrance has chosen to leave newcom
 The entrance seals itself by magic once a wizard steps through, and reopens when that wizard leaves or dies.
 Nothing stops another wizard from waiting at the entrance.
 
-**A world draws its dungeons.**
-At generation, a world draws a limited number of dungeons at random from this catalogue, so no two worlds offer the same set.
-The draw always includes one season-gated dungeon per season.
+**A world draws twenty dungeons.**
+At generation, a world draws 20 distinct dungeons at random from this catalogue, so no two worlds offer the same run.
+An ordinary dungeon is open from the start of the run.
+A season-gated dungeon is never guaranteed to be drawn; when it is, it opens at the start of its own season and closes at its end.
 
 **Season-gated dungeons.**
 Each season has at least one dungeon that exists only while that season lasts.
@@ -323,15 +324,15 @@ The scaling reads the wizard's **rank in carried gold** among the world's living
 
 A rank, not an amount, so the curve never has to be retuned as the economy inflates, and it can never softlock a wizard.
 
-| Room                   | What is there                                      | Enemies                                                                 | Notes                                                                              |
-| ---------------------- | -------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Antechamber of coin    | Scattered coin, deliberately left as bait.         | 1 – 3× Gold Wraiths (common, magic)                                     | Count here scales with carried gold: low gold spawns one, high gold spawns three.  |
-| The Ledger Hall        | Shelves of account books, gilded spines.           | 2 – 4× Gold Wraiths (common, magic)                                     | Same scaling rule.                                                                 |
-| Vault of Small Things  | Display cases of minor treasure, mostly empty now. | 1× Hoard Sentinel (veteran, melee), 1 – 2× Gold Wraiths (common, magic) | Sentinel count is fixed; only the Wraith count scales with gold.                   |
-| The Counting Room      | A single enormous abacus, frozen mid-count.        | 2× Hoard Sentinels (veteran, melee)                                     | No gold scaling in this room — a fixed, hard room regardless of wealth.            |
-| The Appraiser's Study  | A desk stacked with valuation ledgers.             | 1× Hoard Sentinel (veteran, melee), 1 – 3× Gold Wraiths (common, magic) | Gold scaling returns here.                                                         |
-| Treasury threshold     | A door cast from a single sheet of gold.           | 2× Hoard Sentinels (veteran, melee)                                     | No scaling; a breather before the final room regardless of wealth carried.         |
-| The Hoardwarden's Seat | A mountain of coin, the throne buried in it.       | The Hoardwarden (champion, magic)                                       | The Hoardwarden itself does not scale with gold — only the rooms leading to it do. |
+| Room                   | What is there                                      | Enemies                                                             | Notes                                                                              |
+| ---------------------- | -------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Antechamber of coin    | Scattered coin, deliberately left as bait.         | 2× Gold Wraiths (common, magic)                                     | Wraiths scale with the wizard's gold rank, see above.                              |
+| The Ledger Hall        | Shelves of account books, gilded spines.           | 3× Gold Wraiths (common, magic)                                     | Same rank rule.                                                                    |
+| Vault of Small Things  | Display cases of minor treasure, mostly empty now. | 1× Hoard Sentinel (veteran, melee), 2× Gold Wraiths (common, magic) | Only the Wraiths scale; the Sentinel never does.                                   |
+| The Counting Room      | A single enormous abacus, frozen mid-count.        | 2× Hoard Sentinels (veteran, melee)                                 | No gold scaling in this room — a fixed, hard room regardless of wealth.            |
+| The Appraiser's Study  | A desk stacked with valuation ledgers.             | 1× Hoard Sentinel (veteran, melee), 2× Gold Wraiths (common, magic) | Same rank rule for the Wraiths.                                                    |
+| Treasury threshold     | A door cast from a single sheet of gold.           | 2× Hoard Sentinels (veteran, melee)                                 | No scaling; a breather before the final room regardless of wealth carried.         |
+| The Hoardwarden's Seat | A mountain of coin, the throne buried in it.       | The Hoardwarden (champion, magic)                                   | The Hoardwarden itself does not scale with gold — only the rooms leading to it do. |
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 8 – 11, a flat reincarnation point award, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
@@ -460,9 +461,8 @@ Moderate-to-good chance at a life-stone, reflecting that this is the hardest com
   A rest zone after its sixth room sits right before the two veteran Crevasse Wardens of the Frozen Court.
 - **Stone odds are low everywhere.**
   Exact percentages are tuned once every mana-stone and life-stone source is counted.
-- ⬜ **Gold Wraith counts still scale with carried gold, on top of the rank multipliers.**
-  A top-4 wizard therefore meets more wraiths and stronger ones.
-  Still open is whether to keep both scalings, or fix the counts and let the rank alone do the work.
 - ⬜ **Reincarnation points per dungeon need a formula.**
-  It belongs in a `FORMULAS.md` that gathers every scaling formula of the project, not in this file.
-- ⬜ **How many dungeons a world draws is not set.**
+  Listed with the other missing formulas in `FORMULAS.md`.
+- ⬜ **The catalogue is smaller than one draw.**
+  A world draws 20 dungeons and the catalogue holds 18, so the draw cannot run yet.
+  It needs to grow well past 20 for the draw to mean anything.

@@ -220,7 +220,8 @@ It is built for customer identity, the case of strangers signing themselves up.
 Since v4 its login page is a second container, routed on the same domain as the API.
 It runs as its **own instance**, never the one guarding the homelab: an identity provider open to public sign-up must not also hold the keys to private services.
 The AGPL binds only a modified copy offered over the network; running it unmodified imposes nothing on this project.
-Still to verify by a spike: the three social sign-ins and a loopback login from Godot.
+A loopback login from Godot is verified, see `pre-POCs/zitadel/`; any loopback port is accepted, so the client listens on one the system picks.
+⬜ Still to verify: the three social sign-ins, which need a developer account on each provider.
 
 ## Protocol version
 

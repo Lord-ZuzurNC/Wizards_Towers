@@ -1,0 +1,6 @@
+.env
+*.pat
+client_id.txt
+# Upstream ZITADEL files, fetched by run.sh, not redistributed here.
+docker-compose.yml
+.env.example

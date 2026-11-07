@@ -94,6 +94,8 @@ Discovering combinations is the game.
 
 - [`docs/GUIDELINES.md`](docs/GUIDELINES.md) — code, documentation and asset style guide, targeting Godot 4.7.
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — the project's vocabulary, and the contract between the design documents and the identifiers in the code.
+- [`docs/FORMULAS.md`](docs/FORMULAS.md) — every number the game computes rather than authors, written once.
+- [`pre-POCs/`](pre-POCs/) — throwaway technical experiments that settled a design choice, each with its results.
 
 The design question-and-answer document that drives all of this is kept private deliberately, and is not part of this repository.
 
