@@ -52,7 +52,7 @@ Entering any dungeon permanently breaks a level-1 wizard's peace shield, the sam
 A level-1 wizard who steps through a dungeon entrance has chosen to leave newcomer protection behind.
 
 **A dungeon stands where its theme belongs.**
-Its entrance is placed in the region of the map that matches its theme, as a world boss stands in its own territory.
+Its entrance is placed in the zone of the map that matches its theme, as a world boss stands in its own territory; see `WORLD_MAP.md`.
 
 **One wizard at a time.**
 The entrance seals itself by magic once a wizard steps through, and reopens when that wizard leaves or dies.
@@ -537,9 +537,9 @@ A wound in the world where something was erased, and the edges are still fraying
 
 ## Frostfang Caverns
 
-A glacial cave system whose entrance sits on an island in the middle of a lake.
+A glacial cave system whose entrance sits on an island: off the coast, or in the middle of a lake inside the glacier.
 **Winter's season-gated dungeon.**
-The island cannot be reached until winter freezes the lake hard enough to walk across.
+The island cannot be reached until winter freezes the way to it hard enough to walk across; the map makes room for it when the dungeon is drawn, see `WORLD_MAP.md`.
 Past the entrance there is no further gimmick beyond the season gate itself — the challenge is entirely in the enemy escalation across eight rooms, the longest combat dungeon on this list short of Cindermaw Forge.
 
 | Room                  | What is there                                          | Enemies                                                              | Notes                                                                   |
