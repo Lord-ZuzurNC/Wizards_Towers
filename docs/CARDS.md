@@ -4,6 +4,8 @@ How a wizard grows at each level-up: a choice between cards drawn from a deck th
 
 - [Cards — Wizards Towers](#cards--wizards-towers)
   - [How to read this document](#how-to-read-this-document)
+  - [Families](#families)
+  - [Rarity](#rarity)
   - [The level-up choice](#the-level-up-choice)
   - [Paying to change a choice](#paying-to-change-a-choice)
   - [The deck](#the-deck)
@@ -19,6 +21,33 @@ On top of that, they choose a **card**, and the card is where builds differ.
 A run is meant to reach about **level 30**, so a wizard makes roughly thirty choices over eight days, about one per hour of play.
 
 The card catalogue itself is not designed yet; this document sets the rules every card follows.
+
+## Families
+
+| Family      | What taking it grants                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| **Stat**    | A bonus to `health`, `power`, `magic_defence`, `speed` or `luck`.                        |
+| **Mana**    | A bonus to the mana pool, or to anything around mana: regeneration, a spell's cost.      |
+| **Rune**    | A rune, at the rarity the card rolled.                                                   |
+| **Weapon**  | A weapon of the wizard type's own kind.                                                  |
+| **Special** | Anything no other family covers; each Special card is unique, one copy per deck at most. |
+
+**Two Special cards are already designed.**
+
+- **Keepsake Wisp.** Taking it summons the Keepsake Wisp for the rest of the run: a spirit carrying nothing mechanical, which greets the wizard by the name of their previous life. See `SPIRITS_GUARDIANS.md`.
+- **A world boss summon.** It is never offered: when drawn, it is played on the spot, its world boss spawns, it leaves the run deck, and another card is drawn in its place. The wizard learns the boss is coming at the same moment as everyone around.
+
+## Rarity
+
+A card's rarity is rolled when it is drawn into a choice, so the same card can come up stronger one time and ordinary the next.
+
+| Rarity        | Chance | Strength        |
+| ------------- | -----: | --------------- |
+| **common**    |   85 % | as written      |
+| **rare**      |   10 % | 50 % stronger   |
+| **legendary** |    5 % | twice as strong |
+
+A Rune card grants its rune at the rolled rarity, which then scales as every rune does in `RUNES.md`.
 
 ## The level-up choice
 
@@ -70,13 +99,17 @@ Unlocked cards widen what a deck can hold; they are meant to add variety, not ra
 
 **Cards are unlocked with reincarnation points, once an achievement allows it.**
 Each unlockable card is tied to an achievement accomplished during a run; the achievement makes the card purchasable, and RP buy it.
+Achievements are catalogued in `ACHIEVEMENTS.md`.
 
-RP also unlock the other wizard types, and the weapons that may drop during a run; see `GLOSSARY.md`, talent.
+**Only the Sorcerer is open to everyone.**
+The Magus, the Arcanist and the Oracle each need an achievement, then RP, and only then can a player build their deck.
+RP also unlock the weapons that may drop during a run; see `GLOSSARY.md`, talent.
 
 ## Open questions
 
-- ⬜ **The card families.** Stat bonuses, mana pool bonuses, runes and weapons were named; the full list, and what share of a starter deck each takes, is open.
-- ⬜ **The starter deck of each wizard type.**
+- ⬜ **The catalogue: 150 to 200 cards**, enough for three or four truly different decks per wizard type, even if most players' decks will share a large common base.
+- ⬜ **The starter deck of each wizard type**, and what share of it each family takes.
+- ⬜ **How rarity applies to a Weapon card**, since every weapon already has a fixed rarity in `WEAPONS.md`.
+- ⬜ **The world boss summon:** which boss, and where it spawns.
 - ⬜ **The lock price**, see `FORMULAS.md`.
 - ⬜ **The achievements**, and which card each one allows.
-- ⬜ **Which wizard type is available without RP.**

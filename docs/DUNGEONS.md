@@ -94,7 +94,7 @@ The enemy tier scale is fixed across every document in the project:
 | **elite**    |    450 |    34 |            22 |   105 |    5 | Dangerous alone, lethal in a pair.        |
 | **champion** |    900 |    60 |            40 |   100 |    8 | The "strong enemy". Dungeon-end material. |
 
-A level-1 wizard with no talents is the baseline these numbers are measured against: health 100, power 10, mana pool 50, magic defence 10, speed 100, luck 5.
+A level-1 wizard with no talents is the baseline these numbers are measured against: health 100, power 10, mana pool 100, magic defence 10, speed 100, luck 5.
 
 ## Summary table
 
