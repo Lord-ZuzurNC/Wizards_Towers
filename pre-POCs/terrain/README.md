@@ -22,7 +22,13 @@ Can a biome mask be turned into terrain of 16-pixel tiles that reads well at the
 godot --headless --script terrain.gd -- ../map_mask/results/<sheet>.png <mask number 1-10> results
 ```
 
-Each run writes `views_<date-time>.png`, the views at ×2, `day_1080p_<date-time>.png` and `night_1080p_<date-time>.png`, the first view at ×3, and `run_<date-time>.txt`.
+With `full [step]` after the output folder, the whole map is drawn instead, keeping one world pixel out of every `step` on each axis, sprites shrunk the same way, with a black marker where the Monolith stands:
+
+```sh
+godot --headless --script terrain.gd -- ../map_mask/results/<sheet>.png 3 results full 8
+```
+
+Otherwise, each run writes `views_<date-time>.png`, the views at ×2, `day_1080p_<date-time>.png` and `night_1080p_<date-time>.png`, the first view at ×3, and `run_<date-time>.txt`.
 
 ## Results
 
@@ -34,6 +40,19 @@ Run on mask 1 of `sheet_2026-11-07-22-57-23.png`, with Godot 4.7.2 headless:
 | Pixels outside BLK NX64 | 0, day and night                                                                              |
 | Time for the whole run  | About 6 s                                                                                     |
 | Tiles on screen         | 40 × 22.5                                                                                     |
+
+Whole map, mask 3 of the same sheet:
+
+| Measure                 | 1/16                          | 1/8               |
+| ----------------------- | ----------------------------- | ----------------- |
+| Image                   | 2560 × 2560, one pixel a tile | 5120 × 5120       |
+| Decor sprites placed    | About 2.8 million             | About 2.8 million |
+| Pixels outside BLK NX64 | 0                             | 0                 |
+| Time                    | 24 s                          | 65 s              |
+| PNG                     | 2.8 MB                        | 11.1 MB           |
+
+At full scale the map is 40,960 pixels a side, about 7,300 screens of 640 × 360: too large for one image, hence the reduced versions.
+Shrinking by keeping one pixel out of 8 or 16 creates a fine moiré on textured ground and turns sprites into specks; neither happens in the game, which is drawn at full scale.
 
 ## Conclusions
 

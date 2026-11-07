@@ -1,5 +1,6 @@
 ## Pre-POC: turns one biome mask into terrain views of 16-pixel tiles, in the BLK NX64 palette.
-## Run: godot --headless --script terrain.gd -- <mask_sheet.png> <mask number 1-10> <output_dir>
+## Run: godot --headless --script terrain.gd -- <mask_sheet.png> <mask number 1-10> <output_dir> [full [step]]
+## With `full`, draws the whole map instead, keeping one pixel out of every `step` (8 by default) on each axis.
 ## Every tile and sprite is a placeholder drawn by code, only to judge scale, readability and the palette.
 extends SceneTree
 
@@ -44,12 +45,13 @@ var fine := FastNoiseLite.new()
 var patch := FastNoiseLite.new()
 var lava := FastNoiseLite.new()
 var sprites := {}
+var monolith_points := []
 
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() < 3:
-		printerr("usage: -- <mask_sheet.png> <mask number 1-10> <output_dir>")
+		printerr("usage: -- <mask_sheet.png> <mask number 1-10> <output_dir> [full [step]]")
 		quit(1)
 		return
 	for h in PAL_HEX.split(" "):
@@ -67,6 +69,10 @@ func _initialize() -> void:
 	lava.frequency = 0.05
 	lava.fractal_octaves = 2
 
+	if args.size() > 3 and args[3] == "full":
+		_full_map(n, args[0].get_file(), out_dir, int(args[4]) if args.size() > 4 else 8)
+		quit(0)
+		return
 	var stamp := Time.get_datetime_string_from_system().replace("T", "-").replace(":", "-")
 	var spots := _find_spots()
 	var sheet := Image.create_empty(2 * VIEW_W * 2 + 18, ceili(spots.size() / 2.0) * (VIEW_H * 2 + 6) + 6, false, Image.FORMAT_RGB8)
@@ -110,6 +116,8 @@ func _read_mask(path: String, n: int) -> void:
 		for x in MASK:
 			var hex := img.get_pixel(ox + x, oy + y).to_html(false)
 			mask[y * MASK + x] = MASK_COLORS.get(hex, PLAINS)
+			if hex == "000000":
+				monolith_points.append(Vector2(x, y))
 
 
 func _point(x: int, y: int) -> int:
@@ -158,6 +166,81 @@ func _find_spots() -> Dictionary:
 		if best_score > 3:
 			spots[name] = best * TILES_PER_POINT + Vector2i(5, 5)
 	return spots
+
+
+# ---------------------------------------------------------------- the whole map
+
+## The whole map as the views draw it, seen from far off: one world pixel out of every `step` on each axis,
+## sprites shrunk the same way. At 16 pixels a tile, the full map is 40,960 pixels a side.
+func _full_map(n: int, source: String, out_dir: String, step: int) -> void:
+	var t_start := Time.get_ticks_msec()
+	var world := MASK * TILES_PER_POINT * TILE
+	var size := world / step
+	var bio := PackedByteArray()
+	bio.resize(size * size)
+	for y in size:
+		for x in size:
+			bio[y * size + x] = _biome_at(x * step + step / 2, y * step + step / 2)
+	var img := Image.create_empty(size, size, false, Image.FORMAT_RGBA8)
+	for y in size:
+		for x in size:
+			img.set_pixel(x, y, _ground(bio[y * size + x], x * step + step / 2, y * step + step / 2, bio, size, size, x, y))
+	var tiles := world / TILE
+	var placed := 0
+	var small := {}
+	for ty in tiles:
+		for tx in tiles:
+			var cx := tx * TILE + 8
+			var cy := ty * TILE + 8
+			var b := bio[(cy / step) * size + cx / step]
+			var ok := true
+			for o: Vector2i in [Vector2i(-7, -7), Vector2i(7, 7), Vector2i(-7, 7), Vector2i(7, -7)]:
+				var px := clampi((cx + o.x) / step, 0, size - 1)
+				var py := clampi((cy + o.y) / step, 0, size - 1)
+				if bio[py * size + px] != b:
+					ok = false
+					break
+			if not ok:
+				continue
+			var key := _decor_for(b, tx, ty)
+			if key == "":
+				continue
+			if not small.has(key):
+				small[key] = _shrink(_sprite(key), step)
+			var spr: Image = small[key]
+			var rx := (cx + int(_hash(tx, ty, 7) * 8.0) - 4) / step
+			var ry := (cy + int(_hash(tx, ty, 8) * 6.0) - 3) / step
+			img.blend_rect(spr, Rect2i(Vector2i.ZERO, spr.get_size()), Vector2i(rx - spr.get_width() / 2, ry - spr.get_height() + 1))
+			placed += 1
+	# The Monolith's place, a marker only: its size is not decided yet.
+	var centre := Vector2.ZERO
+	for p: Vector2 in monolith_points:
+		centre += p
+	if not monolith_points.is_empty():
+		centre /= monolith_points.size()
+		var m := Vector2i((centre * TILES_PER_POINT * TILE / step).round())
+		var r := maxi(2, 96 / step)
+		for y in range(-3 * r, r + 1):
+			for x in range(-r, r + 1):
+				var edge := absi(x) == r or y == -3 * r or y == r
+				img.set_pixel(m.x + x, m.y + y, Color("ffffff") if edge else Color("000000"))
+	img.convert(Image.FORMAT_RGB8)
+	var stamp := Time.get_datetime_string_from_system().replace("T", "-").replace(":", "-")
+	img.save_png("%s/full_mask%d_step%d_%s.png" % [out_dir, n + 1, step, stamp])
+	print("mask %d of %s, whole map at 1/%d: %d x %d pixels, %d decor sprites, %.0f s" % [
+		n + 1, source, step, size, size, placed, (Time.get_ticks_msec() - t_start) / 1000.0])
+	print("written: full_mask%d_step%d_%s.png" % [n + 1, step, stamp])
+
+
+## A sprite seen from far off: one pixel out of every `step`, taken from the middle of each block.
+func _shrink(s: Image, step: int) -> Image:
+	var w := maxi(1, roundi(float(s.get_width()) / step))
+	var h := maxi(1, roundi(float(s.get_height()) / step))
+	var out := Image.create_empty(w, h, false, Image.FORMAT_RGBA8)
+	for y in h:
+		for x in w:
+			out.set_pixel(x, y, s.get_pixel(mini(x * step + step / 2, s.get_width() - 1), mini(y * step + step / 2, s.get_height() - 1)))
+	return out
 
 
 # ---------------------------------------------------------------- a view
