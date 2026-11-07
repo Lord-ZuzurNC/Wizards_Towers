@@ -33,6 +33,8 @@ Its Outer Ring stands entirely in the plains too.
 The queue screen shows a far minimap of the world; that minimap is the mask, so players know the shape of the land while they wait, and discover the real terrain once inside.
 
 Borders between zones are bent by noise, so no zone has a straight edge.
+No zone narrows to less than 8 mask points, 80 tiles, between two others: a narrower part joins the zones beside it.
+Only a sliver lying against the mountain chain, volcanic ground or the sea, with no other zone to join, is kept.
 
 ## Layers
 

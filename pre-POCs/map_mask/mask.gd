@@ -16,6 +16,7 @@ const SPINE_COLOR := Color("4a4a4a")
 const LAKE_COLOR := Color("8fd6ff")
 const ISLAND_COLOR := Color("f2e3b0")
 const RING_RADIUS := 12.5  # the Outer Ring, which must stand entirely in plains
+const MIN_HALF_WIDTH := 4  # a zone narrower than twice this, in mask points, is absorbed by its neighbours
 
 var monolith := Vector2(W / 2.0, H / 2.0)
 var grid := PackedByteArray()
@@ -113,9 +114,11 @@ func _generate(seed_value: int) -> String:
 		return "seed placement"
 	_voronoi(seeds)
 	_merge_crumbs(0.0)
+	_thin_out(MIN_HALF_WIDTH)
 	_paint_mountain()
 	if not _paint_volcanic():
 		return "no room for volcanic ground"
+	_thin_out(MIN_HALF_WIDTH)
 	_merge_crumbs(0.01)
 	var reason := _validate()
 	if reason == "":
@@ -271,6 +274,38 @@ func _merge_crumbs(share: float) -> void:
 					most = votes[b]; target = b
 			for i: int in comps[k]:
 				grid[i] = target
+
+
+## Minimum zone width: any part of a zone narrower than 2 × r mask points joins the zones beside it,
+## so no biome survives as a thin strip squeezed between two others.
+func _thin_out(r: int) -> void:
+	for biome in [PLAINS, FOREST, MARSH, GLACIER, DESERT]:
+		var depth := _distance_field(func(i: int) -> bool: return grid[i] != biome, r + 1)
+		var near_core := _distance_field(func(i: int) -> bool: return grid[i] == biome and depth[i] >= r, r + 1)
+		var thin := {}
+		for i in W * H:
+			if grid[i] == biome and near_core[i] > r and ring[i] == 0:
+				thin[i] = true
+		while not thin.is_empty():
+			var settled := []
+			for i: int in thin:
+				var votes := {}
+				for j in _neighbours(i):
+					var g := grid[j]
+					if not thin.has(j) and g != biome and g != NONE and g != MOUNTAIN and g != VOLCANIC and g != COAST:
+						votes[g] = votes.get(g, 0) + 1
+				if votes.is_empty():
+					continue
+				var best: int = votes.keys()[0]
+				for b: int in votes:
+					if votes[b] > votes[best]:
+						best = b
+				settled.append([i, best])
+			if settled.is_empty():
+				break  # what is left only touches the chain, the volcano or the sea: it stays
+			for pair: Array in settled:
+				grid[pair[0]] = pair[1]
+				thin.erase(pair[0])
 
 
 func _validate() -> String:

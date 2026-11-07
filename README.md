@@ -99,6 +99,7 @@ Discovering combinations is the game.
 - [`docs/CARDS.md`](docs/CARDS.md) — the level-up card choice and the decks players build between runs.
 - [`docs/ACHIEVEMENTS.md`](docs/ACHIEVEMENTS.md) — the feats that open talents to reincarnation points.
 - [`docs/WORLD_MAP.md`](docs/WORLD_MAP.md) — the biome mask a world's map is generated from.
+- [`docs/ART_DIRECTION.md`](docs/ART_DIRECTION.md) — view, scale, palettes and look every piece of art aims for.
 - [`pre-POCs/`](pre-POCs/) — throwaway technical experiments that settled a design choice, each with its results.
 
 The design question-and-answer document that drives all of this is kept private deliberately, and is not part of this repository.
