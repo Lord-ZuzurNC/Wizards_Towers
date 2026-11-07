@@ -49,7 +49,7 @@ At the end of the fight, each wizard who fought holds tickets in proportion to t
 
 | Reward  | Rule                                                                                    |
 | ------- | --------------------------------------------------------------------------------------- |
-| gold    | One pool per boss, split in proportion to tickets.                                      |
+| gold    | One pool per boss, sized in `FORMULAS.md`, split in proportion to tickets.              |
 | XP      | Split like gold.                                                                        |
 | runes   | Each boss has a rune pool; the three wizards holding the most tickets each receive one. |
 | stones  | A draw among the wizards who want the stone, see below.                                 |

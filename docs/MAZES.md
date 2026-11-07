@@ -44,6 +44,12 @@ A maze is instanced and safe from other wizards, exactly like a combat dungeon.
 Entering one **breaks a level-1 wizard's peace shield permanently**, the same as entering any dungeon, so a newcomer cannot farm mazes from behind invulnerability.
 That is a real cost for a level-1 wizard, and it is meant to be: a maze is a decision, not a freebie.
 
+**A maze is solved once, then gone.**
+Ten mazes are open at the start of each season.
+The first wizard to solve a maze takes its rewards, and it closes for good.
+When a new season begins, every solved maze is replaced by a new one, somewhere else on the map, with a new generated puzzle inside; an unsolved maze stays where it is.
+A shared solution is therefore worthless: no maze is ever solved twice.
+
 The three core examples: a pattern to get a door open, having the right rune so the wizard needs to find it, walking on an invisible path.
 Everything in section 3 elaborates on that list, built from this game's own systems rather than generic riddles.
 

@@ -55,8 +55,10 @@ A level-1 wizard who steps through a dungeon entrance has chosen to leave newcom
 The entrance seals itself by magic once a wizard steps through, and reopens when that wizard leaves or dies.
 Nothing stops another wizard from waiting at the entrance.
 
-**A completed dungeon empties.**
-The first wizard to complete a dungeon takes its rewards, and the dungeon then stays empty until the world ends; nobody can run it again.
+**Each wizard completes a dungeon once, and it rests for an hour.**
+A wizard can complete each dungeon only once per run, so at most 20 over the eight days.
+Once a wizard completes an ordinary dungeon, it stays closed to everyone for one hour, then reopens with its enemies and rewards restored for the wizards who have not completed it yet.
+A season-gated dungeon never reopens: the first completion closes it for the rest of the run.
 
 **A world draws twenty dungeons.**
 At generation, a world draws 20 distinct dungeons at random from this catalogue, so no two worlds offer the same run.
@@ -65,7 +67,7 @@ A season-gated dungeon is never guaranteed to be drawn; when it is, it opens at 
 
 **Season-gated dungeons.**
 Each season has at least one dungeon that exists only while that season lasts.
-The wizard who completes it receives a mana-stone and a life-stone, guaranteed.
+The first wizard to complete it receives a mana-stone and a life-stone, guaranteed, and the dungeon closes for the rest of the run.
 When its season ends, the dungeon closes on the spot; a wizard still inside is thrown out at the entrance and gets no completion reward.
 
 **A rest zone follows every third room.**
@@ -666,7 +668,6 @@ Moderate-to-good chance at a life-stone, reflecting that this is the hardest com
   Its max-alert case puts an extra veteran beside the Warlord, and the sign at the gate is the warning.
 - **The Hollow Crypts is easy on purpose.**
   It is the catch-up dungeon for a wizard behind in levels.
-  ⬜ Since a completed dungeon empties, a stronger wizard can clear it first and leave nothing to catch up with.
 - **Frostfang Caverns is eased by the rest zones.**
   A rest zone after its sixth room sits right before the two veteran Crevasse Wardens of the Frozen Court.
 - **Stone odds are low everywhere.**

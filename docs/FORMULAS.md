@@ -191,6 +191,16 @@ Source: `ENNEMIES.md`, Scaling across the four seasons.
 
 Enemies never grow with the run: no enemy gains anything for surviving a season.
 
+**Kill rewards.**
+
+```text
+xp(kill)   = health / 10
+gold(kill) = health / 20
+```
+
+Provisional: health is the one number every enemy already has, and it measures the effort a kill takes.
+A champion is worth 90 XP and 45 gold; a full dungeon, from 135 XP for The Hollow Crypts to 392 XP for The Sunken Abbey.
+
 ## World bosses
 
 **Season scaling.**
@@ -236,7 +246,17 @@ Each term is the wizard's share of the group's total, not a raw amount: a group 
 Standing in harm's way on purpose does earn tickets, and that is accepted: a hit one wizard takes is a hit another does not.
 Tickets add up across the run and feed the score, see below; a world boss grants no RP directly.
 
-⬜ The size of `gold_pool` and `xp_pool` per boss, set so a group of ten wizards ends the fight well rewarded.
+**Reward pools.**
+
+```text
+xp_pool   = health_at_death / 2
+gold_pool = health_at_death / 4
+```
+
+Provisional: five times the rate of an ordinary kill, the premium for a fight no wizard wins alone.
+`health_at_death` includes season scaling, so a boss left to grow pays more.
+In a group of ten, an average wizard takes about what a full mid-level dungeon gives, and the top contributor about twice that, plus a rune.
+The pool never grows with the number of wizards: a crowd shares the same pool, so wizards in a fight have reason to thin out their rivals before the boss dies.
 
 ## Dungeons
 
@@ -267,16 +287,32 @@ open(d)          = whole run           ordinary dungeon
 Source: `DUNGEONS.md`, What a dungeon is.
 The catalogue holds 30, so a world draws two dungeons in three.
 
-**A dungeon pays out once per world.**
-The first wizard to complete it takes its rewards, and the dungeon then stays empty until the world ends.
+**Completions and rest.**
 
 ```text
-completions per dungeon per world = 1
-season-gated dungeon : mana-stone and life-stone, guaranteed
+completions(wizard, dungeon) ≤ 1                       so at most 20 dungeons per wizard per run
+ordinary dungeon : closed to everyone for 1 h after each completion, then reopens for the others
+season-gated     : closed for the rest of the run after its first completion
+```
+
+**Mazes.**
+
+```text
+open mazes at the start of each season = 10
+completions(maze)                      = 1, then it closes for good
+at each new season                     : every solved maze is replaced elsewhere, with a new puzzle
+```
+
+At most 40 mazes are solved over a run, one wizard each.
+
+**Stones.**
+
+```text
+season-gated dungeon : mana-stone and life-stone, guaranteed to its single completer
 ordinary dungeon     : P(mana-stone) = 15 %, P(life-stone) = 8 %      proposed
 ```
 
-⬜ The ordinary stone chances: with one completion per dungeon, a whole world draws about 3 mana-stones and 1.6 life-stones from its ordinary dungeons.
+Every completion rolls, and since a wizard completes each dungeon once, a wizard doing all 20 expects about 3 mana-stones and 1.6 life-stones from dungeons.
 
 ## Economy
 
