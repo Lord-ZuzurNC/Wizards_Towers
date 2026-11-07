@@ -49,6 +49,7 @@ The wizard learns what it did at the same moment as everyone around.
 | Already in the world            | It gains one season step of growth for free, as if it had just survived a season boundary. |
 | Outside the seasons it lives in | Nothing; the card is replaced like any other summon.                                       |
 
+A player earns a boss's summon by landing the killing blow on it.
 Only bosses that cross seasons have a summon: the Tallyman, the Rootbound Colossus, the Breach-Warden, Fortune's Thief and the Nightfall Reaper.
 A season-locked boss has none, and neither does the Collector, whose meeting is an easter egg.
 
@@ -131,6 +132,5 @@ RP also unlock the weapons that may drop during a run; see `GLOSSARY.md`, talent
 
 - ⬜ **The catalogue: 150 to 200 cards**, enough for three or four truly different decks per wizard type, even if most players' decks will share a large common base.
 - ⬜ **The starter deck of each wizard type**, and what share of it each family takes.
-- ⬜ **How a world boss summon is earned:** by landing the killing blow on that boss, or otherwise.
 - ⬜ **The lock price**, see `FORMULAS.md`.
 - ⬜ **The achievements**, and which card each one allows.

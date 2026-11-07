@@ -20,6 +20,7 @@ It makes a talent purchasable, and RP buy it; see `CARDS.md` and `GLOSSARY.md`, 
 | The Magus, the Arcanist, the Oracle | An achievement, then RP.                        |
 | A weapon that may drop during runs  | RP.                                             |
 | A dungeon's or a maze's card        | Completing it for the first time; nothing else. |
+| A world boss summon                 | Landing the killing blow on that boss.          |
 
 The Sorcerer needs nothing: every player starts with it.
 

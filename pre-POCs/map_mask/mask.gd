@@ -1,5 +1,6 @@
 ## Pre-POC: generates world masks, one biome per zone, following docs/WORLD_MAP.md rules.
 ## Run: godot --headless --script mask.gd -- <output_dir> [first_seed] [count]
+## Writes sheet_<date-time>.png and run_<date-time>.txt, never overwriting an earlier result.
 extends SceneTree
 
 const W := 256
@@ -14,10 +15,12 @@ const COLORS := [
 const SPINE_COLOR := Color("4a4a4a")
 const LAKE_COLOR := Color("8fd6ff")
 const ISLAND_COLOR := Color("f2e3b0")
-var monolith := Vector2(W / 2.0, H / 2.0)  # drawn per mask inside the central box
+const RING_RADIUS := 12.5  # the Outer Ring, which must stand entirely in plains
 
+var monolith := Vector2(W / 2.0, H / 2.0)
 var grid := PackedByteArray()
 var spine := PackedByteArray()
+var ring := PackedByteArray()  # cells no overlay may cover: the Monolith and its Outer Ring
 var feature := PackedByteArray()  # 0 none, 1 Frostfang lake, 2 Frostfang island
 var rng := RandomNumberGenerator.new()
 var warp_x := FastNoiseLite.new()
@@ -37,6 +40,8 @@ func _initialize() -> void:
 	var first_seed := int(args[1]) if args.size() > 1 else 1
 	var count := int(args[2]) if args.size() > 2 else 10
 	DirAccess.make_dir_recursive_absolute(out_dir)
+	var stamp := Time.get_datetime_string_from_system().replace("T", "-").replace(":", "-")
+	var log_lines := PackedStringArray()
 
 	var sheet := Image.create_empty(5 * (W + 6) + 6, ceili(count / 5.0) * (H + 6) + 6, false, Image.FORMAT_RGB8)
 	sheet.fill(Color("202020"))
@@ -51,24 +56,28 @@ func _initialize() -> void:
 			if reason == "":
 				break
 			failures[reason] = failures.get(reason, 0) + 1
-			if attempt >= 200:
+			if attempt >= 300:
 				break
 		total_attempts += attempt
 		if reason != "":
-			printerr("mask %d: no valid mask in 200 attempts, last failure: %s" % [n + 1, reason])
+			log_lines.append("mask %02d  no valid mask in 300 attempts, last failure: %s" % [n + 1, reason])
 			continue
 		var img := _render()
-		var big := img.duplicate() as Image
-		big.resize(W * 2, H * 2, Image.INTERPOLATE_NEAREST)
-		big.save_png("%s/mask_%02d.png" % [out_dir, n + 1])
 		sheet.blit_rect(img, Rect2i(0, 0, W, H), Vector2i(6 + (n % 5) * (W + 6), 6 + (n / 5) * (H + 6)))
-		print("mask %02d  attempts %3d  %s  frostfang: %s" % [n + 1, attempt, _shares(), frostfang])
-	sheet.save_png(out_dir + "/sheet.png")
-	print("attempts in total: %d for %d masks; rejected because: %s" % [total_attempts, count, str(failures)])
+		log_lines.append("mask %02d  attempts %3d  %s  frostfang: %s" % [n + 1, attempt, _shares(), frostfang])
+	log_lines.append("attempts in total: %d for %d masks; rejected because: %s" % [total_attempts, count, str(failures)])
+	sheet.save_png("%s/sheet_%s.png" % [out_dir, stamp])
+	var f := FileAccess.open("%s/run_%s.txt" % [out_dir, stamp], FileAccess.WRITE)
+	f.store_string("\n".join(log_lines) + "\n")
+	f.close()
+	print("\n".join(log_lines))
+	print("written: sheet_%s.png, run_%s.txt" % [stamp, stamp])
 	quit(0)
 
 
 # ---------------------------------------------------------------- generation
+# Layers, from the top down: volcanic > mountain > desert > glacier > marsh > forest > plains > coast.
+# The zones are laid first, then the mountain chain over them, then the volcanic ground over everything.
 
 func _generate(seed_value: int) -> String:
 	rng.seed = seed_value
@@ -82,28 +91,39 @@ func _generate(seed_value: int) -> String:
 	grid.fill(NONE)
 	spine.resize(W * H)
 	spine.fill(0)
+	ring.resize(W * H)
+	ring.fill(0)
 	feature.resize(W * H)
 	feature.fill(0)
 	frostfang = "not drawn"
 
 	# The Monolith stands anywhere within ±10 % of the centre, its Outer Ring entirely in plains.
 	monolith = Vector2(rng.randf_range(0.4, 0.6) * W, rng.randf_range(0.4, 0.6) * H)
-	_stamp(monolith, 16.0, PLAINS)
+	for y in range(int(monolith.y) - 17, int(monolith.y) + 18):
+		for x in range(int(monolith.x) - 17, int(monolith.x) + 18):
+			var d := Vector2(x, y).distance_to(monolith)
+			if d <= 16.0:
+				grid[y * W + x] = PLAINS
+			if d <= RING_RADIUS + 3.0:
+				ring[y * W + x] = 1
+
 	_paint_coast()
-	_paint_mountain()
-	_paint_volcanic()
-	var volcano_distance := _distance_field(func(i: int) -> bool: return grid[i] == VOLCANIC, 80)
-	var seeds := _place_seeds(volcano_distance)
+	var seeds := _place_seeds()
 	if seeds.is_empty():
 		return "seed placement"
-	_voronoi(seeds, volcano_distance)
-	_cleanup()
+	_voronoi(seeds)
+	_merge_crumbs(0.0)
+	_paint_mountain()
+	if not _paint_volcanic():
+		return "no room for volcanic ground"
+	_merge_crumbs(0.01)
 	var reason := _validate()
 	if reason == "":
 		_place_frostfang()
 	return reason
 
 
+## The coast is the sea along one map edge: the bottom layer, and never walkable.
 func _paint_coast() -> void:
 	coast_edge = rng.randi_range(0, 3)
 	var t0 := rng.randf_range(0.0, 0.35)
@@ -129,6 +149,50 @@ func _paint_coast() -> void:
 				grid[y * W + x] = COAST
 
 
+func _place_seeds() -> Dictionary:
+	var free := func(p: Vector2) -> bool: return grid[int(p.y) * W + int(p.x)] == NONE
+	var forest := _random_point(45.0, 20.0, func(p: Vector2) -> bool:
+		return free.call(p) and p.distance_to(monolith) <= 95.0)
+	if forest.x < 0:
+		return {}
+	var marsh := _random_point(70.0, 20.0, func(p: Vector2) -> bool:
+		var d := p.distance_to(forest)
+		return free.call(p) and d >= 45.0 and d <= 75.0 and p.distance_to(monolith) > forest.distance_to(monolith))
+	if marsh.x < 0:
+		return {}
+	var glacier := _random_point(60.0, 20.0, func(p: Vector2) -> bool:
+		return free.call(p) and p.distance_to(forest) >= 60.0 and p.distance_to(marsh) >= 50.0)
+	if glacier.x < 0:
+		return {}
+	var desert := _random_point(60.0, 20.0, func(p: Vector2) -> bool:
+		return free.call(p) and p.distance_to(forest) >= 60.0 \
+			and p.distance_to(marsh) >= 60.0 and p.distance_to(glacier) >= 60.0)
+	if desert.x < 0:
+		return {}
+	return {PLAINS: monolith, FOREST: forest, MARSH: marsh, GLACIER: glacier, DESERT: desert}
+
+
+func _voronoi(seeds: Dictionary) -> void:
+	var weight := {PLAINS: 2.0, FOREST: 1.0, MARSH: 0.9, GLACIER: 1.0, DESERT: 1.0}
+	for y in H:
+		for x in W:
+			var i := y * W + x
+			if grid[i] != NONE:
+				continue
+			# Two scales of warping: broad bends, then a finer ragged edge.
+			var q := Vector2(x, y) + Vector2(warp_x.get_noise_2d(x, y), warp_y.get_noise_2d(x, y)) * 34.0
+			q += Vector2(warp_x.get_noise_2d(x * 4.0 + 500.0, y * 4.0), warp_y.get_noise_2d(x * 4.0, y * 4.0 + 500.0)) * 7.0
+			var best := PLAINS
+			var best_score := INF
+			for biome: int in seeds:
+				var score: float = q.distance_to(seeds[biome]) / weight[biome]
+				if score < best_score:
+					best_score = score
+					best = biome
+			grid[i] = best
+
+
+## The chain covers every zone, the coast included, but never the Monolith's ring.
 func _paint_mountain() -> void:
 	var start := Vector2.ZERO
 	var angle := 0.0
@@ -151,89 +215,55 @@ func _paint_mountain() -> void:
 	else:
 		start = _random_point(60.0, 30.0, func(_p: Vector2) -> bool: return true)
 		angle = rng.randf_range(-PI, PI)
-	_walk(start, angle, rng.randf_range(0.55, 0.8) * W, 8.0, 0.10, MOUNTAIN, 2.5, 30.0, allowed_edge)
+	_walk(start, angle, rng.randf_range(0.55, 0.8) * W, 8.0, 0.10, MOUNTAIN, 2.5, allowed_edge, PackedInt32Array())
 
 
-func _paint_volcanic() -> void:
+## Volcanic ground is the top layer: it cuts through the chain, but keeps away from forest and glacier.
+func _paint_volcanic() -> bool:
+	var away := _distance_field(func(i: int) -> bool: return grid[i] == FOREST or grid[i] == GLACIER, 80)
 	var mode := rng.randi_range(0, 2)  # 0 volcano, 1 rift, 2 both
 	if mode != 1:
-		var c := _random_point(55.0, 30.0, func(p: Vector2) -> bool: return grid[int(p.y) * W + int(p.x)] == NONE)
 		var r := rng.randf_range(16.0, 24.0)
+		var c := _random_point(55.0, 30.0, func(p: Vector2) -> bool:
+			var i := int(p.y) * W + int(p.x)
+			return grid[i] != COAST and away[i] >= int(r * 1.3) + 4)
+		if c.x < 0:
+			return false
 		for y in range(maxi(0, int(c.y - r * 1.4)), mini(H, int(c.y + r * 1.4) + 1)):
 			for x in range(maxi(0, int(c.x - r * 1.4)), mini(W, int(c.x + r * 1.4) + 1)):
 				var i := y * W + x
-				if grid[i] == NONE and Vector2(x, y).distance_to(c) <= r * (1.0 + 0.25 * edge_noise.get_noise_2d(x * 2, y * 2)):
+				if ring[i] == 0 and grid[i] != COAST \
+						and Vector2(x, y).distance_to(c) <= r * (1.0 + 0.25 * edge_noise.get_noise_2d(x * 2, y * 2)):
 					grid[i] = VOLCANIC
+					spine[i] = 0
 	if mode != 0:
-		var s := _random_point(50.0, 30.0, func(p: Vector2) -> bool: return grid[int(p.y) * W + int(p.x)] == NONE)
-		_walk(s, rng.randf_range(-PI, PI), rng.randf_range(0.35, 0.5) * W, 5.0, 0.3, VOLCANIC, 0.0, 35.0, -1)
+		var s := _random_point(50.0, 30.0, func(p: Vector2) -> bool:
+			var i := int(p.y) * W + int(p.x)
+			return grid[i] != COAST and away[i] >= 14)
+		if s.x < 0:
+			return false
+		_walk(s, rng.randf_range(-PI, PI), rng.randf_range(0.35, 0.5) * W, 5.0, 0.3, VOLCANIC, 0.0, -1, away)
+	return true
 
 
-func _place_seeds(volcano_distance: PackedInt32Array) -> Dictionary:
-	var vd := func(p: Vector2) -> int: return volcano_distance[int(p.y) * W + int(p.x)]
-	var forest := _random_point(45.0, 20.0, func(p: Vector2) -> bool:
-		return grid[int(p.y) * W + int(p.x)] == NONE and vd.call(p) >= 35 and p.distance_to(monolith) <= 95.0)
-	if forest.x < 0:
-		return {}
-	var marsh := _random_point(70.0, 20.0, func(p: Vector2) -> bool:
-		var d := p.distance_to(forest)
-		return grid[int(p.y) * W + int(p.x)] == NONE and d >= 45.0 and d <= 75.0 \
-			and p.distance_to(monolith) > forest.distance_to(monolith) and vd.call(p) >= 10)
-	if marsh.x < 0:
-		return {}
-	var glacier := _random_point(60.0, 20.0, func(p: Vector2) -> bool:
-		return grid[int(p.y) * W + int(p.x)] == NONE and vd.call(p) >= 70 \
-			and p.distance_to(forest) >= 60.0 and p.distance_to(marsh) >= 50.0)
-	if glacier.x < 0:
-		return {}
-	var desert := _random_point(60.0, 20.0, func(p: Vector2) -> bool:
-		return grid[int(p.y) * W + int(p.x)] == NONE and p.distance_to(forest) >= 60.0 \
-			and p.distance_to(marsh) >= 60.0 and p.distance_to(glacier) >= 60.0)
-	if desert.x < 0:
-		return {}
-	return {PLAINS: [monolith], FOREST: [forest], MARSH: [marsh], GLACIER: [glacier], DESERT: [desert]}
-
-
-func _voronoi(seeds: Dictionary, volcano_distance: PackedInt32Array) -> void:
-	var weight := {PLAINS: 2.0, FOREST: 1.0, MARSH: 0.9, GLACIER: 1.0, DESERT: 1.0}
-	for y in H:
-		for x in W:
-			var i := y * W + x
-			if grid[i] != NONE:
-				continue
-			# Two scales of warping: broad bends, then a finer ragged edge.
-			var q := Vector2(x, y) + Vector2(warp_x.get_noise_2d(x, y), warp_y.get_noise_2d(x, y)) * 34.0
-			q += Vector2(warp_x.get_noise_2d(x * 4.0 + 500.0, y * 4.0), warp_y.get_noise_2d(x * 4.0, y * 4.0 + 500.0)) * 7.0
-			var best := PLAINS
-			var best_score := INF
-			for biome: int in seeds:
-				if volcano_distance[i] < 6 and (biome == FOREST or biome == GLACIER):
-					continue  # forest and glacier never touch volcanic ground
-				for s: Vector2 in seeds[biome]:
-					var score: float = q.distance_to(s) / weight[biome]
-					if score < best_score:
-						best_score = score
-						best = biome
-			grid[i] = best
-
-
-## Keeps one zone per biome: any stray fragment joins the biome around it.
-func _cleanup() -> void:
+## Fragments smaller than `share` of the map join the zone around them; with 0, every fragment but the largest.
+func _merge_crumbs(share: float) -> void:
 	for biome in [PLAINS, FOREST, MARSH, GLACIER, DESERT, COAST]:
 		var comps := _components(biome)
 		if comps.size() < 2:
 			continue
-		comps.sort_custom(func(a: Array, b: Array) -> bool: return a.size() > b.size())
-		var joined := _plains_side_of_chain() if biome == PLAINS else PackedByteArray()
+		comps.sort_custom(func(a: PackedInt32Array, b: PackedInt32Array) -> bool: return a.size() > b.size())
 		for k in range(1, comps.size()):
-			# Plains cut by the mountain chain stay plains: a piece is kept when only the chain separates it.
-			if biome == PLAINS and comps[k].size() >= W * H * 0.01 and joined[comps[k][0]] == 1:
+			if share > 0.0 and comps[k].size() >= W * H * share:
 				continue
 			var votes := {}
 			for i: int in comps[k]:
 				for j in _neighbours(i):
-					if grid[j] != biome and grid[j] != NONE and grid[j] != MOUNTAIN and grid[j] != VOLCANIC and grid[j] != COAST:
-						votes[grid[j]] = votes.get(grid[j], 0) + 1
+					var g := grid[j]
+					if g != biome and g != NONE and g != MOUNTAIN and g != VOLCANIC and g != COAST:
+						votes[g] = votes.get(g, 0) + 1
+			if votes.is_empty():
+				continue
 			var target: int = biome
 			var most := -1
 			for b: int in votes:
@@ -276,18 +306,15 @@ func _validate() -> String:
 	for b in [FOREST, MARSH, GLACIER, DESERT]:
 		if _components(b).size() != 1:
 			return NAMES[b] + " split in two"
-	var joined := _plains_side_of_chain()
-	for i in W * H:
-		if grid[i] == PLAINS and joined[i] == 0:
-			return "plains in two zones"
 	for y in range(int(monolith.y) - 13, int(monolith.y) + 14):
 		for x in range(int(monolith.x) - 13, int(monolith.x) + 14):
-			if Vector2(x, y).distance_to(monolith) <= 12.5 and grid[y * W + x] != PLAINS:
+			if Vector2(x, y).distance_to(monolith) <= RING_RADIUS and grid[y * W + x] != PLAINS:
 				return "Outer Ring not in plains"
-	# Everything walkable must be reachable from the Monolith: only the mountain spine blocks.
+	# All walkable ground, every plains piece included, must be reachable on foot from the Monolith.
+	# The sea and the mountain spine are the only things that cannot be walked.
 	var reach := _distance_field(func(i: int) -> bool: return i == int(monolith.y) * W + int(monolith.x), 100000, true)
 	for i in W * H:
-		if spine[i] == 0 and reach[i] >= 100000:
+		if _walkable(i) and reach[i] >= 100000:
 			return "unreachable ground"
 	return ""
 
@@ -322,18 +349,19 @@ func _place_frostfang() -> void:
 
 # ---------------------------------------------------------------- helpers
 
+## A brush walking a wandering line. With `avoid`, it turns away from cells closer than its width to a source.
 func _walk(start: Vector2, angle: float, length: float, base_w: float, wiggle: float,
-		biome: int, spine_r: float, avoid_center: float, allowed_edge: int) -> void:
+		biome: int, spine_r: float, allowed_edge: int, avoid: PackedInt32Array) -> void:
 	var p := start
 	var a := angle
 	var travelled := 0.0
 	while travelled < length:
 		var w := base_w * (1.0 + 0.3 * edge_noise.get_noise_2d(p.x * 3, p.y * 3))
-		_stamp(p, w, biome, spine_r)
+		_brush(p, w, biome, spine_r)
 		a += rng.randfn(0.0, wiggle)
-		var away := p - monolith
-		if away.length() < avoid_center + w + 8.0:
-			a = lerp_angle(a, away.angle(), 0.35)
+		var off := p - monolith
+		if off.length() < 30.0 + w + 8.0:
+			a = lerp_angle(a, off.angle(), 0.35)
 		var push := Vector2.ZERO
 		var margin := 18.0
 		if p.x < margin and allowed_edge != 3: push.x += 1
@@ -342,30 +370,50 @@ func _walk(start: Vector2, angle: float, length: float, base_w: float, wiggle: f
 		if p.y > H - 1 - margin and allowed_edge != 2: push.y -= 1
 		if push != Vector2.ZERO:
 			a = lerp_angle(a, push.angle(), 0.5)
+		if not avoid.is_empty():
+			var best_a := a
+			var best_d := -1
+			for turn: float in [0.0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6]:
+				var ahead := p + Vector2.from_angle(a + turn) * (w + 8.0)
+				var ai := clampi(int(ahead.y), 0, H - 1) * W + clampi(int(ahead.x), 0, W - 1)
+				if avoid[ai] > best_d + 2:
+					best_d = avoid[ai]
+					best_a = a + turn
+			a = best_a
+			if best_d < int(w) + 3:
+				return  # cornered: the rift stops rather than reach a forest or a glacier
 		p += Vector2.from_angle(a) * 2.0
 		travelled += 2.0
 
 
-func _stamp(c: Vector2, r: float, biome: int, spine_r := 0.0) -> void:
+## Paints over whatever lies below, the ring always excepted and the sea excepted for volcanic ground.
+func _brush(c: Vector2, r: float, biome: int, spine_r := 0.0) -> void:
 	for y in range(maxi(0, int(c.y - r) - 1), mini(H, int(c.y + r) + 2)):
 		for x in range(maxi(0, int(c.x - r) - 1), mini(W, int(c.x + r) + 2)):
 			var i := y * W + x
 			var d := Vector2(x, y).distance_to(c)
-			if d <= r and grid[i] == NONE:
-				grid[i] = biome
-			if spine_r > 0.0 and d <= spine_r and grid[i] == biome:
-				spine[i] = 1
+			if d > r or ring[i] == 1:
+				continue
+			if biome == VOLCANIC and grid[i] == COAST:
+				continue
+			var keep_spine := biome == MOUNTAIN and grid[i] == MOUNTAIN and spine[i] == 1
+			grid[i] = biome
+			spine[i] = 1 if keep_spine or (biome == MOUNTAIN and d <= spine_r) else 0
 
 
-func _random_point(min_center: float, margin: float, ok: Callable) -> Vector2:
+func _walkable(i: int) -> bool:
+	return grid[i] != COAST and spine[i] == 0
+
+
+func _random_point(min_monolith: float, margin: float, ok: Callable) -> Vector2:
 	for _t in 600:
 		var p := Vector2(rng.randf_range(margin, W - 1 - margin), rng.randf_range(margin, H - 1 - margin))
-		if p.distance_to(monolith) >= min_center and ok.call(p):
+		if p.distance_to(monolith) >= min_monolith and ok.call(p):
 			return p
 	return Vector2(-1, -1)
 
 
-## Breadth-first distance from every cell matching `source`, capped. With `walk`, the spine blocks.
+## Breadth-first distance from every cell matching `source`, capped. With `walk`, only walkable cells are crossed.
 func _distance_field(source: Callable, cap: int, walk := false) -> PackedInt32Array:
 	var dist := PackedInt32Array()
 	dist.resize(W * H)
@@ -382,7 +430,7 @@ func _distance_field(source: Callable, cap: int, walk := false) -> PackedInt32Ar
 		if dist[i] + 1 >= cap:
 			continue
 		for j in _neighbours(i):
-			if dist[j] > dist[i] + 1 and not (walk and spine[j] == 1):
+			if dist[j] > dist[i] + 1 and not (walk and not _walkable(j)):
 				dist[j] = dist[i] + 1
 				queue.append(j)
 	return dist
@@ -406,23 +454,6 @@ func _components(biome: int) -> Array:
 			head += 1
 		comps.append(comp)
 	return comps
-
-
-## Cells joined to the Monolith through plains and mountain only: plains split by the chain count as one zone.
-func _plains_side_of_chain() -> PackedByteArray:
-	var out := PackedByteArray()
-	out.resize(W * H)
-	var start := int(monolith.y) * W + int(monolith.x)
-	var queue := PackedInt32Array([start])
-	out[start] = 1
-	var head := 0
-	while head < queue.size():
-		for j in _neighbours(queue[head]):
-			if out[j] == 0 and (grid[j] == PLAINS or grid[j] == MOUNTAIN):
-				out[j] = 1
-				queue.append(j)
-		head += 1
-	return out
 
 
 func _neighbours(i: int) -> PackedInt32Array:
@@ -458,9 +489,9 @@ func _shares() -> String:
 	var parts := PackedStringArray()
 	for b in 8:
 		parts.append("%s %d%%" % [NAMES[b], roundi(100.0 * counts[b] / (W * H))])
+	var pieces := _components(PLAINS).size()
 	return ", ".join(parts) + "  (plains in %d piece%s, Monolith at %d %%, %d %%)" % [
-		_components(PLAINS).size(), "" if _components(PLAINS).size() == 1 else "s",
-		roundi(100.0 * monolith.x / W), roundi(100.0 * monolith.y / H)]
+		pieces, "" if pieces == 1 else "s", roundi(100.0 * monolith.x / W), roundi(100.0 * monolith.y / H)]
 
 
 func _render() -> Image:
