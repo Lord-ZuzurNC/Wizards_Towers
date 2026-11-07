@@ -304,6 +304,14 @@ open(d)          = whole run           ordinary dungeon
 Source: `DUNGEONS.md`, What a dungeon is.
 The catalogue holds 30, so a world draws two dungeons in three.
 
+```text
+votes(d) = 1 + dungeon cards for d in the decks of every wizard in the world's queue
+P(d)     ∝ votes(d), drawn without replacement until 20 are drawn
+```
+
+The same vote applies to mazes, with maze cards, each time a season replaces its solved mazes.
+Source: `CARDS.md`, Special cards.
+
 **Completions and rest.**
 
 ```text
