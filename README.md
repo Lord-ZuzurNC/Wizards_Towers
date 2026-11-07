@@ -64,7 +64,8 @@ If nobody does, the world ends anyway when winter does.
 
 Death is permanent, and almost everything is lost with it — villages, towers, floors, gold, runes, spells.
 What survives is **Reincarnation Points**, converted from your run's score when you die or the world ends, and spent between runs on **Talents**:
-new cards for your decks, other kinds of wizard, and weapons that may then drop in your next worlds.
+new cards for your decks, the three other kinds of wizard, and weapons that may then drop in your next worlds.
+Everyone starts as a **Sorcerer**; the other kinds are earned through achievements.
 
 Each time you level up, you choose one of three **cards** drawn from a deck of fifty you built before the run, one deck per kind of wizard.
 Everyone starts with the same decks: what you unlock widens your choices, it does not make you stronger than a newcomer.
@@ -96,6 +97,7 @@ Discovering combinations is the game.
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — the project's vocabulary, and the contract between the design documents and the identifiers in the code.
 - [`docs/FORMULAS.md`](docs/FORMULAS.md) — every number the game computes rather than authors, written once.
 - [`docs/CARDS.md`](docs/CARDS.md) — the level-up card choice and the decks players build between runs.
+- [`docs/ACHIEVEMENTS.md`](docs/ACHIEVEMENTS.md) — the feats that open talents to reincarnation points.
 - [`pre-POCs/`](pre-POCs/) — throwaway technical experiments that settled a design choice, each with its results.
 
 The design question-and-answer document that drives all of this is kept private deliberately, and is not part of this repository.
