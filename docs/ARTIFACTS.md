@@ -276,6 +276,5 @@ An Artifact weighs what the rune it builds on weighs, plus its band, plus at mos
 | Judgment | -1 when the effect only applies against one kind of target, +1 when it lasts or reaches unusually far. |
 
 The values will move once a fight can be measured; what they fix now is the ratio between Artifacts.
-As for any rune, the value given is the common-rarity weight, and rarity multiplies it.
-⬜ How an Artifact receives its rarity is not stated anywhere, and band and rarity may be one ladder too many.
+An Artifact has no rarity, only its band, so its weight is never multiplied.
 

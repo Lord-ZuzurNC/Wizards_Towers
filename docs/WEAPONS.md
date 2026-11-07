@@ -41,7 +41,7 @@ The type is chosen at reincarnation and fixed for the whole run.
 
 ## How to read this document
 
-Every weapon lists a `Rarity` of common, rare or legendary — **the same single scale runes and Artifacts use**, not a parallel ladder borrowing the same three words.
+Every weapon lists a `Rarity` of common, rare or legendary — **the same single scale runes use**, not a parallel ladder borrowing the same three words.
 `Stat bonuses` always lists the six stats in the fixed order health, power, mana pool, magic defence, speed, luck, and omits any stat a weapon does not touch.
 A bonus is additive to the base stat and small: +3 to +15 for common and rare weapons, a little higher for legendary weapons.
 Every legendary carries a real drawback, shown as a negative number in the same column.

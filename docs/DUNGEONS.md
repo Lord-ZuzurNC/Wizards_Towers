@@ -29,7 +29,7 @@
 
 This is a content list, not an implementation spec.
 Every dungeon below is a self-contained combat encounter: a short identity paragraph, a room-by-room table, and a line on what completion drops.
-The summary table lets a designer scan all eighteen entries before drilling into one.
+The summary table lets a designer scan all thirty entries before drilling into one.
 Room tables use four fixed columns — **Room**, **What is there**, **Enemies**, **Notes** — so every dungeon reads the same way regardless of theme.
 Enemy entries always carry a tier from the shared tier scale below, and an attack type of either `melee` or `magic`, per the project's single `power` stat convention.
 Where an enemy's numbers deviate from its tier by more than a token amount, the Notes column says why, capped at the ±25 % allowed by the tier scale.
@@ -39,7 +39,7 @@ The puzzle variant, the maze, is documented elsewhere and is not repeated here.
 
 A naming note worth flagging up front: the theme **ruined wizard tower** is flavour only.
 It does not refer to the mechanical `Tower` entity that a village builds for mana income, and it is never the Monolith.
-Two dungeons below use this theme and their in-fiction name is simply "a tower that used to belong to a wizard," nothing more.
+Three dungeons below use this theme and their in-fiction name is simply "a tower that used to belong to a wizard," nothing more.
 No code or UI string ever shortens such a dungeon's name to "the tower".
 
 ## What a dungeon is
@@ -94,24 +94,67 @@ A level-1 wizard with no talents is the baseline these numbers are measured agai
 
 | Name                  | Rooms | Recommended level | Theme               | Final enemy                          | Season      |
 | --------------------- | ----: | ----------------- | ------------------- | ------------------------------------ | ----------- |
+| The Mudlark Sewers    |     4 | 1 – 3             | Sewers              | The Sludge Matriarch (champion)      | Any         |
+| The Millrace          |     5 | 1 – 3             | Goblin mill         | The Wheelboss (champion)             | Any         |
 | The Hollow Crypts     |     4 | 2 – 4             | Crypts              | Crypt Warden (champion)              | Any         |
 | Ashfall Bandit Hold   |     5 | 3 – 5             | Bandit fort         | The Pass Reaver (champion)           | Any         |
+| Gnashtooth Warren     |     5 | 3 – 5             | Goblin warren       | Gnashtooth the Trapper (champion)    | Any         |
 | Thistlewake Grove     |     5 | 4 – 6             | Fae grove           | Grove Matriarch (champion)           | Any         |
 | Bramblefang Warren    |     6 | 4 – 7             | Beast warren        | Alpha Direwolf (champion)            | Any         |
 | The Drowned Shaft     |     6 | 5 – 8             | Flooded mines       | The Drowned Colossus (champion)      | Any         |
 | Rustbelly Hive        |     5 | 5 – 8             | Beast warren        | Hive Queen (champion)                | Any         |
 | Mournwillow Fen       |     6 | 6 – 9             | Fae grove           | The Willow Widow (champion)          | Any         |
 | Cinder Rift           |     6 | 6 – 9             | Elemental rift      | The Ember Hunter (champion)          | Any         |
+| The Clockwork Vault   |     6 | 6 – 9             | Construct vault     | The Vault Mainspring (champion)      | Any         |
 | Blackroot Bandit Fort |     7 | 7 – 10            | Bandit fort         | Bandit Warlord (champion)            | Any         |
 | Skyreach Spire        |     7 | 7 – 10            | Ruined wizard tower | The Unbound Archmage (champion)      | Any         |
+| Redtusk Warcamp       |     7 | 7 – 10            | Orc warcamp         | Warchief Redtusk (champion)          | Any         |
 | Suncoil Ruins         |     6 | 8 – 11            | Ruined wizard tower | The Arc Warden (champion)            | Any         |
 | The Gilded Hoard      |     7 | 8 – 11            | Crypts              | The Hoardwarden (champion)           | Any         |
 | The Silt Cisterns     |     5 | 9 – 12            | Flooded mines       | The Silt Behemoth (champion)         | Any         |
+| The Weeping Ossuary   |     6 | 9 – 12            | Ossuary             | The Ossuary Keeper (champion)        | Any         |
+| The Glass Observatory |     6 | 10 – 13           | Ruined wizard tower | The Starglass Magus (champion)       | Any         |
+| The Mirror Court      |     6 | 11 – 14           | Fae court           | The Mirrored Queen (champion)        | Any         |
+| The Sunken Abbey      |     7 | 12 – 15           | Flooded abbey       | The Drowned Abbess (champion)        | Any         |
+| The Void Scar         |     6 | 13 – 16           | Elemental rift      | The Unmade Heart (champion)          | Any         |
 | Frostfang Caverns     |     8 | 10 – 13           | Elemental rift      | The Frost Sovereign (champion)       | Winter only |
 | The Thawroot Burrow   |     5 | 3 – 6             | Root burrow         | The Rootmother (champion)            | Spring only |
+| The Meltwater Grotto  |     5 | 5 – 8             | Ice grotto          | The Thaw Leviathan (champion)        | Spring only |
 | The Sunheart Bloom    |     6 | 6 – 9             | Giant flower        | The Heartseed Warden (champion)      | Summer only |
+| The Wasp Cathedral    |     6 | 9 – 12            | Giant nest          | The Paper Matriarch (champion)       | Summer only |
 | Vespergrave           |     6 | 8 – 11            | Haunted graveyard   | The Lantern Keeper (champion)        | Autumn only |
 | Cindermaw Forge       |     9 | 11 – 14           | Elemental rift      | The Cindermaw Triumvirate (3 elites) | Any         |
+
+## The Mudlark Sewers
+
+The drains under the oldest village of the map, and the first dungeon a brand-new wizard can survive.
+**Gimmick — the water rises:** from the third room on, the water is knee-high, and everything except the rats moves at reduced `speed`.
+
+| Room              | What is there                                  | Enemies                                                         | Notes                                                                     |
+| ----------------- | ---------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Outflow grate     | A rusted grate over a trickle of filthy water. | 3× Sewer Rats (critter, melee)                                  | Teaches the room-clear loop.                                              |
+| The junction      | Four tunnels meeting over a sluice.            | 4× Sewer Rats (critter, melee), 1× Drain Lurker (common, melee) | The Lurker waits submerged until the first rat falls.                     |
+| Flooded cistern   | A vaulted cistern, the water now knee-high.    | 2× Drain Lurkers (common, melee)                                | The water slows the wizard and the Lurkers alike.                         |
+| The sludge throne | A mound of refuse under a broken drain.        | The Sludge Matriarch (champion, melee)                          | health and power −25 %, reason: the entry-level dungeon of the catalogue. |
+
+**Drops:** experience, gold and common runes scaled to level 1 – 3, and a flat reincarnation point award.
+No stone chance: the first dungeon of a run must not decide who unlocks a Grimoire position first.
+
+## The Millrace
+
+A watermill a goblin band took over, still turning, still grinding something.
+**Gimmick — the wheel turns:** each time a wizard enters, rooms two to four come in a new order, so no two visits play alike.
+
+| Room           | What is there                                  | Enemies                                                               | Notes                                                                |
+| -------------- | ---------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Sluice gate    | A gate jammed with driftwood.                  | 2× Goblin Sneaks (critter, melee)                                     | Standard opener; always first.                                       |
+| Grain loft     | Sacks stacked high, flour hanging in the air.  | 3× Goblin Sneaks (critter, melee), 1× Goblin Slinger (common, magic)  | The flour hides the Slinger until it throws.                         |
+| The gear pit   | Wooden gears turning in the floor.             | 2× Goblin Bruisers (common, melee)                                    | Standing on a gear carries anyone slowly round the room.             |
+| Millstone hall | Two great stones grinding against each other.  | 1× Goblin Bruiser (common, melee), 2× Goblin Slingers (common, magic) | The Slingers keep the stones between them and the wizard.            |
+| The wheelhouse | The axle of the great wheel, spray everywhere. | The Wheelboss (champion, melee)                                       | health and power −25 %, reason: an entry-level dungeon; always last. |
+
+**Drops:** experience, gold and common runes scaled to level 1 – 3, and a flat reincarnation point award.
+No stone chance, for the same reason as The Mudlark Sewers.
 
 ## The Hollow Crypts
 
@@ -145,6 +188,21 @@ Carried gold is irrelevant here — that pressure belongs to The Gilded Hoard, n
 | Captain's hall        | A long table, a banner of a torn standard. | The Pass Reaver (champion, melee)                                 | No reinforcements, no gimmick — a clean final fight.             |
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 3 – 5, a flat reincarnation point award, and a small-to-moderate chance at a mana-stone.
+
+## Gnashtooth Warren
+
+A goblin warren whose owner cares more about traps than about goblins.
+**Gimmick — the traps bite everyone:** every trap hurts a goblin exactly as much as a wizard, so luring enemies into their own traps is the intended play.
+
+| Room               | What is there                               | Enemies                                  | Notes                                                              |
+| ------------------ | ------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------ |
+| Burrow mouth       | Bones and snares scattered at the entrance. | 3× Goblin Sneaks (critter, melee)        | The first snare is in plain sight, to teach the gimmick.           |
+| The pit run        | A corridor of covered pits.                 | 2× Goblin Bruisers (common, melee)       | The Bruisers charge in a straight line, pits or not.               |
+| Spike gallery      | Spring-loaded spikes set into both walls.   | 3× Goblin Slingers (common, magic)       | Pressure plates fire the spikes across the whole room.             |
+| Trapper's workshop | Half-built traps on every bench.            | 1× Goblin Trapmaster (veteran, magic)    | Arms a new snare under the wizard every few seconds.               |
+| The gnashing den   | A pit ringed with jaw traps.                | Gnashtooth the Trapper (champion, magic) | Knocked into one of his own jaw traps, he is stunned for a moment. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 5, a flat reincarnation point award, and a small chance at a mana-stone.
 
 ## Thistlewake Grove
 
@@ -251,6 +309,22 @@ Reaching the final room guarantees a confrontation; it does not start one — th
 **Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, a flat reincarnation point award, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
+## The Clockwork Vault
+
+A sealed strongroom whose builder trusted machines over guards, and whose machines never stopped.
+**Gimmick — the Tinker Imps repair:** every construct in a room is kept alive by its Tinker Imps, so the fight is won by killing the Imps first.
+
+| Room           | What is there                                   | Enemies                                                             | Notes                                                  |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------ |
+| Brass door     | A round door of brass plates, half open.        | 2× Cogwork Sentries (common, melee)                                 | Standard opener, no Imp yet.                           |
+| Repair bay     | Workbenches covered in spare limbs.             | 2× Cogwork Sentries (common, melee), 2× Tinker Imps (common, magic) | First Imps: a Sentry left alone with them never falls. |
+| Pendulum hall  | A blade pendulum swinging across the room.      | 1× Brass Warder (veteran, melee)                                    | The pendulum hits the Warder as hard as the wizard.    |
+| Spring chamber | Coiled springs underfoot.                       | 3× Cogwork Sentries (common, melee), 1× Tinker Imp (common, magic)  | Stepping on a spring throws anyone a short distance.   |
+| Escapement     | Two great toothed wheels locking and unlocking. | 2× Brass Warders (veteran, melee), 2× Tinker Imps (common, magic)   | The hardest room before the end, by design.            |
+| The mainspring | The coiled heart of the vault.                  | The Vault Mainspring (champion, melee)                              | Two Tinker Imps climb out of the walls at half health. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, a flat reincarnation point award, and a small chance at a mana-stone.
+
 ## Blackroot Bandit Fort
 
 A proper fortified bandit holding, built into an old quarry wall, with a working alarm system.
@@ -291,6 +365,23 @@ Enemy tiers in that one room are kept to critter and common specifically to comp
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 7 – 10, a flat reincarnation point award, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
+
+## Redtusk Warcamp
+
+An orc warband's camp, loud from the first palisade to the warchief's tent.
+**Gimmick — the war drum:** while a room's Orc Drummer lives, every orc in that room has +15 % `power`.
+
+| Room            | What is there                            | Enemies                                                              | Notes                                                                          |
+| --------------- | ---------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Palisade gate   | Sharpened stakes, a gate of lashed logs. | 2× Orc Pickets (common, melee)                                       | Standard opener, no drum yet.                                                  |
+| Drum circle     | A ring of drums around a fire.           | 3× Orc Pickets (common, melee), 1× Orc Drummer (common, magic)       | The Drummer stays behind the fire.                                             |
+| Training yard   | Straw dummies, broken weapons.           | 2× Redtusk Berserkers (veteran, melee)                               | No drum: a straight fight.                                                     |
+| Shaman's tent   | Smoke, hanging bones, a cracked totem.   | 1× Redtusk Shaman (veteran, magic), 1× Orc Drummer (common, magic)   | The Shaman heals the Drummer first.                                            |
+| Beast pens      | Muddy pens, a broken gate.               | 2× War Boars (common, melee), 1× Redtusk Handler (veteran, melee)    | The Boars charge whoever the Handler points at.                                |
+| Trophy hall     | Banners of beaten warbands.              | 1× Redtusk Bloodguard (elite, melee), 1× Orc Drummer (common, magic) | An elite under the drum: the Drummer is the priority.                          |
+| Warchief's tent | A throne of shields.                     | Warchief Redtusk (champion, melee)                                   | Carries his own drum on his back; it breaks only from a hit landed behind him. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 10, a flat reincarnation point award, and a small chance at a mana-stone.
 
 ## Suncoil Ruins
 
@@ -354,6 +445,87 @@ No speed-halving gimmick here — only the lowest two rooms hold standing water,
 **Drops:** experience, gold and common-to-rare runes scaled to level 9 – 12, a flat reincarnation point award, and a moderate chance at a mana-stone.
 Moderate chance at a life-stone, reflecting the higher recommended level.
 
+## The Weeping Ossuary
+
+A bone-house carved under a cliff, its walls of skulls always wet.
+**Gimmick — the bones get back up:** every skeleton that falls leaves a heap of bones that rises again after 20 seconds, unless the heap itself is destroyed.
+
+| Room             | What is there                             | Enemies                                                                   | Notes                                                                                  |
+| ---------------- | ----------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Weeping stair    | Water seeping through a stair of skulls.  | 3× Ossuary Skeletons (common, melee)                                      | Teaches the gimmick on weak enemies.                                                   |
+| Hall of niches   | Walls of stacked remains, a narrow aisle. | 2× Ossuary Skeletons (common, melee), 1× Ossuary Acolyte (veteran, magic) | The Acolyte raises a heap at once instead of waiting.                                  |
+| The weeping well | A well brimming with dark water.          | 2× Weeping Wights (veteran, magic)                                        | No skeleton here: a breather from the gimmick.                                         |
+| Charnel gallery  | Bones heaped along the floor.             | 4× Ossuary Skeletons (common, melee)                                      | Three heaps already lie on the floor when the wizard enters.                           |
+| Reliquary        | A sealed casket on a stone altar.         | 1× Bone Colossus (elite, melee)                                           | Built from the heaps: every heap left standing in the dungeon adds +5 % to its health. |
+| Keeper's crypt   | A crypt of polished bone.                 | The Ossuary Keeper (champion, magic)                                      | At half health, raises every heap in the room at once.                                 |
+
+**Drops:** experience, gold and rare runes scaled to level 9 – 12, a flat reincarnation point award, and a small chance at a mana-stone or a life-stone.
+
+## The Glass Observatory
+
+A tower that used to belong to a wizard who watched the stars through lenses of his own making.
+**Gimmick — the beams:** beams of light cross every room and burn whatever they touch, wizard or enemy; a mirror struck by any attack turns and redirects its beam.
+
+| Room            | What is there                             | Enemies                                                             | Notes                                                                               |
+| --------------- | ----------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Lens hall       | Lenses of every size hanging from chains. | 3× Glass Wisps (common, magic)                                      | One fixed beam, to teach the hazard.                                                |
+| Mirror stair    | A spiral stair lined with mirrors.        | 2× Prism Sentinels (veteran, melee)                                 | The first mirror that turns.                                                        |
+| Star chart room | Charts pinned over every wall.            | 1× Lens Adept (veteran, magic), 2× Glass Wisps (common, magic)      | The Adept turns mirrors too, against the wizard.                                    |
+| The orrery      | A brass orrery the size of the room.      | 2× Prism Sentinels (veteran, melee), 1× Lens Adept (veteran, magic) | The orrery turns every beam a quarter round every ten seconds.                      |
+| Refractor       | A single huge prism.                      | 1× Shardglass Golem (elite, melee)                                  | Takes double damage from a beam.                                                    |
+| The great lens  | The telescope itself, aimed at the room.  | The Starglass Magus (champion, magic)                               | Fires through the great lens; turning the mirrors back on him is the intended play. |
+
+**Drops:** experience, gold and rare runes scaled to level 10 – 13, a flat reincarnation point award, and a small chance at a mana-stone or a life-stone.
+
+## The Mirror Court
+
+A fae court held inside a hall of mirrors, where every guest is a reflection of the last one.
+**Gimmick — the court copies you:** every enemy takes on the Element of the wizard's last spell for its own attacks, so a varied Grimoire fights better than a single strong spell.
+
+| Room                | What is there                               | Enemies                                                                | Notes                                                                 |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Glass antechamber   | A hall of mirrors, none showing the wizard. | 2× Court Pages (common, magic), 1× Mirror Duelist (veteran, melee)     | Teaches the copying on weak enemies.                                  |
+| Hall of reflections | Mirrors facing mirrors, to infinity.        | 3× Mirror Duelists (veteran, melee)                                    | Straight fight, but every hit carries the copied Element.             |
+| The masquerade      | Masked dancers who never stop.              | 1× Masked Courtier (elite, magic), 2× Court Pages (common, magic)      | The Courtier copies the last two spells, not one.                     |
+| The jester's stage  | A stage, a curtain, an empty seat.          | 1× Court Jester (elite, magic)                                         | Swaps places with the wizard once per fight.                          |
+| Throne approach     | A carpet between two rows of mirrors.       | 2× Mirror Duelists (veteran, melee), 1× Masked Courtier (elite, magic) | The hardest room before the end.                                      |
+| The mirrored throne | A throne of glass facing a wall of glass.   | The Mirrored Queen (champion, magic)                                   | Copies the whole last spell, not only its Element, and casts it back. |
+
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 11 – 14, a flat reincarnation point award, and a small chance at a mana-stone or a life-stone.
+
+## The Sunken Abbey
+
+An abbey the sea took in one night, still ringing its bell under the water.
+**Gimmick — the tide follows:** two minutes after a room is cleared, the tide floods it; a wizard still inside is slowed and takes light damage over time.
+
+| Room                | What is there                                   | Enemies                                                                | Notes                                                                      |
+| ------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Nave porch          | A flooded porch, statues to the waist in water. | 3× Drowned Novices (common, melee)                                     | The first flood comes behind the wizard.                                   |
+| Cloister            | A square garden turned into a pool.             | 2× Tidebound Monks (veteran, melee), 1× Drowned Novice (common, melee) | Standard fight under tide pressure.                                        |
+| Bell tower base     | The bell rope, hanging into the water.          | 1× Bell Wraith (elite, magic)                                          | Each ring of the bell brings the next flood forward by ten seconds.        |
+| Scriptorium         | Floating pages, ink clouding the water.         | 2× Tidebound Monks (veteran, melee), 1× Brine Chanter (veteran, magic) | The Chanter stands in deep water and is slowed by nothing.                 |
+| Crypt stairs        | Stairs going down into black water.             | 2× Brine Chanters (veteran, magic)                                     | A breather before the last rooms.                                          |
+| Chapter house       | A round hall, benches floating.                 | 2× Tidebound Monks (veteran, melee), 1× Bell Wraith (elite, magic)     | The hardest room before the end.                                           |
+| The abbess's chapel | An altar above the waterline, barely.           | The Drowned Abbess (champion, magic)                                   | Rings the drowned bell: each ring raises the water in the chapel one step. |
+
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 12 – 15, a flat reincarnation point award, and a moderate chance at a mana-stone or a life-stone.
+
+## The Void Scar
+
+A wound in the world where something was erased, and the edges are still fraying.
+**Gimmick — mana leaks:** entering each room costs the wizard a share of current mana, and mana regenerates at half rate inside the Scar.
+
+| Room              | What is there                                  | Enemies                                                         | Notes                                                          |
+| ----------------- | ---------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- |
+| Rim of the scar   | Ground breaking off into nothing.              | 3× Void Motes (common, magic)                                   | The first leak, on weak enemies.                               |
+| The fracture      | A bridge of floating stone.                    | 2× Null Wardens (veteran, melee)                                | Standard fight with a thinning mana pool.                      |
+| Gravity well      | Debris orbiting a point of darkness.           | 1× Void Maw (elite, magic)                                      | The bestiary's Void Maw, unchanged.                            |
+| Echo chamber      | Sounds arriving before what makes them.        | 2× Null Wardens (veteran, melee), 2× Void Motes (common, magic) | The hardest room before the end.                               |
+| The tear          | A rip in the air, wide enough to walk through. | 2× Rift Stalkers (elite, melee)                                 | Two elites; a wizard who arrives low on mana should turn back. |
+| Heart of the scar | Nothing at all, and something in it.           | The Unmade Heart (champion, magic)                              | Pulls the wizard toward itself and drains mana on touch.       |
+
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 13 – 16, a flat reincarnation point award, and a moderate chance at a mana-stone or a life-stone.
+
 ## Frostfang Caverns
 
 A glacial cave system whose entrance sits on an island in the middle of a lake.
@@ -392,6 +564,22 @@ The burrow exists only in spring; the start of summer dries the roots and the wh
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 3 – 6, a flat reincarnation point award, and a small chance at a mana-stone.
 
+## The Meltwater Grotto
+
+A grotto of winter ice that the spring thaw opens a little more each day.
+**Spring's second season-gated dungeon.**
+**Gimmick — the ice melts:** on the first day of spring only the first three rooms are reachable; the last two open on the second day, so the grotto cannot be finished before then.
+
+| Room               | What is there                                | Enemies                                                            | Notes                                                      |
+| ------------------ | -------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Icefall entrance   | A curtain of dripping icicles.               | 3× Melt Sprites (critter, magic)                                   | Standard opener.                                           |
+| Dripping hall      | Water running down walls of ice.             | 2× Frostwing Bats (common, melee), 1× Melt Sprite (critter, magic) | The Bats strike from the ceiling.                          |
+| Frozen pool        | A pool crusted with thin ice.                | 2× Slush Elementals (common, magic)                                | Ice gives way under heavy blows; a wizard on it is slowed. |
+| The thawed gallery | A gallery that was solid ice the day before. | 1× Floe Guardian (veteran, melee)                                  | Opens on spring's second day.                              |
+| The meltwater lake | An underground lake, freshly liquid.         | The Thaw Leviathan (champion, melee)                               | Opens on spring's second day.                              |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 8, a flat reincarnation point award, and a small chance at a mana-stone.
+
 ## The Sunheart Bloom
 
 A flower the size of a hill that opens at the start of summer, its inner chambers reachable through the petals.
@@ -410,6 +598,23 @@ The bloom opens when summer begins and wilts shut when autumn begins.
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, a flat reincarnation point award, and a small chance at a mana-stone.
 Small chance at a life-stone.
+
+## The Wasp Cathedral
+
+A wasp nest grown to the size of a cathedral, built of chewed paper over a summer.
+**Summer's second season-gated dungeon.**
+**Gimmick — the nest grows:** on summer's second day, every room holds one more Paper Wasp than on the first.
+
+| Room             | What is there                           | Enemies                                                           | Notes                                                         |
+| ---------------- | --------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------- |
+| Paper narthex    | Walls of grey paper, humming.           | 3× Paper Wasps (critter, melee)                                   | Standard opener.                                              |
+| Comb nave        | Rows of hexagonal cells, some hatching. | 3× Paper Wasps (critter, melee), 1× Wasp Drone (common, magic)    | A cell hatches a Paper Wasp every 20 seconds until destroyed. |
+| Choir of drones  | A buzzing that never stops.             | 2× Wasp Drones (common, magic), 1× Wasp Sentinel (veteran, melee) | The noise hides the Sentinel's approach.                      |
+| Brood chapel     | Larvae in every cell.                   | 2× Wasp Sentinels (veteran, melee)                                | Hitting a larva cell enrages every wasp in the room.          |
+| Royal transept   | The widest chamber, paper-thin floor.   | 1× Wasp Praetor (elite, melee), 2× Paper Wasps (critter, melee)   | The hardest room before the end.                              |
+| The queen's apse | A paper throne dripping with wax.       | The Paper Matriarch (champion, magic)                             | Calls two Paper Wasps at a time, at regular intervals.        |
+
+**Drops:** experience, gold and rare runes scaled to level 9 – 12, a flat reincarnation point award, and a small chance at a mana-stone or a life-stone.
 
 ## Vespergrave
 
@@ -461,8 +666,7 @@ Moderate-to-good chance at a life-stone, reflecting that this is the hardest com
   A rest zone after its sixth room sits right before the two veteran Crevasse Wardens of the Frozen Court.
 - **Stone odds are low everywhere.**
   Exact percentages are tuned once every mana-stone and life-stone source is counted.
+- **The Void Scar now tops the catalogue at level 13 – 16, above Cindermaw Forge.**
+  Whether any wizard reaches level 16 within a run depends on the XP curve, still open in `FORMULAS.md`.
 - ⬜ **Reincarnation points per dungeon need a formula.**
   Listed with the other missing formulas in `FORMULAS.md`.
-- ⬜ **The catalogue is smaller than one draw.**
-  A world draws 20 dungeons and the catalogue holds 18, so the draw cannot run yet.
-  It needs to grow well past 20 for the draw to mean anything.

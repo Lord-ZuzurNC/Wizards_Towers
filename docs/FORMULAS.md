@@ -7,6 +7,7 @@ Other documents state the rule in words and point here for the arithmetic.
   - [How to read this document](#how-to-read-this-document)
   - [World and Monolith](#world-and-monolith)
   - [Wizard progression](#wizard-progression)
+  - [Combat](#combat)
   - [Magic](#magic)
   - [Enemies](#enemies)
   - [World bosses](#world-bosses)
@@ -77,6 +78,22 @@ Source: `GLOSSARY.md`, mana-stone.
 This is a **target** for tuning drop rates, not a computation the game runs.
 
 ⬜ The XP needed for each `wizard_level`.
+
+## Combat
+
+**Damage is multiplicative.**
+
+```text
+damage = raw_damage × K / (K + effective_magic_defence)
+effective_magic_defence = magic_defence × (1 - penetration)      penetration in [0, 1]
+```
+
+Defence never brings a hit to zero, and each point of `magic_defence` adds the same amount of survival.
+`K` is the defence that halves a hit.
+Penetration is how Stone ignores a portion of defence and Rust ignores all of it.
+
+⬜ `K`, set once stat growth per level is known.
+⬜ `raw_damage`, from the spell's magnitude and the caster's `power`.
 
 ## Magic
 
@@ -211,7 +228,7 @@ open(d)          = whole run           ordinary dungeon
 ```
 
 Source: `DUNGEONS.md`, What a dungeon is.
-The draw needs a catalogue well past 20 dungeons.
+The catalogue holds 30, so a world draws two dungeons in three.
 ⬜ Mana-stone and life-stone drop chance per dungeon, set low on purpose.
 
 ## Economy
@@ -231,18 +248,16 @@ Source: `GLOSSARY.md`, escalating price.
 ## Flags
 
 ```text
-flag_end = min(raised_at + flag_duration, end of the current season)      or the wizard's death
+flag_end = min(raised_at + 24 h, end of the current season, the wizard's death)
 ```
 
-| Flag           | Bonus while flown                    |
-| -------------- | ------------------------------------ |
-| **truce flag** | `magic_defence` and `health`, slight |
-| **war flag**   | `power` and `speed`, slight          |
+| Flag           | Bonus while flown                  |
+| -------------- | ---------------------------------- |
+| **truce flag** | +10 % `magic_defence` and `health` |
+| **war flag**   | +10 % `power` and `speed`          |
 
 Source: `GLOSSARY.md`, flag.
 
-⬜ The size of each bonus; +10 % on each stat is the starting proposal.
-⬜ `flag_duration`.
 
 ## Score and reincarnation points
 
@@ -276,7 +291,8 @@ Gathered here so they can be answered in one pass, roughly in the order the game
 
 | Formula                                         | Needed by                        | Blocks                      |
 | ----------------------------------------------- | -------------------------------- | --------------------------- |
-| Damage, from `power` against `magic_defence`    | every fight                      | any balancing at all        |
+| `K` and `raw_damage`                            | every fight                      | any balancing at all        |
+| Stat growth per `wizard_level`                  | `GLOSSARY.md`                    | `K`, every fight            |
 | Crit and favourable rolls, from `luck`          | every fight, drops               | Spark, crits, drop rates    |
 | Mana cost, from `spell_weight`                  | `RUNES.md`                       | the spell builder           |
 | Cooldown, from Duration and Element             | `RUNES.md`                       | the spell builder           |
@@ -287,7 +303,6 @@ Gathered here so they can be answered in one pass, roughly in the order the game
 | Score composition and RP conversion             | `GLOSSARY.md`                    | meta-progression            |
 | RP per source                                   | `DUNGEONS.md`, `WORLD_BOSSES.md` | meta-progression            |
 | Stone drop chances                              | `DUNGEONS.md`                    | Grimoire pace               |
-| Flag bonus and duration                         | `GLOSSARY.md`                    | flags                       |
 
-**Damage comes first.**
-Every other combat number, from tier baselines to Artifact percentages, is only meaningful once one hit can be computed.
+**Stat growth comes first, then `K`.**
+The shape of the damage formula is settled; its constant only means something once the range of `magic_defence` across a run is known.
