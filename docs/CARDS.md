@@ -24,22 +24,23 @@ The card catalogue itself is not designed yet; this document sets the rules ever
 
 ## Families
 
-| Family      | What taking it grants                                                                    |
-| ----------- | ---------------------------------------------------------------------------------------- |
-| **Stat**    | A bonus to `health`, `power`, `magic_defence`, `speed` or `luck`.                        |
-| **Mana**    | A bonus to the mana pool, or to anything around mana: regeneration, a spell's cost.      |
-| **Rune**    | A rune, at the rarity the card rolled.                                                   |
-| **Weapon**  | A weapon of the wizard type's own kind.                                                  |
-| **Special** | Anything no other family covers; each Special card is unique, one copy per deck at most. |
+| Family      | What taking it grants                                                                                       |
+| ----------- | ----------------------------------------------------------------------------------------------------------- |
+| **Stat**    | A bonus to `health`, `power`, `magic_defence`, `speed` or `luck`.                                           |
+| **Mana**    | A bonus to the mana pool, or to anything around mana: regeneration, a spell's cost.                         |
+| **Rune**    | A rune, at the rarity the card names.                                                                       |
+| **Weapon**  | A weapon of the wizard type's own kind.                                                                     |
+| **Special** | Anything no other family covers; each Special card is unique, one copy per deck at most, and has no rarity. |
 
 **Two Special cards are already designed.**
 
 - **Keepsake Wisp.** Taking it summons the Keepsake Wisp for the rest of the run: a spirit carrying nothing mechanical, which greets the wizard by the name of their previous life. See `SPIRITS_GUARDIANS.md`.
-- **A world boss summon.** It is never offered: when drawn, it is played on the spot, its world boss spawns, it leaves the run deck, and another card is drawn in its place. The wizard learns the boss is coming at the same moment as everyone around.
+- **A world boss summon.** It is never offered: when drawn, it is played on the spot, its world boss spawns where that boss always stands, it leaves the run deck, and another card is drawn in its place. The wizard learns the boss is coming at the same moment as everyone around.
 
 ## Rarity
 
-A card's rarity is rolled when it is drawn into a choice, so the same card can come up stronger one time and ordinary the next.
+Only **Stat** and **Mana** cards roll a rarity, when they are drawn into a choice, so the same card can come up stronger one time and ordinary the next.
+A Rune or Weapon card grants an item whose rarity is already its own, as in `RUNES.md` and `WEAPONS.md`; a Special card has none.
 
 | Rarity        | Chance | Strength        |
 | ------------- | -----: | --------------- |
@@ -47,7 +48,6 @@ A card's rarity is rolled when it is drawn into a choice, so the same card can c
 | **rare**      |   10 % | 50 % stronger   |
 | **legendary** |    5 % | twice as strong |
 
-A Rune card grants its rune at the rolled rarity, which then scales as every rune does in `RUNES.md`.
 
 ## The level-up choice
 
@@ -87,7 +87,14 @@ A wizard may well stop at five positions and spend every other mana-stone on rer
 
 ## The deck
 
-**A deck is 50 cards, one per wizard type.**
+**A deck is 50 cards, plus up to six outside the count, one deck per wizard type.**
+
+| Part                     | Cards      |
+| ------------------------ | ---------- |
+| Stat, Mana, Rune, Weapon | exactly 50 |
+| World boss summon        | at most 1  |
+| Special                  | at most 5  |
+
 A player keeps up to four decks in their profile, one for each wizard type, built between runs.
 At the start of a run, the deck of the chosen wizard type becomes that wizard's run deck.
 
@@ -109,7 +116,6 @@ RP also unlock the weapons that may drop during a run; see `GLOSSARY.md`, talent
 
 - ⬜ **The catalogue: 150 to 200 cards**, enough for three or four truly different decks per wizard type, even if most players' decks will share a large common base.
 - ⬜ **The starter deck of each wizard type**, and what share of it each family takes.
-- ⬜ **How rarity applies to a Weapon card**, since every weapon already has a fixed rarity in `WEAPONS.md`.
-- ⬜ **The world boss summon:** which boss, and where it spawns.
+- ⬜ **World boss summons:** whether they summon bosses that exist only through a card, or ordinary bosses whose card is earned by landing the killing blow.
 - ⬜ **The lock price**, see `FORMULAS.md`.
 - ⬜ **The achievements**, and which card each one allows.
