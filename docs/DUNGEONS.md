@@ -51,6 +51,9 @@ A handful of the dungeons below then deliberately undercut that safety with a ti
 Entering any dungeon permanently breaks a level-1 wizard's peace shield, the same as their first attack or reaching level 2 does.
 A level-1 wizard who steps through a dungeon entrance has chosen to leave newcomer protection behind.
 
+**A dungeon stands where its theme belongs.**
+Its entrance is placed in the region of the map that matches its theme, as a world boss stands in its own territory.
+
 **One wizard at a time.**
 The entrance seals itself by magic once a wizard steps through, and reopens when that wizard leaves or dies.
 Nothing stops another wizard from waiting at the entrance.
