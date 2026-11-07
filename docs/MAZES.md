@@ -167,7 +167,7 @@ A maze built around the idea that magic has texture: fire undoes ice, cold undoe
 
 A maze that is honest about being personally gated, and says so to the player rather than hiding it: a notice at the entrance states the Grimoire requirement before the peace shield breaks.
 
-- **Stage 1 — the threshold.** A lock checking the wizard currently has at least three filled Grimoire positions, meaning wizard level 3 or higher. Below that, the maze politely refuses entry and the peace shield is untouched.
+- **Stage 1 — the threshold.** A lock checking the wizard currently has at least three filled Grimoire positions, meaning wizard level 7 or higher. Below that, the maze politely refuses entry and the peace shield is untouched.
 - **Stage 2 — the mirror chamber.** A mirror image of the wizard's current loadout stands opposite a sealed exit — not the wizard's actual echo. Swapping a weapon or a Grimoire spell changes the mirror's resulting stat, and the exit opens once a generated stat threshold is crossed.
 
 **Difficulty:** Medium-high.

@@ -100,36 +100,36 @@ A level-1 wizard with no talents is the baseline these numbers are measured agai
 
 | Name                  | Rooms | Recommended level | Theme               | Final enemy                          | Season      |
 | --------------------- | ----: | ----------------- | ------------------- | ------------------------------------ | ----------- |
-| The Mudlark Sewers    |     4 | 1 – 3             | Sewers              | The Sludge Matriarch (champion)      | Any         |
-| The Millrace          |     5 | 1 – 3             | Goblin mill         | The Wheelboss (champion)             | Any         |
-| The Hollow Crypts     |     4 | 2 – 4             | Crypts              | Crypt Warden (champion)              | Any         |
-| Ashfall Bandit Hold   |     5 | 3 – 5             | Bandit fort         | The Pass Reaver (champion)           | Any         |
-| Gnashtooth Warren     |     5 | 3 – 5             | Goblin warren       | Gnashtooth the Trapper (champion)    | Any         |
-| Thistlewake Grove     |     5 | 4 – 6             | Fae grove           | Grove Matriarch (champion)           | Any         |
-| Bramblefang Warren    |     6 | 4 – 7             | Beast warren        | Alpha Direwolf (champion)            | Any         |
-| The Drowned Shaft     |     6 | 5 – 8             | Flooded mines       | The Drowned Colossus (champion)      | Any         |
-| Rustbelly Hive        |     5 | 5 – 8             | Beast warren        | Hive Queen (champion)                | Any         |
-| Mournwillow Fen       |     6 | 6 – 9             | Fae grove           | The Willow Widow (champion)          | Any         |
-| Cinder Rift           |     6 | 6 – 9             | Elemental rift      | The Ember Hunter (champion)          | Any         |
-| The Clockwork Vault   |     6 | 6 – 9             | Construct vault     | The Vault Mainspring (champion)      | Any         |
-| Blackroot Bandit Fort |     7 | 7 – 10            | Bandit fort         | Bandit Warlord (champion)            | Any         |
-| Skyreach Spire        |     7 | 7 – 10            | Ruined wizard tower | The Unbound Archmage (champion)      | Any         |
-| Redtusk Warcamp       |     7 | 7 – 10            | Orc warcamp         | Warchief Redtusk (champion)          | Any         |
-| Suncoil Ruins         |     6 | 8 – 11            | Ruined wizard tower | The Arc Warden (champion)            | Any         |
-| The Gilded Hoard      |     7 | 8 – 11            | Crypts              | The Hoardwarden (champion)           | Any         |
-| The Silt Cisterns     |     5 | 9 – 12            | Flooded mines       | The Silt Behemoth (champion)         | Any         |
-| The Weeping Ossuary   |     6 | 9 – 12            | Ossuary             | The Ossuary Keeper (champion)        | Any         |
-| The Glass Observatory |     6 | 10 – 13           | Ruined wizard tower | The Starglass Magus (champion)       | Any         |
-| The Mirror Court      |     6 | 11 – 14           | Fae court           | The Mirrored Queen (champion)        | Any         |
-| The Sunken Abbey      |     7 | 12 – 15           | Flooded abbey       | The Drowned Abbess (champion)        | Any         |
-| The Void Scar         |     6 | 13 – 16           | Elemental rift      | The Unmade Heart (champion)          | Any         |
-| Frostfang Caverns     |     8 | 10 – 13           | Elemental rift      | The Frost Sovereign (champion)       | Winter only |
-| The Thawroot Burrow   |     5 | 3 – 6             | Root burrow         | The Rootmother (champion)            | Spring only |
-| The Meltwater Grotto  |     5 | 5 – 8             | Ice grotto          | The Thaw Leviathan (champion)        | Spring only |
-| The Sunheart Bloom    |     6 | 6 – 9             | Giant flower        | The Heartseed Warden (champion)      | Summer only |
-| The Wasp Cathedral    |     6 | 9 – 12            | Giant nest          | The Paper Matriarch (champion)       | Summer only |
-| Vespergrave           |     6 | 8 – 11            | Haunted graveyard   | The Lantern Keeper (champion)        | Autumn only |
-| Cindermaw Forge       |     9 | 11 – 14           | Elemental rift      | The Cindermaw Triumvirate (3 elites) | Any         |
+| The Mudlark Sewers    |     4 | 1 – 6             | Sewers              | The Sludge Matriarch (champion)      | Any         |
+| The Millrace          |     5 | 1 – 6             | Goblin mill         | The Wheelboss (champion)             | Any         |
+| The Hollow Crypts     |     4 | 3 – 8             | Crypts              | Crypt Warden (champion)              | Any         |
+| Ashfall Bandit Hold   |     5 | 5 – 10            | Bandit fort         | The Pass Reaver (champion)           | Any         |
+| Gnashtooth Warren     |     5 | 5 – 10            | Goblin warren       | Gnashtooth the Trapper (champion)    | Any         |
+| Thistlewake Grove     |     5 | 7 – 12            | Fae grove           | Grove Matriarch (champion)           | Any         |
+| Bramblefang Warren    |     6 | 7 – 14            | Beast warren        | Alpha Direwolf (champion)            | Any         |
+| The Drowned Shaft     |     6 | 9 – 16            | Flooded mines       | The Drowned Colossus (champion)      | Any         |
+| Rustbelly Hive        |     5 | 9 – 16            | Beast warren        | Hive Queen (champion)                | Any         |
+| Mournwillow Fen       |     6 | 11 – 18           | Fae grove           | The Willow Widow (champion)          | Any         |
+| Cinder Rift           |     6 | 11 – 18           | Elemental rift      | The Ember Hunter (champion)          | Any         |
+| The Clockwork Vault   |     6 | 11 – 18           | Construct vault     | The Vault Mainspring (champion)      | Any         |
+| Blackroot Bandit Fort |     7 | 13 – 20           | Bandit fort         | Bandit Warlord (champion)            | Any         |
+| Skyreach Spire        |     7 | 13 – 20           | Ruined wizard tower | The Unbound Archmage (champion)      | Any         |
+| Redtusk Warcamp       |     7 | 13 – 20           | Orc warcamp         | Warchief Redtusk (champion)          | Any         |
+| Suncoil Ruins         |     6 | 15 – 22           | Ruined wizard tower | The Arc Warden (champion)            | Any         |
+| The Gilded Hoard      |     7 | 15 – 22           | Crypts              | The Hoardwarden (champion)           | Any         |
+| The Silt Cisterns     |     5 | 17 – 24           | Flooded mines       | The Silt Behemoth (champion)         | Any         |
+| The Weeping Ossuary   |     6 | 17 – 24           | Ossuary             | The Ossuary Keeper (champion)        | Any         |
+| The Glass Observatory |     6 | 19 – 26           | Ruined wizard tower | The Starglass Magus (champion)       | Any         |
+| The Mirror Court      |     6 | 21 – 28           | Fae court           | The Mirrored Queen (champion)        | Any         |
+| The Sunken Abbey      |     7 | 23 – 30           | Flooded abbey       | The Drowned Abbess (champion)        | Any         |
+| The Void Scar         |     6 | 25 – 32           | Elemental rift      | The Unmade Heart (champion)          | Any         |
+| Frostfang Caverns     |     8 | 19 – 26           | Elemental rift      | The Frost Sovereign (champion)       | Winter only |
+| The Thawroot Burrow   |     5 | 5 – 12            | Root burrow         | The Rootmother (champion)            | Spring only |
+| The Meltwater Grotto  |     5 | 9 – 16            | Ice grotto          | The Thaw Leviathan (champion)        | Spring only |
+| The Sunheart Bloom    |     6 | 11 – 18           | Giant flower        | The Heartseed Warden (champion)      | Summer only |
+| The Wasp Cathedral    |     6 | 17 – 24           | Giant nest          | The Paper Matriarch (champion)       | Summer only |
+| Vespergrave           |     6 | 15 – 22           | Haunted graveyard   | The Lantern Keeper (champion)        | Autumn only |
+| Cindermaw Forge       |     9 | 21 – 28           | Elemental rift      | The Cindermaw Triumvirate (3 elites) | Any         |
 
 ## The Mudlark Sewers
 
@@ -143,7 +143,7 @@ The drains under the oldest village of the map, and the first dungeon a brand-ne
 | Flooded cistern   | A vaulted cistern, the water now knee-high.    | 2× Drain Lurkers (common, melee)                                | The water slows the wizard and the Lurkers alike.                         |
 | The sludge throne | A mound of refuse under a broken drain.        | The Sludge Matriarch (champion, melee)                          | health and power −25 %, reason: the entry-level dungeon of the catalogue. |
 
-**Drops:** experience, gold and common runes scaled to level 1 – 3.
+**Drops:** experience, gold and common runes scaled to level 1 – 6.
 No stone chance: the first dungeon of a run must not decide who unlocks a Grimoire position first.
 
 ## The Millrace
@@ -159,7 +159,7 @@ A watermill a goblin band took over, still turning, still grinding something.
 | Millstone hall | Two great stones grinding against each other.  | 1× Goblin Bruiser (common, melee), 2× Goblin Slingers (common, magic) | The Slingers keep the stones between them and the wizard.            |
 | The wheelhouse | The axle of the great wheel, spray everywhere. | The Wheelboss (champion, melee)                                       | health and power −25 %, reason: an entry-level dungeon; always last. |
 
-**Drops:** experience, gold and common runes scaled to level 1 – 3.
+**Drops:** experience, gold and common runes scaled to level 1 – 6.
 No stone chance, for the same reason as The Mudlark Sewers.
 
 ## The Hollow Crypts
@@ -167,7 +167,7 @@ No stone chance, for the same reason as The Mudlark Sewers.
 A burial ground predating the current villages, four low chambers cut into a hillside.
 This is the baseline dungeon: no gimmick, a clean escalation from critter to champion, built to teach a new wizard what a dungeon run feels like.
 It is deliberately easy, so a wizard who has fallen behind in levels still has a dungeon to clear.
-Every enemy here is undead, melee-leaning, and slow by design so a level-2 wizard can read their attacks.
+Every enemy here is undead, melee-leaning, and slow by design so a level-3 wizard can read their attacks.
 
 | Room             | What is there                                  | Enemies                                                         | Notes                                                                  |
 | ---------------- | ---------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -176,7 +176,7 @@ Every enemy here is undead, melee-leaning, and slow by design so a level-2 wizar
 | Sealed vault     | A cracked stone door, runes scratched over it. | 2× Bound Skeletons (common, melee)                              | Small gimmick: the door only opens once both skeletons are down.       |
 | Warden's chamber | A raised dais, cold air, a single stone seat.  | Crypt Warden (champion, magic)                                  | Opens with a ranged volley the moment the door is breached.            |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 2 – 4, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 8, and a small chance at a mana-stone.
 No life-stone chance here — the dungeon is intentionally too low-stakes to justify one.
 
 ## Ashfall Bandit Hold
@@ -190,10 +190,10 @@ Carried gold is irrelevant here — that pressure belongs to The Gilded Hoard, n
 | Toll gate             | A barricade of cart wreckage.              | 2× Hold Scouts (critter, melee)                                   | Scouts flee at low health instead of fighting to the end.        |
 | Barracks              | Bunks, a cold firepit.                     | 3× Hold Raiders (common, melee)                                   | Standard group fight, no twist.                                  |
 | Armoury               | Racked weapons, most already taken.        | 2× Hold Raiders (common, melee), 1× Hold Marksman (common, magic) | Marksman uses thrown fire; break line of sight behind the racks. |
-| Captain's antechamber | A locked strongbox, empty.                 | 1× Hold Lieutenant (veteran, melee)                               | A real fight for a level-4 wizard, by design.                    |
+| Captain's antechamber | A locked strongbox, empty.                 | 1× Hold Lieutenant (veteran, melee)                               | A real fight for a level-8 wizard, by design.                    |
 | Captain's hall        | A long table, a banner of a torn standard. | The Pass Reaver (champion, melee)                                 | No reinforcements, no gimmick — a clean final fight.             |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 5, and a small-to-moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 10, and a small-to-moderate chance at a mana-stone.
 
 ## Gnashtooth Warren
 
@@ -208,7 +208,7 @@ A goblin warren whose owner cares more about traps than about goblins.
 | Trapper's workshop | Half-built traps on every bench.            | 1× Goblin Trapmaster (veteran, magic)    | Arms a new snare under the wizard every few seconds.               |
 | The gnashing den   | A pit ringed with jaw traps.                | Gnashtooth the Trapper (champion, magic) | Knocked into one of his own jaw traps, he is stunned for a moment. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 5, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 10, and a small chance at a mana-stone.
 
 ## Thistlewake Grove
 
@@ -225,7 +225,7 @@ The grove rewards a fast, decisive clear over a cautious one, which is the oppos
 | The Drowsing Pool     | Still water reflecting no sky.         | 3× Thistle Sprites (common, magic)                                 | Lingering reinforcement escalates faster here: the delay before reinforcements is shorter. |
 | The Matriarch's Bower | A throne woven from living branches.   | Grove Matriarch (champion, magic)                                  | The lingering rule does not apply in the final room — this fight is a straight one.        |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 4 – 6, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 12, and a moderate chance at a mana-stone.
 Small chance at a life-stone, reflecting the grove's reputation as a healing place twisted into a trap.
 
 ## Bramblefang Warren
@@ -244,7 +244,7 @@ The den core only opens once all four side-dens are cleared, regardless of order
 | Den of Marrow | A bone midden stacked by generations of wolves. | 1× Packmaster (veteran, melee)                                      | Side-den 4 of 4, order-independent — the only one with a veteran.         |
 | The Deep Den  | A sunken pit, warm with animal breath.          | Alpha Direwolf (champion, melee)                                    | Final room, unlocked only once all four side-dens are cleared.            |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 4 – 7, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 14, and a moderate chance at a mana-stone.
 
 ## The Drowned Shaft
 
@@ -261,7 +261,7 @@ Enemies tagged aquatic are exempt from the penalty, which is what makes the back
 | Lower flood chamber    | Water nearly to the ceiling, visible only in patches. | 2× Current Wisps (common, magic, aquatic)                                    | Visibility gimmick on top of the speed one: enemies here are only visible when adjacent. |
 | The Drowned Hall       | A cavern lit by phosphorescent fungus.                | The Drowned Colossus (champion, melee, aquatic)                              | The Colossus is aquatic and fights at full speed while the wizard remains halved.        |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 8, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 9 – 16, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## Rustbelly Hive
@@ -277,7 +277,7 @@ No special gimmick, but the enemy composition itself is the lesson: swarms of cr
 | The Larder         | Stored carcasses, a strong smell.                        | 1× Rustbelly Brood-warden (veteran, melee)                               | Single strong enemy, a breather after two swarm rooms.                    |
 | The Queen's Hollow | A pulsing chamber at the hive's centre.                  | Hive Queen (champion, magic)                                             | Summons single critter-tier Nymphs periodically through the fight.        |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 8, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 9 – 16, and a moderate chance at a mana-stone.
 
 ## Mournwillow Fen
 
@@ -293,7 +293,7 @@ A sunken swamp grove the local fae abandoned generations ago, now home to someth
 | Willow Approach    | Weeping willows bent low over black water.         | 2× Bog Stalkers (common, melee)                               | Last breather room before the final fight.                                        |
 | The Widow's Hollow | A ring of dead willow roots, pale light.           | The Willow Widow (champion, magic)                            | Fights entirely at range; closing distance is the main challenge.                 |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 11 – 18, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## Cinder Rift
@@ -312,7 +312,7 @@ Reaching the final room guarantees a confrontation; it does not start one — th
 | Collapsed Forge Hall | A ruined forge, tools fused to their benches.      | 2× Ash Skirmishers (common, melee)                                  | High-likelihood Hunter ambush point if it has not appeared yet.                             |
 | The Rift's Heart     | A column of standing fire at the dungeon's centre. | The Ember Hunter (champion, magic)                                  | Guaranteed confrontation here regardless of whether it already ambushed the wizard earlier. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 11 – 18, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## The Clockwork Vault
@@ -329,7 +329,7 @@ A sealed strongroom whose builder trusted machines over guards, and whose machin
 | Escapement     | Two great toothed wheels locking and unlocking. | 2× Brass Warders (veteran, melee), 2× Tinker Imps (common, magic)   | The hardest room before the end, by design.            |
 | The mainspring | The coiled heart of the vault.                  | The Vault Mainspring (champion, melee)                              | Two Tinker Imps climb out of the walls at half health. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 11 – 18, and a small chance at a mana-stone.
 
 ## Blackroot Bandit Fort
 
@@ -349,7 +349,7 @@ This is a global, accumulating version of the same pressure Thistlewake Grove ap
 | Powder store        | Sealed barrels, handled carefully.            | 2× Fort Guards (common, melee)                                      | Avoid lingering: every alert step still active adds a Fort Guard here too.                       |
 | The Warlord's Hall  | A throne built from stacked shields.          | Bandit Warlord (champion, melee)                                    | At max alert, an extra Fort Sergeant (veteran) joins the Warlord at the start of the fight.      |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 10, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 13 – 20, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## Skyreach Spire
@@ -369,7 +369,7 @@ Enemy tiers in that one room are kept to critter and common specifically to comp
 | The Archivist's Vault | Locked cabinets, one forced open already.          | 1× Spire Sentinel (veteran, magic), 1× Wardbound Construct (common, magic)         | Last room before the top; no gimmick.                                                                      |
 | The Shattered Study   | The tower's top floor, open to the wind.           | The Unbound Archmage (champion, magic)                                             | Full spellcasting available again; the ward does not reach this high.                                      |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 10, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 13 – 20, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## Redtusk Warcamp
@@ -387,7 +387,7 @@ An orc warband's camp, loud from the first palisade to the warchief's tent.
 | Trophy hall     | Banners of beaten warbands.              | 1× Redtusk Bloodguard (elite, melee), 1× Orc Drummer (common, magic) | An elite under the drum: the Drummer is the priority.                          |
 | Warchief's tent | A throne of shields.                     | Warchief Redtusk (champion, melee)                                   | Carries his own drum on his back; it breaks only from a hit landed behind him. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 7 – 10, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 13 – 20, and a small chance at a mana-stone.
 
 ## Suncoil Ruins
 
@@ -403,7 +403,7 @@ No gimmick: a straightforward mid-to-late escalation built around construct enem
 | Collapsed laboratory | Broken alembics, dried reagents underfoot.       | 2× Suncoil Adepts (common, magic)                                       | Standard room, no gimmick.                             |
 | The Arc Chamber      | A half-buried ring of standing stones, humming.  | The Arc Warden (champion, magic)                                        | Straight final fight.                                  |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 8 – 11, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 15 – 22, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 
 ## The Gilded Hoard
@@ -431,7 +431,7 @@ A rank, not an amount, so the curve never has to be retuned as the economy infla
 | Treasury threshold     | A door cast from a single sheet of gold.           | 2× Hoard Sentinels (veteran, melee)                                 | No scaling; a breather before the final room regardless of wealth carried.         |
 | The Hoardwarden's Seat | A mountain of coin, the throne buried in it.       | The Hoardwarden (champion, magic)                                   | The Hoardwarden itself does not scale with gold — only the rooms leading to it do. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 8 – 11, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 15 – 22, and a moderate chance at a mana-stone.
 Small chance at a life-stone.
 A wizard who enters wealthy and survives earns a visibly larger gold drop than one who entered poor, which is the dungeon's whole point.
 
@@ -448,7 +448,7 @@ No speed-halving gimmick here — only the lowest two rooms hold standing water,
 | Lower flooded cistern | Standing water, waist deep.                     | 2× Cistern Divers (common, magic, aquatic)                          | Flooding begins here; no dungeon-wide speed halving, just this room. |
 | The Silt Floor        | A shallow, silty basin at the cistern's bottom. | The Silt Behemoth (champion, melee, aquatic)                        | Final room is flooded; the Behemoth is aquatic and unaffected.       |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 9 – 12, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 17 – 24, and a moderate chance at a mana-stone.
 Moderate chance at a life-stone, reflecting the higher recommended level.
 
 ## The Weeping Ossuary
@@ -465,7 +465,7 @@ A bone-house carved under a cliff, its walls of skulls always wet.
 | Reliquary        | A sealed casket on a stone altar.         | 1× Bone Colossus (elite, melee)                                           | Built from the heaps: every heap left standing in the dungeon adds +5 % to its health. |
 | Keeper's crypt   | A crypt of polished bone.                 | The Ossuary Keeper (champion, magic)                                      | At half health, raises every heap in the room at once.                                 |
 
-**Drops:** experience, gold and rare runes scaled to level 9 – 12, and a small chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare runes scaled to level 17 – 24, and a small chance at a mana-stone or a life-stone.
 
 ## The Glass Observatory
 
@@ -481,7 +481,7 @@ A tower that used to belong to a wizard who watched the stars through lenses of 
 | Refractor       | A single huge prism.                      | 1× Shardglass Golem (elite, melee)                                  | Takes double damage from a beam.                                                    |
 | The great lens  | The telescope itself, aimed at the room.  | The Starglass Magus (champion, magic)                               | Fires through the great lens; turning the mirrors back on him is the intended play. |
 
-**Drops:** experience, gold and rare runes scaled to level 10 – 13, and a small chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare runes scaled to level 19 – 26, and a small chance at a mana-stone or a life-stone.
 
 ## The Mirror Court
 
@@ -497,7 +497,7 @@ A fae court held inside a hall of mirrors, where every guest is a reflection of 
 | Throne approach     | A carpet between two rows of mirrors.       | 2× Mirror Duelists (veteran, melee), 1× Masked Courtier (elite, magic) | The hardest room before the end.                                      |
 | The mirrored throne | A throne of glass facing a wall of glass.   | The Mirrored Queen (champion, magic)                                   | Copies the whole last spell, not only its Element, and casts it back. |
 
-**Drops:** experience, gold and rare-to-legendary runes scaled to level 11 – 14, and a small chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 21 – 28, and a small chance at a mana-stone or a life-stone.
 
 ## The Sunken Abbey
 
@@ -514,7 +514,7 @@ An abbey the sea took in one night, still ringing its bell under the water.
 | Chapter house       | A round hall, benches floating.                 | 2× Tidebound Monks (veteran, melee), 1× Bell Wraith (elite, magic)     | The hardest room before the end.                                           |
 | The abbess's chapel | An altar above the waterline, barely.           | The Drowned Abbess (champion, magic)                                   | Rings the drowned bell: each ring raises the water in the chapel one step. |
 
-**Drops:** experience, gold and rare-to-legendary runes scaled to level 12 – 15, and a moderate chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 23 – 30, and a moderate chance at a mana-stone or a life-stone.
 
 ## The Void Scar
 
@@ -530,7 +530,7 @@ A wound in the world where something was erased, and the edges are still fraying
 | The tear          | A rip in the air, wide enough to walk through. | 2× Rift Stalkers (elite, melee)                                 | Two elites; a wizard who arrives low on mana should turn back. |
 | Heart of the scar | Nothing at all, and something in it.           | The Unmade Heart (champion, magic)                              | Pulls the wizard toward itself and drains mana on touch.       |
 
-**Drops:** experience, gold and rare-to-legendary runes scaled to level 13 – 16, and a moderate chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare-to-legendary runes scaled to level 25 – 32, and a moderate chance at a mana-stone or a life-stone.
 
 ## Frostfang Caverns
 
@@ -550,7 +550,7 @@ Past the entrance there is no further gimmick beyond the season gate itself — 
 | The Frozen Court      | A ring of ice pillars shaped like a throne room.       | 2× Crevasse Wardens (veteran, melee)                                 | Last room before the final fight, deliberately hard for the level band. |
 | The Sovereign's Floe  | A slab of unmelting ice at the cavern's deepest point. | The Frost Sovereign (champion, magic)                                | Straight final fight, no further gimmick.                               |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 10 – 13, and a moderate chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 19 – 26, and a moderate chance at a mana-stone.
 Moderate chance at a life-stone.
 
 ## The Thawroot Burrow
@@ -568,7 +568,7 @@ The burrow exists only in spring; the start of summer dries the roots and the wh
 | The Old Trunk   | An old trunk the burrow grew around.               | 1× Barkhide Warden (veteran, melee)                                | Single strong enemy, a breather before the end.          |
 | The Mother Root | A hollow where every root of the burrow converges. | The Rootmother (champion, magic)                                   | Calls a Sprout Mite from the walls at regular intervals. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 6, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 12, and a small chance at a mana-stone.
 
 ## The Meltwater Grotto
 
@@ -584,7 +584,7 @@ A grotto of winter ice that the spring thaw opens a little more each day.
 | The thawed gallery | A gallery that was solid ice the day before. | 1× Floe Guardian (veteran, melee)                                  | Opens on spring's second day.                              |
 | The meltwater lake | An underground lake, freshly liquid.         | The Thaw Leviathan (champion, melee)                               | Opens on spring's second day.                              |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 5 – 8, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 9 – 16, and a small chance at a mana-stone.
 
 ## The Sunheart Bloom
 
@@ -602,7 +602,7 @@ The bloom opens when summer begins and wilts shut when autumn begins.
 | Sepal Chamber   | Green walls, the light filtered and dim.            | 2× Nectar Beetles (common, melee), 1× Stamen Lancer (common, melee) | Two small pools near the far wall.                                                |
 | The Heartseed   | The flower's core, a seed glowing like a small sun. | The Heartseed Warden (champion, magic)                              | The Warden stands on the seed, which heals it like nectar until it is pushed off. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 11 – 18, and a small chance at a mana-stone.
 Small chance at a life-stone.
 
 ## The Wasp Cathedral
@@ -620,7 +620,7 @@ A wasp nest grown to the size of a cathedral, built of chewed paper over a summe
 | Royal transept   | The widest chamber, paper-thin floor.   | 1× Wasp Praetor (elite, melee), 2× Paper Wasps (critter, melee)   | The hardest room before the end.                              |
 | The queen's apse | A paper throne dripping with wax.       | The Paper Matriarch (champion, magic)                             | Calls two Paper Wasps at a time, at regular intervals.        |
 
-**Drops:** experience, gold and rare runes scaled to level 9 – 12, and a small chance at a mana-stone or a life-stone.
+**Drops:** experience, gold and rare runes scaled to level 17 – 24, and a small chance at a mana-stone or a life-stone.
 
 ## Vespergrave
 
@@ -638,7 +638,7 @@ The graveyard is ordinary ground in spring and summer, becomes an instanced dung
 | The Mourning Path   | A long path between yew trees, lanterns far apart. | 3× Grave Wails (common, magic)                                   | The lanterns are spaced so no single one covers every ghost.                       |
 | The Lantern Crypt   | A crypt full of lanterns, all of them dark.        | The Lantern Keeper (champion, magic)                             | The Keeper puts lanterns out during the fight; relight them to keep it vulnerable. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 8 – 11, and a small chance at a mana-stone.
+**Drops:** experience, gold and common-to-rare runes scaled to level 15 – 22, and a small chance at a mana-stone.
 Small chance at a life-stone.
 
 ## Cindermaw Forge
@@ -659,7 +659,7 @@ Each of the three deviates slightly from the base elite numbers, within the ±25
 | The Triumvirate's Approach | A corridor lined with the order's dead.                  | 1× Forge Warden (veteran, melee), 1× Quench Adept (common, magic)                                                                                               | Last breather before the final room.                                                                            |
 | The Cindermaw Hearth       | A forge still lit, impossibly, after centuries.          | The Cindermaw Triumvirate — 3× elite (melee, magic, magic), health/power +15 % each, reason: endgame final room needs to clear a single champion's total threat | The three deviate +15 % on health and power each, within the ±25 % tier allowance, to outweigh a lone champion. |
 
-**Drops:** experience, gold and common-to-rare runes scaled to level 11 – 14, and the best mana-stone odds on this list.
+**Drops:** experience, gold and common-to-rare runes scaled to level 21 – 28, and the best mana-stone odds on this list.
 Moderate-to-good chance at a life-stone, reflecting that this is the hardest combat dungeon documented here.
 
 ## Notes for balancing
@@ -672,5 +672,5 @@ Moderate-to-good chance at a life-stone, reflecting that this is the hardest com
   A rest zone after its sixth room sits right before the two veteran Crevasse Wardens of the Frozen Court.
 - **Stone odds are low everywhere.**
   Exact percentages are tuned once every mana-stone and life-stone source is counted.
-- **The Void Scar now tops the catalogue at level 13 – 16, above Cindermaw Forge.**
-  Whether any wizard reaches level 16 within a run depends on the XP curve, still open in `FORMULAS.md`.
+- **The Void Scar now tops the catalogue at level 25 – 32, above Cindermaw Forge.**
+  It sits just past the level-30 target, for the wizards who outpace it.

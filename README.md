@@ -59,15 +59,15 @@ Someone will come for yours.
 A world lives for **eight days**, divided into **four seasons of two days**.
 Seasons change the world: crops, dungeon entrances, world boss strength.
 
-If a wizard takes Floor 49 before winter ends, they win the run.
+If a wizard takes the ROOF before winter ends, they win the run.
 If nobody does, the world ends anyway when winter does.
 
 Death is permanent, and almost everything is lost with it — villages, towers, floors, gold, runes, spells.
 What survives is **Reincarnation Points**, converted from your run's score when you die or the world ends, and spent between runs on **Talents**:
-small permanent stat bonuses, other kinds of wizard, other weapons, and the chance for a rune you have unlocked to appear somewhere in your next world.
+new cards for your decks, other kinds of wizard, and weapons that may then drop in your next worlds.
 
-Unlocking a rune does not hand it to you.
-It only makes it findable.
+Each time you level up, you choose one of three **cards** drawn from a deck of fifty you built before the run, one deck per kind of wizard.
+Everyone starts with the same decks: what you unlock widens your choices, it does not make you stronger than a newcomer.
 
 ## Spellcrafting
 
@@ -84,7 +84,7 @@ A spell is assembled from runes, each belonging to one attribute:
 Runes come in **common**, **rare** and **legendary** grades, which change how strongly a rune acts rather than what it does.
 **Artifacts** from the Monolith are rarer than any of them, and they corrupt the wizard who carries them.
 
-Finished spells live in your **Grimoire**, which gains a position with each wizard level, up to ten.
+Finished spells live in your **Grimoire**, which gains a position every three wizard levels, up to ten.
 Unlocking a position costs a mana-stone, and a spell can only be edited from your own tower, so a build is a commitment.
 
 Nobody is given a list of valid recipes.
@@ -95,6 +95,7 @@ Discovering combinations is the game.
 - [`docs/GUIDELINES.md`](docs/GUIDELINES.md) — code, documentation and asset style guide, targeting Godot 4.7.
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — the project's vocabulary, and the contract between the design documents and the identifiers in the code.
 - [`docs/FORMULAS.md`](docs/FORMULAS.md) — every number the game computes rather than authors, written once.
+- [`docs/CARDS.md`](docs/CARDS.md) — the level-up card choice and the decks players build between runs.
 - [`pre-POCs/`](pre-POCs/) — throwaway technical experiments that settled a design choice, each with its results.
 
 The design question-and-answer document that drives all of this is kept private deliberately, and is not part of this repository.

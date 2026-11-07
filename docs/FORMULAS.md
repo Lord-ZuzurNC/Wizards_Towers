@@ -12,6 +12,7 @@ Other documents state the rule in words and point here for the arithmetic.
   - [Enemies](#enemies)
   - [World bosses](#world-bosses)
   - [Dungeons](#dungeons)
+  - [Cards](#cards)
   - [Economy](#economy)
   - [Flags](#flags)
   - [Score and reincarnation points](#score-and-reincarnation-points)
@@ -59,57 +60,63 @@ Source: `GLOSSARY.md`, queue.
 
 ## Wizard progression
 
-**Grimoire positions.**
-
-```text
-grimoire_positions = min(10, max(1, wizard_level - 1))
-```
-
-Source: `GLOSSARY.md`, Grimoire position.
-Each position beyond the first costs one mana-stone to unlock.
-Ten is the cap, one per number key from 1 to 0, reached at level 11.
-
 **Target level.**
 
 ```text
-the most active wizard reaches about wizard_level 15 on day 8
+a wizard who plays the whole run reaches about wizard_level 30, on average
 ```
 
 There is no level cap; the XP curve is built so this target holds, and the curve itself becomes the ceiling.
-Dungeon level ranges, up to 13 – 16, are set against it.
+Thirty levels give about thirty card choices over eight days, about one per hour of play; see `CARDS.md`.
+Dungeon level ranges, up to 25 – 32, are set against it.
 
 **Stat growth.**
 
 ```text
-health        = 100 + 20 × (wizard_level - 1)
-power         =  10 +  2 × (wizard_level - 1)
-magic_defence =  10 +  2 × (wizard_level - 1)
-luck          =   5 + floor((wizard_level - 1) / 2)
+health        = 100 + 10 × (wizard_level - 1)
+power         =  10 +  1 × (wizard_level - 1)
+magic_defence =  10 +  1 × (wizard_level - 1)
+luck          =   5 + floor((wizard_level - 1) / 4)
 speed         = 100                                      never grows with level
 ```
 
+This is the automatic part of a level-up; the card chosen at each level-up comes on top.
 Growth is linear, a starting point to tune once fights can be measured.
-Weapons, talents, flags and Artifacts stack on top of these base values.
-
-| `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool |
-| -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: |
-|              1 |    100 |    10 |            10 |                   14 % |    5 |             50 |
-|              4 |    160 |    16 |            16 |                   21 % |    6 |             76 |
-|              7 |    220 |    22 |            22 |                   27 % |    8 |             86 |
-|             11 |    300 |    30 |            30 |                   33 % |   10 |             94 |
-|             15 |    380 |    38 |            38 |                   39 % |   12 |            100 |
-
-A wizard at level 7 roughly matches a veteran enemy, and at the level-15 target blocks about what a champion blocks.
+Cards, weapons, flags and Artifacts stack on top of these base values.
 
 **Base mana pool.**
 
 ```text
-base_mana_pool = round(50 × (1 + ln(wizard_level) / ln(15)))
+base_mana_pool = round(50 + (wizard_level - 1) + 21 × ln(wizard_level) / ln(30))
 mana_pool      = base_mana_pool + tower income
 ```
 
-Logarithmic: every level adds mana, each a little less than the one before, from +13 at level 2 to +1 a level from level 14 on.
-It doubles from 50 at level 1 to 100 at the level-15 target, and keeps creeping up beyond.
+A logarithmic curve on top of one point per level: every level adds mana, the early ones much more than the late ones, from +5 at level 2 down to +1 or +2 past level 10.
+The single point per level is there because a pure logarithm stretched over thirty levels adds less than one point a level from level 15 on, and rounding would leave levels that add nothing.
+It doubles from 50 at level 1 to 100 at the level-30 target, and keeps rising beyond.
+
+**Grimoire positions.**
+
+```text
+grimoire_positions = min(10, 1 + floor((wizard_level - 1) / 3))
+```
+
+Source: `GLOSSARY.md`, Grimoire position.
+One position every three levels, each beyond the first costing one mana-stone to unlock.
+Ten is the cap, one per number key from 1 to 0, reached at level 28.
+
+| `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool | Grimoire positions |
+| -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: | -----------------: |
+|              1 |    100 |    10 |            10 |                   14 % |    5 |             50 |                  1 |
+|              4 |    130 |    13 |            13 |                   18 % |    5 |             62 |                  2 |
+|              7 |    160 |    16 |            16 |                   21 % |    6 |             68 |                  3 |
+|             10 |    190 |    19 |            19 |                   24 % |    7 |             73 |                  4 |
+|             16 |    250 |    25 |            25 |                   29 % |    8 |             82 |                  6 |
+|             22 |    310 |    31 |            31 |                   34 % |   10 |             90 |                  8 |
+|             28 |    370 |    37 |            37 |                   38 % |   11 |             98 |                 10 |
+|             30 |    390 |    39 |            39 |                   39 % |   12 |            100 |                 10 |
+
+A wizard at level 10 roughly matches a veteran enemy, and at the level-30 target blocks about what a champion blocks, before any card.
 
 ⬜ The XP needed for each `wizard_level`.
 
@@ -314,6 +321,19 @@ ordinary dungeon     : P(mana-stone) = 15 %, P(life-stone) = 8 %      proposed
 
 Every completion rolls, and since a wizard completes each dungeon once, a wizard doing all 20 expects about 3 mana-stones and 1.6 life-stones from dungeons.
 
+## Cards
+
+**Lock price.**
+
+```text
+lock_price(n) = base_lock_price × lock_multiplier ^ n      n = locks already bought this run
+```
+
+Source: `CARDS.md`.
+A reroll costs one mana-stone and an extra pick one life-stone, always.
+
+⬜ `base_lock_price` and `lock_multiplier`.
+
 ## Economy
 
 **Escalating price.**
@@ -404,6 +424,7 @@ Gathered here so they can be answered in one pass, roughly in the order the game
 | `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy           |
 | Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression            |
 | Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace               |
+| Lock price                                      | `CARDS.md`                    | the card choice             |
 
 **Stat growth comes first, then `K`.**
 The shape of the damage formula is settled; its constant only means something once the range of `magic_defence` across a run is known.

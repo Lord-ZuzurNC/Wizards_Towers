@@ -98,7 +98,7 @@ One database server holds everything that persists.
 
 | Data     | Holds                                                                                                          | Lifetime         |
 | -------- | -------------------------------------------------------------------------------------------------------------- | ---------------- |
-| accounts | Accounts, reincarnation points, talents, cosmetics, owned skins.                                               | Forever.         |
+| accounts | Accounts, reincarnation points, talents, decks, cosmetics, owned skins.                                        | Forever.         |
 | worlds   | Keyed by `world_id`: the map seed, villages, towers, floors, echoes, inventories, gold, spells, the run clock. | One run, 8 days. |
 
 Why PostgreSQL from the start.
