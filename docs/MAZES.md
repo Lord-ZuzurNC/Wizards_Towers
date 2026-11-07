@@ -101,7 +101,7 @@ At least 22 reusable primitives, the pieces assembled mazes in section 4 are bui
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Rune-Key Door**            | Presents a rune they hold to a lock that opens for exactly one rune.                                               | The door, the room, the permanent-this-visit fail state.             | Which single rune, attribute plus name, the lock accepts.           | Yes                        | Needs the generation guarantee from section 1, or it risks being globally unsolvable.                                                          |
 | **Attribute Sequence Lock**  | Touches four motifs, one per rune attribute, on a panel in the order the room hints at.                            | The panel, the four motifs, the hinting method.                      | The correct order of the four attributes, 24 possibilities.         | Yes                        | Pure logic, owns nothing, so it is always personally solvable.                                                                                 |
-| **Cost-Bar Threshold Gate**  | Casts or holds a spell so their own cost bar's fill lands inside a marked band on a gate.                          | The gate, the visible band, the hold interaction.                    | Where the band sits on the bar.                                     | Partial                    | Knowing to aim the bar is strategy, not an answer, since the band moves per instance.                                                          |
+| **Mana Band Gate**           | Casts or holds a spell until their own current mana lands inside a marked band on a gate.                          | The gate, the visible band, the hold interaction.                    | Where the band sits on the mana bar.                                | Partial                    | Knowing to aim the mana bar is strategy, not an answer, since the band moves per instance.                                                     |
 | **Effect-Order Plates**      | Pulls two Effect-tagged levers in sequence, since the order changes the outcome.                                   | The two-lever room, the two differing outcomes.                      | Which outcome is correct, so which lever goes first.                | Yes                        | Teaches the Effect1-then-Effect2 ordering rule without requiring ownership of either Effect rune.                                              |
 | **Element Resonance Gate**   | Casts the one Element the obstacle resonates with to clear it.                                                     | The obstacle, its visual tell.                                       | Which of the twelve Elements it responds to.                        | Yes                        | Hard for a Grimoire with no matching Element, but common Elements are purchasable, so a fallback is cheap to guarantee.                        |
 | **Invisible Safe-Tile Path** | Crosses a floor where only some tiles are safe, found from an environmental tell, not a guess.                     | The room, the soft penalty, the tell mechanism.                      | Which tiles are safe.                                               | Yes                        | Keep the penalty a reset, never damage.                                                                                                        |
@@ -272,12 +272,12 @@ Built around two of the heaviest, rarest Shape runes in the game, and flagged he
 
 ### 4.12 The Prism of Luck
 
-*Mechanics: Luck Ledger Deduction + Cost-Bar Threshold Gate.*
+*Mechanics: Luck Ledger Deduction + Mana Band Gate.*
 
 A deduction-heavy maze pitched as a late-run finale: nothing here is a luck roll, despite the name, and that contrast is the point.
 
 - **Stage 1 — the ledger hall.** A ledger of fictional past outcomes; deducing the favoured option opens the inner door.
-- **Stage 2 — the prism gate.** A gate reading the wizard's live cost bar, open only while a cast holds the bar's fill inside a marked, generated band.
+- **Stage 2 — the prism gate.** A gate reading the wizard's live mana, open only while a held cast keeps their current mana inside a marked, generated band.
 
 **Difficulty:** High.
 **Reward:** large XP and a rare rune.
@@ -305,7 +305,7 @@ Rune-Key Door, Attribute Sequence Lock, Effect-Order Plates, Element Resonance G
 That is 21 of the 26, and it is the category this document recommends building almost exclusively from.
 
 **Partially spoiler-proof, because a transferable strategy leaks even though the exact answer still regenerates:**
-Cost-Bar Threshold Gate, Mana Budget Gauntlet, Gold Toll Pedestals, Mad-Libs Rune Riddle.
+Mana Band Gate, Mana Budget Gauntlet, Gold Toll Pedestals, Mad-Libs Rune Riddle.
 These are still worth building — a returning player solving faster is normal game feel, not a problem — but they should not be the hardest gate in a maze, because the ceiling on how hard they can be made is lower once the trick is known.
 
 **Not spoiler-proof on its own:**
