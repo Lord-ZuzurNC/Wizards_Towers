@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+0 initial state -> HTTP 200 in 20.9 ms
+    {"wizards" : [{"id":1,"name":"Alba","gold":5000}, 
+ {"id":2,"name":"Brann","gold":100}], "villages" : [{"id":1,"owner_id":null,"price":3000}, 
+ {"id":2,"owner_id":null,"price":3000}, 
+ {"id":3,"owner_id":null,"price":50}], "ledger_rows" : 0}
+A Brann buys village 3 (price 50, has 100) -> HTTP 200 in 41.3 ms
+    {"wizard" : 2, "village" : 3, "gold_left" : 50}
+B Brann buys village 1 (price 3000, has 50) -> HTTP 400 in 34.5 ms
+    {"code":"P0001","details":null,"hint":null,"message":"not enough gold"}
+C crash after debit (Alba, village 1) -> HTTP 400 in 34.4 ms
+    {"code":"P0001","details":null,"hint":null,"message":"simulated crash after the debit"}
+C' state after crash -> HTTP 200 in 34.5 ms
+    {"wizards" : [{"id":1,"name":"Alba","gold":5000}, 
+ {"id":2,"name":"Brann","gold":50}], "villages" : [{"id":1,"owner_id":null,"price":3000}, 
+ {"id":2,"owner_id":null,"price":3000}, 
+ {"id":3,"owner_id":2,"price":50}], "ledger_rows" : 1}
+D1 concurrent buy, village 1 -> HTTP 200 in 338.1 ms
+    {"wizard" : 1, "village" : 1, "gold_left" : 2000}
+D2 concurrent buy, village 2 -> HTTP 400 in 641.6 ms
+    {"code":"P0001","details":null,"hint":null,"message":"not enough gold"}
+D' state after race -> HTTP 200 in 27.6 ms
+    {"wizards" : [{"id":1,"name":"Alba","gold":2000}, 
+ {"id":2,"name":"Brann","gold":50}], "villages" : [{"id":1,"owner_id":1,"price":3000}, 
+ {"id":2,"owner_id":null,"price":3000}, 
+ {"id":3,"owner_id":2,"price":50}], "ledger_rows" : 2}
+E direct table write attempt -> HTTP 404 in 34.5 ms
+    {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'api.wizards' in the schema cache"}
+F latency ms: min 34.35 / median 34.47 / max 34.52
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+use_threads=false  min 14.08 / median 34.47 / max 34.62 ms  (fps cap 0)
+use_threads=true  min 6.80 / median 6.87 / max 6.93 ms  (fps cap 0)

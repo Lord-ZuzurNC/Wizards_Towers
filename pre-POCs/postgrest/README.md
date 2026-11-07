@@ -25,7 +25,7 @@ Only the functions in the `api` schema are callable, and each value-moving write
 
 ## Results
 
-Measured on 2026-11-07, twice, with identical results; the raw output of the second run is in `results.log`.
+Measured on 2026-11-07, twice, with identical results; the raw output of the second run is in `results.txt`.
 
 | Case | What it checks                                      | Result                                                         |
 | ---- | --------------------------------------------------- | -------------------------------------------------------------- |

@@ -14,7 +14,7 @@ const COLORS := [
 const SPINE_COLOR := Color("4a4a4a")
 const LAKE_COLOR := Color("8fd6ff")
 const ISLAND_COLOR := Color("f2e3b0")
-const CENTER := Vector2(W / 2.0, H / 2.0)
+var monolith := Vector2(W / 2.0, H / 2.0)  # drawn per mask inside the central box
 
 var grid := PackedByteArray()
 var spine := PackedByteArray()
@@ -86,7 +86,9 @@ func _generate(seed_value: int) -> String:
 	feature.fill(0)
 	frostfang = "not drawn"
 
-	_stamp(CENTER, 16.0, PLAINS)  # the Monolith and its Outer Ring always stand in plains
+	# The Monolith stands anywhere within ±10 % of the centre, its Outer Ring entirely in plains.
+	monolith = Vector2(rng.randf_range(0.4, 0.6) * W, rng.randf_range(0.4, 0.6) * H)
+	_stamp(monolith, 16.0, PLAINS)
 	_paint_coast()
 	_paint_mountain()
 	_paint_volcanic()
@@ -170,13 +172,13 @@ func _paint_volcanic() -> void:
 func _place_seeds(volcano_distance: PackedInt32Array) -> Dictionary:
 	var vd := func(p: Vector2) -> int: return volcano_distance[int(p.y) * W + int(p.x)]
 	var forest := _random_point(45.0, 20.0, func(p: Vector2) -> bool:
-		return grid[int(p.y) * W + int(p.x)] == NONE and vd.call(p) >= 35 and p.distance_to(CENTER) <= 95.0)
+		return grid[int(p.y) * W + int(p.x)] == NONE and vd.call(p) >= 35 and p.distance_to(monolith) <= 95.0)
 	if forest.x < 0:
 		return {}
 	var marsh := _random_point(70.0, 20.0, func(p: Vector2) -> bool:
 		var d := p.distance_to(forest)
 		return grid[int(p.y) * W + int(p.x)] == NONE and d >= 45.0 and d <= 75.0 \
-			and p.distance_to(CENTER) > forest.distance_to(CENTER) and vd.call(p) >= 10)
+			and p.distance_to(monolith) > forest.distance_to(monolith) and vd.call(p) >= 10)
 	if marsh.x < 0:
 		return {}
 	var glacier := _random_point(60.0, 20.0, func(p: Vector2) -> bool:
@@ -189,16 +191,11 @@ func _place_seeds(volcano_distance: PackedInt32Array) -> Dictionary:
 			and p.distance_to(marsh) >= 60.0 and p.distance_to(glacier) >= 60.0)
 	if desert.x < 0:
 		return {}
-	var plains := _random_point(50.0, 20.0, func(p: Vector2) -> bool:
-		return grid[int(p.y) * W + int(p.x)] == NONE and p.distance_to(forest) >= 55.0 \
-			and p.distance_to(marsh) >= 55.0 and p.distance_to(glacier) >= 55.0 and p.distance_to(desert) >= 55.0)
-	if plains.x < 0:
-		return {}
-	return {PLAINS: [CENTER, plains], FOREST: [forest], MARSH: [marsh], GLACIER: [glacier], DESERT: [desert]}
+	return {PLAINS: [monolith], FOREST: [forest], MARSH: [marsh], GLACIER: [glacier], DESERT: [desert]}
 
 
 func _voronoi(seeds: Dictionary, volcano_distance: PackedInt32Array) -> void:
-	var weight := {PLAINS: 1.5, FOREST: 1.0, MARSH: 0.9, GLACIER: 1.0, DESERT: 1.0}
+	var weight := {PLAINS: 2.0, FOREST: 1.0, MARSH: 0.9, GLACIER: 1.0, DESERT: 1.0}
 	for y in H:
 		for x in W:
 			var i := y * W + x
@@ -227,7 +224,11 @@ func _cleanup() -> void:
 		if comps.size() < 2:
 			continue
 		comps.sort_custom(func(a: Array, b: Array) -> bool: return a.size() > b.size())
+		var joined := _plains_side_of_chain() if biome == PLAINS else PackedByteArray()
 		for k in range(1, comps.size()):
+			# Plains cut by the mountain chain stay plains: a piece is kept when only the chain separates it.
+			if biome == PLAINS and comps[k].size() >= W * H * 0.01 and joined[comps[k][0]] == 1:
+				continue
 			var votes := {}
 			for i: int in comps[k]:
 				for j in _neighbours(i):
@@ -272,11 +273,19 @@ func _validate() -> String:
 		return "mountain touching two edges"
 	if _edges_touched(COAST) < 1:
 		return "coast off the edge"
-	for b in [PLAINS, FOREST, MARSH, GLACIER, DESERT]:
+	for b in [FOREST, MARSH, GLACIER, DESERT]:
 		if _components(b).size() != 1:
 			return NAMES[b] + " split in two"
+	var joined := _plains_side_of_chain()
+	for i in W * H:
+		if grid[i] == PLAINS and joined[i] == 0:
+			return "plains in two zones"
+	for y in range(int(monolith.y) - 13, int(monolith.y) + 14):
+		for x in range(int(monolith.x) - 13, int(monolith.x) + 14):
+			if Vector2(x, y).distance_to(monolith) <= 12.5 and grid[y * W + x] != PLAINS:
+				return "Outer Ring not in plains"
 	# Everything walkable must be reachable from the Monolith: only the mountain spine blocks.
-	var reach := _distance_field(func(i: int) -> bool: return i == int(CENTER.y) * W + int(CENTER.x), 100000, true)
+	var reach := _distance_field(func(i: int) -> bool: return i == int(monolith.y) * W + int(monolith.x), 100000, true)
 	for i in W * H:
 		if spine[i] == 0 and reach[i] >= 100000:
 			return "unreachable ground"
@@ -322,7 +331,7 @@ func _walk(start: Vector2, angle: float, length: float, base_w: float, wiggle: f
 		var w := base_w * (1.0 + 0.3 * edge_noise.get_noise_2d(p.x * 3, p.y * 3))
 		_stamp(p, w, biome, spine_r)
 		a += rng.randfn(0.0, wiggle)
-		var away := p - CENTER
+		var away := p - monolith
 		if away.length() < avoid_center + w + 8.0:
 			a = lerp_angle(a, away.angle(), 0.35)
 		var push := Vector2.ZERO
@@ -351,7 +360,7 @@ func _stamp(c: Vector2, r: float, biome: int, spine_r := 0.0) -> void:
 func _random_point(min_center: float, margin: float, ok: Callable) -> Vector2:
 	for _t in 600:
 		var p := Vector2(rng.randf_range(margin, W - 1 - margin), rng.randf_range(margin, H - 1 - margin))
-		if p.distance_to(CENTER) >= min_center and ok.call(p):
+		if p.distance_to(monolith) >= min_center and ok.call(p):
 			return p
 	return Vector2(-1, -1)
 
@@ -399,6 +408,23 @@ func _components(biome: int) -> Array:
 	return comps
 
 
+## Cells joined to the Monolith through plains and mountain only: plains split by the chain count as one zone.
+func _plains_side_of_chain() -> PackedByteArray:
+	var out := PackedByteArray()
+	out.resize(W * H)
+	var start := int(monolith.y) * W + int(monolith.x)
+	var queue := PackedInt32Array([start])
+	out[start] = 1
+	var head := 0
+	while head < queue.size():
+		for j in _neighbours(queue[head]):
+			if out[j] == 0 and (grid[j] == PLAINS or grid[j] == MOUNTAIN):
+				out[j] = 1
+				queue.append(j)
+		head += 1
+	return out
+
+
 func _neighbours(i: int) -> PackedInt32Array:
 	var x := i % W
 	var y := i / W
@@ -432,7 +458,9 @@ func _shares() -> String:
 	var parts := PackedStringArray()
 	for b in 8:
 		parts.append("%s %d%%" % [NAMES[b], roundi(100.0 * counts[b] / (W * H))])
-	return ", ".join(parts)
+	return ", ".join(parts) + "  (plains in %d piece%s, Monolith at %d %%, %d %%)" % [
+		_components(PLAINS).size(), "" if _components(PLAINS).size() == 1 else "s",
+		roundi(100.0 * monolith.x / W), roundi(100.0 * monolith.y / H)]
 
 
 func _render() -> Image:
@@ -448,9 +476,9 @@ func _render() -> Image:
 			elif feature[i] == 2:
 				c = ISLAND_COLOR
 			img.set_pixel(x, y, c)
-	for y in range(int(CENTER.y) - 13, int(CENTER.y) + 14):
-		for x in range(int(CENTER.x) - 13, int(CENTER.x) + 14):
-			var d := Vector2(x, y).distance_to(CENTER)
+	for y in range(int(monolith.y) - 13, int(monolith.y) + 14):
+		for x in range(int(monolith.x) - 13, int(monolith.x) + 14):
+			var d := Vector2(x, y).distance_to(monolith)
 			if d <= 3.5:
 				img.set_pixel(x, y, Color.BLACK)
 			elif d >= 11.0 and d <= 12.0:

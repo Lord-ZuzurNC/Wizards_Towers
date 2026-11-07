@@ -36,6 +36,8 @@ The card catalogue itself is not designed yet; this document sets the rules ever
 
 - **Keepsake Wisp.** Taking it summons the Keepsake Wisp for the rest of the run: a spirit carrying nothing mechanical, which greets the wizard by the name of their previous life. See `SPIRITS_GUARDIANS.md`.
 - **Dungeon and maze cards.** Never drawn: each one adds **one vote** for its dungeon or maze in a draw, without guaranteeing it. A dungeon card counts when the world draws its 20 dungeons, a maze card each time a season replaces its mazes; the votes of every deck in the world's queue add up.
+  A player earns a dungeon's card the first time they complete it, and a maze's card the first time they solve it.
+  A maze marked solved by an item, such as the Artifact The Maze-Breaker, does not earn its card.
 
 **World boss summons.**
 A summon is never offered: when drawn, it is played on the spot, it leaves the run deck, and another card is drawn in its place.

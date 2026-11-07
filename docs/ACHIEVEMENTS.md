@@ -14,11 +14,12 @@ It makes a talent purchasable, and RP buy it; see `CARDS.md` and `GLOSSARY.md`, 
 
 ## What an achievement unlocks
 
-| Unlock                              | Needs                    |
-| ----------------------------------- | ------------------------ |
-| A card for a wizard type's deck     | An achievement, then RP. |
-| The Magus, the Arcanist, the Oracle | An achievement, then RP. |
-| A weapon that may drop during runs  | RP.                      |
+| Unlock                              | Needs                                           |
+| ----------------------------------- | ----------------------------------------------- |
+| A card for a wizard type's deck     | An achievement, then RP.                        |
+| The Magus, the Arcanist, the Oracle | An achievement, then RP.                        |
+| A weapon that may drop during runs  | RP.                                             |
+| A dungeon's or a maze's card        | Completing it for the first time; nothing else. |
 
 The Sorcerer needs nothing: every player starts with it.
 

@@ -68,7 +68,7 @@ A level-1 wizard with no talents is the baseline.
 | **health**        | Damage a combatant absorbs before dying.                                                                                                            | `health`        | 100      | ✅      |
 | **power**         | Offensive strength. **One** stat whether the combatant strikes in melee or at range.                                                                | `power`         | 10       | ✅      |
 | **magic defence** | Damage reduction. Spelled the British way, with a `c`.                                                                                              | `magic_defence` | 10       | ✅      |
-| **speed**         | Movement rate, where 100 is a normal walk.                                                                                                          | `speed`         | 100      | ✅      |
+| **speed**         | Movement rate, where 100 is a normal walk: **4 tiles a second**.                                                                                    | `speed`         | 100      | ✅      |
 | **luck**          | Chance of a favourable roll: a crit, a second Spark strike, a better drop.                                                                          | `luck`          | 5        | ✅      |
 | **attack type**   | Descriptive only, `melee` or `magic`. Never a second power stat.                                                                                    | `attack_type`   | —        | ✅      |
 

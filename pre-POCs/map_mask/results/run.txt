@@ -1,0 +1,11 @@
+mask 01  attempts   7  plains 51%, forest 9%, marsh 9%, glacier 13%, desert 8%, mountain 5%, volcanic 2%, coast 3%  (plains in 1 piece, Monolith at 50 %, 45 %)  frostfang: island off the coast
+mask 02  attempts  10  plains 50%, forest 8%, marsh 6%, glacier 9%, desert 14%, mountain 5%, volcanic 3%, coast 5%  (plains in 2 pieces, Monolith at 59 %, 50 %)  frostfang: island off the coast
+mask 03  attempts   3  plains 56%, forest 7%, marsh 9%, glacier 10%, desert 7%, mountain 4%, volcanic 2%, coast 5%  (plains in 1 piece, Monolith at 42 %, 50 %)  frostfang: lake in the glacier
+mask 04  attempts   5  plains 52%, forest 8%, marsh 5%, glacier 15%, desert 8%, mountain 4%, volcanic 3%, coast 5%  (plains in 3 pieces, Monolith at 60 %, 50 %)  frostfang: not drawn
+mask 05  attempts   3  plains 55%, forest 5%, marsh 9%, glacier 10%, desert 9%, mountain 5%, volcanic 2%, coast 5%  (plains in 2 pieces, Monolith at 41 %, 45 %)  frostfang: lake in the glacier
+mask 06  attempts   1  plains 50%, forest 6%, marsh 8%, glacier 12%, desert 15%, mountain 3%, volcanic 1%, coast 5%  (plains in 1 piece, Monolith at 41 %, 52 %)  frostfang: not drawn
+mask 07  attempts   2  plains 53%, forest 10%, marsh 13%, glacier 6%, desert 7%, mountain 5%, volcanic 1%, coast 5%  (plains in 1 piece, Monolith at 57 %, 53 %)  frostfang: not drawn
+mask 08  attempts   5  plains 55%, forest 7%, marsh 7%, glacier 13%, desert 9%, mountain 4%, volcanic 2%, coast 4%  (plains in 1 piece, Monolith at 48 %, 41 %)  frostfang: lake in the glacier
+mask 09  attempts   2  plains 55%, forest 6%, marsh 9%, glacier 13%, desert 7%, mountain 4%, volcanic 1%, coast 5%  (plains in 3 pieces, Monolith at 55 %, 56 %)  frostfang: not drawn
+mask 10  attempts   4  plains 53%, forest 9%, marsh 8%, glacier 6%, desert 11%, mountain 5%, volcanic 4%, coast 4%  (plains in 1 piece, Monolith at 48 %, 49 %)  frostfang: not drawn
+attempts in total: 42 for 10 masks; rejected because: { "glacier split in two": 3, "desert split in two": 6, "glacier too small": 1, "marsh too small": 5, "marsh not bordering forest": 4, "forest touching volcanic": 1, "marsh split in two": 2, "forest split in two": 2, "plains in two zones": 5, "forest too small": 3 }

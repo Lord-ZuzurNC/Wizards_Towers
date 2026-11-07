@@ -5,6 +5,7 @@ How a world's map is laid out: a **mask** of biomes first, then the terrain gene
 - [World map — Wizards Towers](#world-map--wizards-towers)
   - [How to read this document](#how-to-read-this-document)
   - [The mask](#the-mask)
+  - [Scale](#scale)
   - [Biomes](#biomes)
   - [Placement](#placement)
   - [The Frostfang exception](#the-frostfang-exception)
@@ -22,18 +23,37 @@ A first pre-POC generating masks is in `pre-POCs/map_mask/`.
 ## The mask
 
 **Each biome appears exactly once**, as a single zone.
-**The Monolith always stands at the exact centre**, in the plains, with its Outer Ring around it.
+One exception: the mountain chain may cut the plains in pieces, as long as the pieces are walkable from one another through the other zones.
+
+**The Monolith stands near the centre**, anywhere within 10 % of it on each axis, in the plains.
+Its Outer Ring stands entirely in the plains too.
 
 **Players see the mask before they see the world.**
 The queue screen shows a far minimap of the world; that minimap is the mask, so players know the shape of the land while they wait, and discover the real terrain once inside.
 
 Borders between zones are bent by noise, so no zone has a straight edge.
 
+## Scale
+
+Provisional, until the art style fixes the size of a tile in pixels.
+
+| Measure                  | Value                                               |
+| ------------------------ | --------------------------------------------------- |
+| Normal walk, `speed` 100 | 4 tiles a second                                    |
+| Map side                 | 2 560 tiles, about 10 minutes 40 seconds of walking |
+| Map corner to corner     | about 15 minutes                                    |
+| Mask                     | 256 × 256 points, each covering 10 × 10 tiles       |
+| Streaming chunk          | 64 × 64 tiles, so 40 × 40 chunks for the whole map  |
+
+The ten-minute width is the one settled in the design questions, sized for fifty wizards.
+Four tiles a second is a usual walk in top-down pixel-art games, quick enough that a 10 to 20 second fight can move around.
+At 16 pixels a tile, `speed` 100 is 64 pixels a second and the map is 40 960 pixels wide.
+
 ## Biomes
 
 | Biome    | Mask colour | Rule                                                                                                          |
 | -------- | ----------- | ------------------------------------------------------------------------------------------------------------- |
-| Plains   | yellow      | The largest zone, and the one holding the Monolith.                                                           |
+| Plains   | yellow      | The largest zone, and the one holding the Monolith; the only one the mountain chain may cut.                  |
 | Forest   | green       | Always borders the plains. Never touches volcanic ground.                                                     |
 | Marsh    | brown       | Always borders the forest.                                                                                    |
 | Glacier  | white       | Never touches volcanic ground.                                                                                |
@@ -69,6 +89,7 @@ The dungeon's entrance stands on that island, and the way to it freezes over in 
 
 ## Open questions
 
-- ⬜ **The size of a map**, and how many terrain tiles one mask point covers.
+- ⬜ **The size of a tile in pixels**, fixed with the art style.
+- ⬜ **A minimum width for every zone**, so no biome ends up as a thin strip between two others.
 - ⬜ **The theme of every dungeon and world boss**, assigned to a biome; the table above is a first pass.
 - ⬜ **Hand-painted masks**: whether some worlds use a curated mask instead of a generated one.
