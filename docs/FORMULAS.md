@@ -345,9 +345,8 @@ A reroll costs one mana-stone and an extra pick one life-stone, always.
 **Card rarity.**
 
 ```text
-rarity rolled when a card is drawn: common 85 %, rare 10 %, legendary 5 %
-stat, mana, special card : bonus × 1.0 common, × 1.5 rare, × 2.0 legendary
-rune card                : grants the rune at the rolled rarity, scaled as in RUNES.md
+rarity rolled when a Stat or Mana card is drawn: common 85 %, rare 10 %, legendary 5 %
+stat and mana cards only : bonus × 1.0 common, × 1.5 rare, × 2.0 legendary
 ```
 
 ⬜ `base_lock_price` and `lock_multiplier`.
