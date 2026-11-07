@@ -1,5 +1,16 @@
 # Runes — Wizards Towers
 
+- [Runes — Wizards Towers](#runes--wizards-towers)
+  - [Reach](#reach)
+  - [How to read this document](#how-to-read-this-document)
+  - [Shape](#shape)
+  - [Element](#element)
+  - [Duration](#duration)
+  - [Effect](#effect)
+  - [Rune counts](#rune-counts)
+  - [Combination space](#combination-space)
+  - [Notes for balancing](#notes-for-balancing)
+
 A rune is the atomic ingredient of a spell.
 Each rune belongs to exactly one **attribute**, and an attribute is a position inside a spell.
 

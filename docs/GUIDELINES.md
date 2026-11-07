@@ -6,6 +6,40 @@
 
 # Wizards Towers — style guideline
 
+- [Wizards Towers — style guideline](#wizards-towers--style-guideline)
+  - [How to read this document](#how-to-read-this-document)
+- [Wiki style](#wiki-style)
+- [Code style](#code-style)
+  - [GDScript (.gd)](#gdscript-gd)
+    - [Upstream rules worth stating explicitly](#upstream-rules-worth-stating-explicitly)
+    - [Naming (upstream)](#naming-upstream)
+    - [Code order (upstream, Godot 4.7)](#code-order-upstream-godot-47)
+    - [Line length (project)](#line-length-project)
+    - [Signals (project)](#signals-project)
+    - [Setters, initializers and exported scenes (project)](#setters-initializers-and-exported-scenes-project)
+    - [Node groups and animations (project)](#node-groups-and-animations-project)
+    - [Inner classes (project)](#inner-classes-project)
+  - [Documentation comments](#documentation-comments)
+    - [Virtual properties](#virtual-properties)
+  - [Typed collections instead of commented ones](#typed-collections-instead-of-commented-ones)
+  - [Getting a custom class name at runtime](#getting-a-custom-class-name-at-runtime)
+  - [JSON and save data](#json-and-save-data)
+  - [Node access](#node-access)
+  - [Referencing engine bugs](#referencing-engine-bugs)
+  - [Multiplayer code](#multiplayer-code)
+  - [Scene files (.tscn)](#scene-files-tscn)
+  - [Shaders (.gdshader)](#shaders-gdshader)
+  - [Shell scripts (.sh)](#shell-scripts-sh)
+  - [Third-party code and licence notices](#third-party-code-and-licence-notices)
+- [Markdown documentation style](#markdown-documentation-style)
+  - [Line breaks](#line-breaks)
+  - [Blocks](#blocks)
+  - [Tables and tables of contents](#tables-and-tables-of-contents)
+  - [Prose versus code](#prose-versus-code)
+  - [What does not belong in public documentation](#what-does-not-belong-in-public-documentation)
+- [Glossary](#glossary)
+- [Appendix: Godot 3 traps](#appendix-godot-3-traps)
+
 ## How to read this document
 
 Three kinds of rules live here, and the distinction matters:

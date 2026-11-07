@@ -1,5 +1,8 @@
 # Easter eggs — Wizards Towers
 
+- [Easter eggs — Wizards Towers](#easter-eggs--wizards-towers)
+  - [The Collector in the sealed ROOF](#the-collector-in-the-sealed-roof)
+
 🔴 **Spoilers.**
 This file holds every hidden mechanic players are meant to find for themselves.
 No other document describes them; the others point here instead.

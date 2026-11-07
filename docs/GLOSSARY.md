@@ -4,6 +4,20 @@ The glossary is not decoration.
 It is the **contract between the design documents and the identifiers in the code**:
 one concept, one word, one spelling, everywhere — in the design document, in the wiki, in the class names, in the UI strings.
 
+- [Glossary — Wizards Towers](#glossary--wizards-towers)
+  - [How to use it](#how-to-use-it)
+  - [Entities](#entities)
+  - [Stats](#stats)
+  - [The Monolith](#the-monolith)
+  - [Resources](#resources)
+  - [Magic](#magic)
+  - [Session structure](#session-structure)
+  - [Endings](#endings)
+    - [World endings](#world-endings)
+    - [Wizard endings](#wizard-endings)
+  - [Offline and ownership](#offline-and-ownership)
+  - [Banned synonyms](#banned-synonyms)
+
 ## How to use it
 
 1. **One concept, one term.**

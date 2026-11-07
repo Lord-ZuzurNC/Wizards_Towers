@@ -1,5 +1,13 @@
 # Bestiary — Wizards Towers
 
+- [Bestiary — Wizards Towers](#bestiary--wizards-towers)
+  - [How to read this document](#how-to-read-this-document)
+  - [Tiers](#tiers)
+  - [Families](#families)
+  - [Special enemies](#special-enemies)
+  - [Scaling across the four seasons](#scaling-across-the-four-seasons)
+  - [Notes for balancing](#notes-for-balancing)
+
 ## How to read this document
 
 This document lists the enemies that roam the open world, fill dungeons and mazes, and defend the Monolith's floors.

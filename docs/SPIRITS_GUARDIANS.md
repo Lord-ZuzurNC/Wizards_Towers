@@ -1,5 +1,14 @@
 # Spirits and Guardians — Wizards Towers
 
+- [Spirits and Guardians — Wizards Towers](#spirits-and-guardians--wizards-towers)
+  - [A place, or a person](#a-place-or-a-person)
+  - [Guardians](#guardians)
+  - [Guardian deployment rules](#guardian-deployment-rules)
+  - [Spirits](#spirits)
+    - [Combat-capable spirits](#combat-capable-spirits)
+  - [Spirit rules](#spirit-rules)
+  - [Balance](#balance)
+
 ## A place, or a person
 
 A **guardian** holds a place and never leaves it. It is stationed in a village by a village upgrade — the physical result of a purchase a wizard made — and if that village falls, every guardian stationed in it falls with it.

@@ -1,5 +1,16 @@
 # Weapons — Wizards Towers
 
+- [Weapons — Wizards Towers](#weapons--wizards-towers)
+  - [Wizard types](#wizard-types)
+  - [How to read this document](#how-to-read-this-document)
+  - [Wand](#wand)
+  - [Staff](#staff)
+  - [Tome](#tome)
+  - [Relic](#relic)
+  - [Choosing between kinds](#choosing-between-kinds)
+  - [Weapon counts](#weapon-counts)
+  - [Notes for balancing](#notes-for-balancing)
+
 A weapon is what a wizard holds, not what a wizard casts.
 There are four kinds: wand, staff, tome and relic, and this document lists them with the small stat bonuses each one grants.
 A weapon is the one durable possession a wizard keeps.

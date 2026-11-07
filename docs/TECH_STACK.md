@@ -4,6 +4,21 @@ This document records what the project is built with and why.
 It is a decision record, not a tutorial.
 Where a decision is deferred it carries ⬜ and says what would settle it.
 
+- [Tech stack — Wizards Towers](#tech-stack--wizards-towers)
+  - [Engine and language](#engine-and-language)
+  - [View and projection](#view-and-projection)
+  - [Client and server](#client-and-server)
+  - [Authority model](#authority-model)
+  - [Persistence](#persistence)
+  - [Crash recovery](#crash-recovery)
+  - [Hosting](#hosting)
+  - [Multiple worlds](#multiple-worlds)
+  - [Accounts and identity](#accounts-and-identity)
+  - [Protocol version](#protocol-version)
+  - [Skins](#skins)
+  - [Release](#release)
+  - [What is deliberately absent](#what-is-deliberately-absent)
+
 ## Engine and language
 
 | Choice      | Decision                       | Notes                                                            |

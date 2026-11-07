@@ -4,6 +4,16 @@ An Artifact is a world-unique rune bound to a floor of the Monolith, not to a wi
 Hold the floor, use the rune in your spell.
 Lose the floor and the rune leaves your spell.
 
+- [Artifacts — Wizards Towers](#artifacts--wizards-towers)
+  - [How to read this document](#how-to-read-this-document)
+  - [Shape Artifacts](#shape-artifacts)
+  - [Element Artifacts](#element-artifacts)
+  - [Duration Artifacts](#duration-artifacts)
+  - [Effect Artifacts](#effect-artifacts)
+  - [Corruptions](#corruptions)
+  - [Catalogue counts](#catalogue-counts)
+  - [Notes for balancing](#notes-for-balancing)
+
 ## How to read this document
 
 This catalogue holds exactly **100** Artifacts.
