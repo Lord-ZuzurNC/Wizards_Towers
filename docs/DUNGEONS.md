@@ -19,6 +19,9 @@
   - [The Gilded Hoard](#the-gilded-hoard)
   - [The Silt Cisterns](#the-silt-cisterns)
   - [Frostfang Caverns](#frostfang-caverns)
+  - [The Thawroot Burrow](#the-thawroot-burrow)
+  - [The Sunheart Bloom](#the-sunheart-bloom)
+  - [Vespergrave](#vespergrave)
   - [Cindermaw Forge](#cindermaw-forge)
   - [Notes for balancing](#notes-for-balancing)
 
@@ -26,7 +29,7 @@
 
 This is a content list, not an implementation spec.
 Every dungeon below is a self-contained combat encounter: a short identity paragraph, a room-by-room table, and a line on what completion drops.
-The summary table lets a designer scan all fifteen entries before drilling into one.
+The summary table lets a designer scan all eighteen entries before drilling into one.
 Room tables use four fixed columns — **Room**, **What is there**, **Enemies**, **Notes** — so every dungeon reads the same way regardless of theme.
 Enemy entries always carry a tier from the shared tier scale below, and an attack type of either `melee` or `magic`, per the project's single `power` stat convention.
 Where an enemy's numbers deviate from its tier by more than a token amount, the Notes column says why, capped at the ±25 % allowed by the tier scale.
@@ -37,6 +40,7 @@ The puzzle variant, the maze, is documented elsewhere and is not repeated here.
 A naming note worth flagging up front: the theme **ruined wizard tower** is flavour only.
 It does not refer to the mechanical `Tower` entity that a village builds for mana income, and it is never the Monolith.
 Two dungeons below use this theme and their in-fiction name is simply "a tower that used to belong to a wizard," nothing more.
+No code or UI string ever shortens such a dungeon's name to "the tower".
 
 ## What a dungeon is
 
@@ -46,9 +50,24 @@ That safety is a deliberate design feature: a dungeon is the one place a wizard 
 A handful of the dungeons below then deliberately undercut that safety with a time-pressure or lingering gimmick, which is the point — the dungeon is still PvE-safe, but it is not passive-safe.
 Entering any dungeon permanently breaks a level-1 wizard's peace shield, the same as their first attack or reaching level 2 does.
 A level-1 wizard who steps through a dungeon entrance has chosen to leave newcomer protection behind.
-Exactly one dungeon entrance in the world only opens during a specific season; every other entrance is open all run.
+
+**One wizard at a time.**
+The entrance seals itself by magic once a wizard steps through, and reopens when that wizard leaves or dies.
+Nothing stops another wizard from waiting at the entrance.
+
+**A world draws its dungeons.**
+At generation, a world draws a limited number of dungeons at random from this catalogue, so no two worlds offer the same set.
+The draw always includes one season-gated dungeon per season.
+
+**Season-gated dungeons.**
+Each season has at least one dungeon that exists only while that season lasts.
+When its season ends, the dungeon closes on the spot; a wizard still inside is thrown out at the entrance and gets no completion reward.
+
+**A rest zone follows every third room.**
+It holds no enemy, is not counted as a room, and health and mana regenerate there at an accelerated rate.
+
 Completing a dungeon grants experience, gold, runes and reincarnation points, plus a chance — never a guarantee — at a mana-stone or a life-stone.
-Those two consumables are scarce by design: a wizard sees three to five mana-stones and two to three life-stones across an entire run, so no single dungeon can be relied on to produce one.
+Those two consumables are scarce by design, so stone odds in dungeons are **low** everywhere.
 
 ## How difficulty is expressed
 
@@ -88,12 +107,16 @@ A level-1 wizard with no talents is the baseline these numbers are measured agai
 | The Gilded Hoard      |     7 | 8 – 11            | Crypts              | The Hoardwarden (champion)           | Any         |
 | The Silt Cisterns     |     5 | 9 – 12            | Flooded mines       | The Silt Behemoth (champion)         | Any         |
 | Frostfang Caverns     |     8 | 10 – 13           | Elemental rift      | The Frost Sovereign (champion)       | Winter only |
+| The Thawroot Burrow   |     5 | 3 – 6             | Root burrow         | The Rootmother (champion)            | Spring only |
+| The Sunheart Bloom    |     6 | 6 – 9             | Giant flower        | The Heartseed Warden (champion)      | Summer only |
+| Vespergrave           |     6 | 8 – 11            | Haunted graveyard   | The Lantern Keeper (champion)        | Autumn only |
 | Cindermaw Forge       |     9 | 11 – 14           | Elemental rift      | The Cindermaw Triumvirate (3 elites) | Any         |
 
 ## The Hollow Crypts
 
 A burial ground predating the current villages, four low chambers cut into a hillside.
-This is the dungeon the design brief treats as a baseline: no gimmick, a clean escalation from critter to champion, built to teach a new wizard what a dungeon run feels like.
+This is the baseline dungeon: no gimmick, a clean escalation from critter to champion, built to teach a new wizard what a dungeon run feels like.
+It is deliberately easy, so a wizard who has fallen behind in levels still has a dungeon to clear.
 Every enemy here is undead, melee-leaning, and slow by design so a level-2 wizard can read their attacks.
 
 | Room             | What is there                                  | Enemies                                                         | Notes                                                                  |
@@ -230,6 +253,7 @@ Small chance at a life-stone.
 ## Blackroot Bandit Fort
 
 A proper fortified bandit holding, built into an old quarry wall, with a working alarm system.
+It is deliberately hard for its level band, and a wooden sign nailed at the quarry gate warns the careless before they step in.
 **Gimmick — punishes slow clearing, fort-wide:** the fort tracks a single alert level across the whole run, not per room.
 Clearing a room slowly raises the alert level; every room entered afterward spawns additional common-tier reinforcements for each alert step still active, and if the alert is maxed by the time the wizard reaches the Warlord, he enters the fight with an extra veteran-tier guard already present.
 This is a global, accumulating version of the same pressure Thistlewake Grove applies locally per room.
@@ -287,9 +311,17 @@ Small chance at a life-stone.
 ## The Gilded Hoard
 
 A crypt built by a wizard obsessed with wealth, sealed with his collection still inside.
-**Gimmick — harder for a wizard carrying gold:** the Gold Wraiths native to this crypt sense carried wealth and scale their aggression and spawn density to it.
-A wizard who spent down to near-zero gold before entering passes through quietly; a wizard carrying a large reserve draws a noticeably harder version of every room.
-The exact scaling curve against gold carried is undecided — see Notes for balancing.
+**Gimmick — harder for a wizard carrying gold:** the Gold Wraiths native to this crypt sense carried wealth and scale to it.
+The scaling reads the wizard's **rank in carried gold** among the world's living wizards, taken at the moment they enter:
+
+| Rank in carried gold | Gold Wraiths gain  |
+| -------------------- | ------------------ |
+| 1 – 4                | ×2 `power`         |
+| 5 – 8                | ×2 `magic_defence` |
+| 9 – 14               | ×2 `health`        |
+| 15 and below         | nothing            |
+
+A rank, not an amount, so the curve never has to be retuned as the economy inflates, and it can never softlock a wizard.
 
 | Room                   | What is there                                      | Enemies                                                                 | Notes                                                                              |
 | ---------------------- | -------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -323,9 +355,9 @@ Moderate chance at a life-stone, reflecting the higher recommended level.
 
 ## Frostfang Caverns
 
-A glacial cave system that only opens a path through the ice during winter.
-**This is the run's single season-gated dungeon entrance.**
-The entrance is sealed solid in spring, summer and autumn, and the ice recedes only once winter begins.
+A glacial cave system whose entrance sits on an island in the middle of a lake.
+**Winter's season-gated dungeon.**
+The island cannot be reached until winter freezes the lake hard enough to walk across.
 Past the entrance there is no further gimmick beyond the season gate itself — the challenge is entirely in the enemy escalation across eight rooms, the longest combat dungeon on this list short of Cindermaw Forge.
 
 | Room                  | What is there                                          | Enemies                                                              | Notes                                                                   |
@@ -341,6 +373,61 @@ Past the entrance there is no further gimmick beyond the season gate itself — 
 
 **Drops:** experience, gold and common-to-rare runes scaled to level 10 – 13, a flat reincarnation point award, and a moderate chance at a mana-stone.
 Moderate chance at a life-stone.
+
+## The Thawroot Burrow
+
+A tunnel system that opens when the spring thaw softens the ground and new roots push through it.
+**Spring's season-gated dungeon.**
+The burrow exists only in spring; the start of summer dries the roots and the whole burrow caves in.
+**Gimmick — the roots keep growing:** every room cleared lets new roots creep across the rooms behind, so backtracking toward the entrance costs a short fight with a fresh critter.
+
+| Room            | What is there                                      | Enemies                                                            | Notes                                                    |
+| --------------- | -------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------- |
+| Thawmouth       | Wet earth, meltwater dripping from the ceiling.    | 3× Sprout Mites (critter, melee)                                   | Standard opener.                                         |
+| The Root Tangle | A chamber laced with living roots, waist high.     | 2× Rootlash Vines (common, melee), 1× Sprout Mite (critter, melee) | The vines are rooted in place; the mites are not.        |
+| Seedwater Pool  | A pool of meltwater full of floating seeds.        | 2× Thaw Sprites (common, magic)                                    | The sprites stand in the pool and keep their distance.   |
+| The Old Trunk   | An old trunk the burrow grew around.               | 1× Barkhide Warden (veteran, melee)                                | Single strong enemy, a breather before the end.          |
+| The Mother Root | A hollow where every root of the burrow converges. | The Rootmother (champion, magic)                                   | Calls a Sprout Mite from the walls at regular intervals. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 3 – 6, a flat reincarnation point award, and a small chance at a mana-stone.
+
+## The Sunheart Bloom
+
+A flower the size of a hill that opens at the start of summer, its inner chambers reachable through the petals.
+**Summer's season-gated dungeon.**
+The bloom opens when summer begins and wilts shut when autumn begins.
+**Gimmick — nectar heals:** pools of nectar lie across several rooms, and any enemy standing in one regenerates health; a fight is won by drawing enemies out of the pools first.
+
+| Room            | What is there                                       | Enemies                                                             | Notes                                                                             |
+| --------------- | --------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Petal stair     | Broad petals curling upward like steps.             | 3× Pollen Motes (critter, magic)                                    | Standard opener, no nectar yet.                                                   |
+| The Nectar Hall | A wide chamber with two nectar pools.               | 2× Nectar Beetles (common, melee), 1× Pollen Mote (critter, magic)  | First nectar room: pull the beetles out before fighting.                          |
+| Stamen Gallery  | A forest of tall golden stalks.                     | 3× Pollen Motes (critter, magic), 1× Stamen Lancer (common, melee)  | No nectar here; the stalks block line of sight.                                   |
+| The Sweet Well  | A single deep nectar pool in the floor.             | 1× Bloomguard (veteran, melee)                                      | The Bloomguard tries to fight from inside the pool.                               |
+| Sepal Chamber   | Green walls, the light filtered and dim.            | 2× Nectar Beetles (common, melee), 1× Stamen Lancer (common, melee) | Two small pools near the far wall.                                                |
+| The Heartseed   | The flower's core, a seed glowing like a small sun. | The Heartseed Warden (champion, magic)                              | The Warden stands on the seed, which heals it like nectar until it is pushed off. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 6 – 9, a flat reincarnation point award, and a small chance at a mana-stone.
+Small chance at a life-stone.
+
+## Vespergrave
+
+An old graveyard on the open map, quiet for three seasons, that turns haunted once autumn sets in.
+**Autumn's season-gated dungeon.**
+The graveyard is ordinary ground in spring and summer, becomes an instanced dungeon when autumn begins, and goes quiet again when winter begins.
+**Gimmick — lantern light:** the ghosts here cannot be harmed outside lantern light; each room holds lanterns to light, and a ghost that drifts out of the light becomes untouchable again.
+
+| Room                | What is there                                      | Enemies                                                          | Notes                                                                              |
+| ------------------- | -------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| The Lychgate        | A roofed gate, one unlit lantern hanging from it.  | 3× Whisperlings (critter, magic)                                 | Teaches the lantern rule on weak enemies.                                          |
+| Rows of the Unnamed | Leaning headstones with their names worn away.     | 3× Restless Dead (common, melee)                                 | The restless dead are solid; no lantern needed for them.                           |
+| The Ossuary Chapel  | A small chapel stacked with bones, two lanterns.   | 2× Grave Wails (common, magic), 1× Restless Dead (common, melee) | The wails are ghosts: light both lanterns first.                                   |
+| Gravedigger's Hut   | A shovel still in the earth, a cold stove.         | 1× The Gravedigger (veteran, melee)                              | Solid, single strong enemy.                                                        |
+| The Mourning Path   | A long path between yew trees, lanterns far apart. | 3× Grave Wails (common, magic)                                   | The lanterns are spaced so no single one covers every ghost.                       |
+| The Lantern Crypt   | A crypt full of lanterns, all of them dark.        | The Lantern Keeper (champion, magic)                             | The Keeper puts lanterns out during the fight; relight them to keep it vulnerable. |
+
+**Drops:** experience, gold and common-to-rare runes scaled to level 8 – 11, a flat reincarnation point award, and a small chance at a mana-stone.
+Small chance at a life-stone.
 
 ## Cindermaw Forge
 
@@ -365,29 +452,17 @@ Moderate-to-good chance at a life-stone, reflecting that this is the hardest com
 
 ## Notes for balancing
 
-Honest assessment of what is likely to need a pass, plus what is genuinely undecided rather than guessed at.
-
-- **Likely overpowered:** Blackroot Bandit Fort's max-alert case (an extra veteran guard alongside the Warlord) stacked on top of a champion fight may be too much for the stated level 7 – 10 band.
-  Consider either capping the alert bonus below the Warlord room or raising the recommended level.
-- **Likely underpowered:** The Hollow Crypts' Crypt Warden fights alone with no room gimmick and no reinforcement — it may read as anticlimactic next to Ashfall Bandit Hold's cleaner but equally simple finish.
-  Worth a pass to see if a small flavour mechanic (not a full gimmick) would help without over-complicating the first dungeon a new wizard sees.
-- **Likely overpowered:** Frostfang Caverns stacks two veteran-tier Crevasse Wardens in its second-to-last room directly before a champion fight, with no recovery room between them.
-  This may be the single hardest non-final room on the whole list and deserves a dedicated playtest pass.
-- ⬜ **Open — exact mana-stone and life-stone drop odds per dungeon.**
-  This document only ranks dungeons relative to each other (small / moderate / good chance).
-  No concrete percentages are set, and none should be invented without a designer decision, given how tightly scarce these two consumables are meant to stay across a run.
-- ⬜ **Open — the exact gold-scaling formula for The Gilded Hoard's Gold Wraiths.**
-  The dungeon's identity depends on this curve feeling fair at both ends — a wealthy wizard should feel meaningfully punished, not softlocked, and a poor wizard should not feel the gimmick is wasted on them.
-  No formula is proposed here.
-- ⬜ **Open — reincarnation point formula per dungeon.**
-  This document assumes RP award scales with recommended level and room count, but no concrete number or curve is set; that belongs with whoever owns the run-to-RP conversion (see the open **score** question in the glossary).
-- ⬜ **Open — whether dungeons support more than one wizard at a time.**
-  Every dungeon above is written as a solo encounter.
-  If co-op entry is intended, every room's enemy count likely needs a second pass, since none of the tier numbers here assume a second wizard sharing the pull.
-- ⬜ **Open — which dungeon should hold the single season-gated entrance.**
-  Frostfang Caverns was chosen here because a winter-only ice cavern is the most thematically obvious fit, but this is an arbitrary pick for the purpose of having a complete document, not a settled design decision.
-  Swapping it for another dungeon has no mechanical knock-on effect as long as exactly one entrance stays season-gated.
-- **Naming tension worth flagging again:** "ruined wizard tower" as a dungeon theme name sits close to the mechanical term `Tower`.
-  No code or UI string should ever shorten a dungeon's name to just "the tower" for this reason — Skyreach Spire and Suncoil Ruins both avoid the bare word in their own names deliberately.
-- **Volume note:** fifteen dungeons are documented against a brief asking for at least fourteen, specifically so there is a dungeon to cut rather than a minimum to pad up to.
-  The Silt Cisterns is the weakest differentiator on the list — it shares a theme and a rough level band with The Drowned Shaft without a gimmick of its own — and is the first candidate if the list needs trimming.
+- **Blackroot Bandit Fort is hard on purpose.**
+  Its max-alert case puts an extra veteran beside the Warlord, and the sign at the gate is the warning.
+- **The Hollow Crypts is easy on purpose.**
+  It is the catch-up dungeon for a wizard behind in levels.
+- **Frostfang Caverns is eased by the rest zones.**
+  A rest zone after its sixth room sits right before the two veteran Crevasse Wardens of the Frozen Court.
+- **Stone odds are low everywhere.**
+  Exact percentages are tuned once every mana-stone and life-stone source is counted.
+- ⬜ **Gold Wraith counts still scale with carried gold, on top of the rank multipliers.**
+  A top-4 wizard therefore meets more wraiths and stronger ones.
+  Still open is whether to keep both scalings, or fix the counts and let the rank alone do the work.
+- ⬜ **Reincarnation points per dungeon need a formula.**
+  It belongs in a `FORMULAS.md` that gathers every scaling formula of the project, not in this file.
+- ⬜ **How many dungeons a world draws is not set.**

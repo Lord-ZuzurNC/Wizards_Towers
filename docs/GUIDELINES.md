@@ -39,9 +39,29 @@ If `Home` grows past 20 links, reorganize it into a hierarchy instead of letting
 
 Code follows the [official GDScript style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html) and, where it does not conflict, the [GDQuest best practices](https://www.gdquest.com/docs/guidelines/best-practices/godot-gdscript/).
 
-⬜ **OPEN** — a linter, we have none yet.
-Candidates:
-`gdlint`/`gdformat` from [godot-gdscript-toolkit](https://github.com/Scony/godot-gdscript-toolkit) (pip-installable, has a formatter, usable in CI).
+**Formatter and linter (project): [GDScript Formatter](https://github.com/GDQuest/GDScript-formatter) by GDQuest.**
+One static binary, MIT, no Python runtime.
+It formats to the official style guide and ships a linter in the same tool.
+The version is pinned in CI and bumped deliberately.
+
+| Command                              | Where           | Effect                                     |
+| ------------------------------------ | --------------- | ------------------------------------------ |
+| `gdscript-formatter <files>`         | editor, on save | Rewrites the file to the project style.    |
+| `gdscript-formatter --check <files>` | CI, pre-commit  | Fails if a file is not formatted.          |
+| `gdscript-formatter lint <files>`    | CI, pre-commit  | Fails on a naming or convention violation. |
+
+**Static typing is enforced by the engine, not by the linter.**
+A linter reads text and cannot know a type.
+`project.godot` raises these GDScript warnings to **error**, so an untyped declaration does not run:
+
+- `debug/gdscript/warnings/untyped_declaration`
+- `debug/gdscript/warnings/unsafe_property_access`
+- `debug/gdscript/warnings/unsafe_method_access`
+- `debug/gdscript/warnings/unsafe_cast`
+- `debug/gdscript/warnings/unsafe_call_argument`
+
+`gdlint`/`gdformat` from godot-gdscript-toolkit is not used.
+It has had no release since October 2025, and its open issues show the parser lagging behind recent syntax such as `@abstract`.
 
 ### Upstream rules worth stating explicitly
 
@@ -359,10 +379,10 @@ Format:
 
 ## Multiplayer code
 
-⬜ **OPEN — do not write networked code until ASK chapter 14 is answered.**
-Server authority, hosting model and anti-cheat posture all change what the conventions must be.
+**The server is authoritative; the client sends only its own input.**
+The full authority model lives in `TECH_STACK.md`, section *Authority model*, and binds every networked line of code.
 
-Two rules can be committed to now, because they are cheap and expensive to retrofit:
+Two rules follow from it, because they are cheap now and expensive to retrofit:
 
 - **Name the direction in the symbol.**
   A client asking the server for something is a `_request`; the server telling clients what happened is a `_sync` or a past-tense signal.
@@ -532,11 +552,11 @@ A 95-character line holding half a sentence is not.
 
 `README.md` is a shop window, not a design document.
 
-🔴 **Nothing the player is meant to discover may appear in any public file.**
-This project explicitly invites players to find spell combinations for themselves, and the same protection extends to hidden mechanics, secret interactions, and anything meant to be earned by paying attention.
-Writing it down publicly spends the discovery before anyone has played.
+🔴 **Hidden mechanics live in `docs/PAQUES.md`, and nowhere else.**
+Everything stays available, but a player reading the documentation must be able to avoid spoilers.
+Any other document that touches a hidden mechanic points to `PAQUES.md` instead of describing it, and `README.md` never mentions one.
 
-When in doubt about a mechanic, ask before publishing it.
+When in doubt whether a mechanic is meant to be discovered, ask before writing it anywhere else.
 
 The private design document holds everything else, and `.gitignore` keeps it out of this repository deliberately.
 

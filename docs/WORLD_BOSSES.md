@@ -1,13 +1,13 @@
 # World bosses — Wizards Towers
 
 This document lists the world bosses available to a run.
-A world boss is a PvE entity standing on the open world map, outside the Monolith.
+A world boss is a PvE entity standing on the open world map, outside the Monolith; exceptions are kept in `PAQUES.md`.
 It is never a floor boss and never a dungeon boss.
 Its strength is tied to the season, and killing one is one of the best sources of gold, XP, reincarnation points and rare runes in the game.
 
 - [World bosses — Wizards Towers](#world-bosses--wizards-towers)
   - [How to read this document](#how-to-read-this-document)
-  - [PvP and the kill](#pvp-and-the-kill)
+  - [Rewards and the kill](#rewards-and-the-kill)
   - [Summary table](#summary-table)
   - [Crowd versus solo: quick index](#crowd-versus-solo-quick-index)
   - [Bosses](#bosses)
@@ -29,7 +29,8 @@ Its strength is tied to the season, and killing one is one of the best sources o
 
 ## How to read this document
 
-Thirteen world bosses follow, each at least five times a champion's strength, per the designer's floor of health 4 500, power 300, magic defence 200.
+Thirteen world bosses follow, each at least five times a champion's strength.
+The minimum is health 4 500, power 300 and magic defence 200.
 Every boss carries the same six stats as every other combatant in the game: `health`, `power`, `mana_pool`, `magic_defence`, `speed`, `luck`.
 `power` is one number regardless of attack type, so a separate **Attack type** field says whether that number lands as melee or magic.
 
@@ -39,14 +40,27 @@ Each boss then gets its own subsection with a short mini stat block for quick re
 The numbers here are a first pass meant to be cut down and rebalanced, not a finished tuning.
 That intention is restated in [Notes for balancing](#notes-for-balancing).
 
-## PvP and the kill
+## Rewards and the kill
 
 The world allows up to 50 wizards and always-on PvP outside safe zones, so a world boss fight is also a PvP flashpoint.
-Nothing in the existing design documents decides whether kill credit for loot and reincarnation points goes to whoever lands the last hit or to whoever contributed the most damage.
 
-⬜ **Open question.**
-That credit rule is not decided anywhere in `GLOSSARY.md` or `GUIDELINES.md`, and it changes how every boss below actually plays out in a contested pull.
-Every boss is written so its mechanic makes sense under either rule, but the project needs to settle this before implementation.
+**Rewards are shared by contribution tickets, unless a boss states an exception.**
+At the end of the fight, each wizard who fought holds tickets in proportion to their contribution, counted as damage dealt, healing done and damage taken from the boss.
+
+| Reward  | Rule                                                                                    |
+| ------- | --------------------------------------------------------------------------------------- |
+| gold    | One pool per boss, split in proportion to tickets.                                      |
+| XP      | Split like gold.                                                                        |
+| RP      | Split like gold.                                                                        |
+| runes   | Each boss has a rune pool; the three wizards holding the most tickets each receive one. |
+| stones  | A draw among the wizards who want the stone, see below.                                 |
+| special | A boss-specific condition stated in its own section, such as the Tallyman's purse.      |
+
+**A stone drop is a draw among the wizards who want it.**
+When a boss drops a mana-stone or a life-stone, every wizard who fought it chooses **Want** or **Pass**.
+Pass leaves the draw; Want enters all of the wizard's tickets.
+One ticket is drawn, and its owner receives the stone.
+A wizard who has not answered when the draw closes counts as Want, since a wizard busy fighting cannot be expected to click.
 
 What is designed below, per boss, is how the fight itself behaves when several wizards converge on it at once: whether it rewards coordination, punishes a crowd outright, or stays indifferent to how many wizards are swinging at it.
 
@@ -59,7 +73,7 @@ What is designed below, per boss, is how the fight itself behaves when several w
 | The Rootbound Colossus | melee       | 6000   | 340   | 300       | 260           | 70    | 8    | Spring, persists after | The Deep Fen                         |
 | The Leaden Saint       | magic       | 5400   | 330   | 1200      | 300           | 85    | 12   | Summer                 | Sunfall Mesa                         |
 | The Breach-Warden      | magic       | 7000   | 360   | 1000      | 280           | 95    | 14   | All seasons            | The Outer Ring, at the Monolith base |
-| The Collector          | magic       | 5600   | 320   | 1100      | 240           | 100   | 18   | Autumn                 | Ruins of the Fourth Spire            |
+| The Collector          | magic       | 5600   | 320   | 1100      | 240           | 100   | 18   | All seasons            | Hidden, see `PAQUES.md`              |
 | The Twin Omen          | magic       | 5000   | 300   | 1300      | 220           | 100   | 15   | Summer                 | The Rift Glade                       |
 | The Riven Maw          | melee       | 12000  | 620   | 2000      | 420           | 110   | 25   | Winter only            | The Deep Rift                        |
 | Stormcaller Roost      | magic       | 6500   | 350   | 1400      | 230           | 130   | 16   | Autumn                 | The Shattered Crag                   |
@@ -76,7 +90,7 @@ What is designed below, per boss, is how the fight itself behaves when several w
 | The Tallyman           | A race: whoever's damage triggers its flight condition first decides the fight. |
 | The Rootbound Colossus | Rewards an early, decisive group kill before its growth compounds further.      |
 | The Leaden Saint       | Rewards a coordinated swap from Stone to raw power once it cracks.              |
-| The Breach-Warden      | Indifferent alone, but it actively drags nearby floor raiders into the fight.   |
+| The Breach-Warden      | Passive on patrol; during any floor raid, it attacks every wizard in sight.     |
 | The Collector          | Punishes whichever wizard in the group is carrying the most Artifacts.          |
 | The Twin Omen          | Punishes solo play directly, by forcing a split-attention fight on one wizard.  |
 | The Riven Maw          | Requires a group; its late phases outscale almost any solo wizard's output.     |
@@ -131,19 +145,19 @@ A solo wizard can still win, but risks letting it reach enrage and cost a villag
 - **Season:** Spring, Summer
 - **Where it stands:** the trade roads strung between villages
 
-The Tallyman is a thin, ledger-carrying enemy that robs wizards and villages alike on the roads between settlements, converting every successful theft into a "purse" it carries on its own body.
+The Tallyman is a thin, ledger-carrying enemy that robs wizards and villages alike on the roads between villages, converting every successful theft into a "purse" it carries on its own body.
 Killing it while that purse is full returns every coin it has stolen this encounter, straight into the killer's pocket.
 
 **Phases.**
 It has no health-based phase transition.
-Instead it runs a purse meter: each successful theft fills it, and once full the Tallyman stops fighting and sprints for the nearest Ground Floor gate to bank the gold permanently, at which point it can no longer be robbed back.
+Instead it runs a purse meter: each successful theft fills it, and once full the Tallyman stops fighting and sprints for the Lobby gate to bank the gold permanently, at which point it can no longer be robbed back.
 
 **What makes this fight different.**
 Every other boss on this list is a straightforward damage race.
 The Tallyman is a race against its own escape condition, and a wizard who deals damage without first stopping its theft and its flight simply loses the gold regardless of the kill.
 
 **Drops.**
-Whatever gold is in its purse when it dies, plus the baseline gold, XP and reincarnation point award.
+**Special:** the whole purse goes to the wizard who lands the killing blow, on top of the shared pool.
 A Greed-attribute rune is its signature drop, since its own damage output scales with carried gold, and a small chance at a mana-stone.
 
 **Group versus solo.**
@@ -163,7 +177,7 @@ A solo wizard has to choose between chasing and fighting, and usually only gets 
 - **Where it stands:** the Deep Fen, rooted, does not roam
 
 The Rootbound Colossus is an ancient, tree-limbed enemy that spawns at the start of a run and never despawns on its own, rooted to one spot in the Deep Fen until something kills it.
-Every season it survives, it grows, so the easy kill of week one becomes the apex threat of week six if nobody bothers.
+Every season it survives, it grows, so the easy kill of spring becomes the apex threat of winter if nobody bothers.
 
 **Phases.**
 Dormant: immobile, low aggression, and the easiest world boss on this list to pick off early, since it has not yet grown.
@@ -222,26 +236,34 @@ Once the crack phase starts, a coordinated group can focus the exposed window fa
 - **speed:** 95
 - **luck:** 14
 - **Season:** all seasons
-- **Where it stands:** the Outer Ring, the open ground encircling the Monolith's base, in sight of the Ground Floor gate
+- **Where it stands:** the Outer Ring, the open ground encircling the Monolith's base, in sight of the Lobby gate
 
 The Breach-Warden is a permanent fixture of the world map, a sentinel of cracked Monolith stone that patrols the ring of ground around the tower's base.
 Unlike every other boss here, it does not need a season to exist: it spawns with the world and remains until killed, regardless of how many seasons pass.
+A floor raid is an instance, so the Breach-Warden never enters one.
 
 **Phases.**
 It has no health-based phase.
-Instead it alternates between a patrol state, where it circles the Outer Ring and largely ignores anyone who keeps clear, and a lockdown state, triggered automatically whenever a floor raid begins nearby, during which it rushes toward the raiders and actively interferes with the attempt.
+It switches between three states:
+
+- **Patrol** while no floor raid is in progress.
+  Passive, it circles the Outer Ring and ignores every wizard.
+- **Sentinel** while any floor raid is in progress.
+  It attacks every wizard who passes within sight.
+- **Focus** as soon as it is attacked.
+  It turns sentinel and locks onto the wizard who struck it.
 
 **What makes this fight different.**
-It is the only boss whose trigger condition is another system entirely: a floor raid starting at the Ground Floor.
-A group raiding a low floor can suddenly find themselves fighting a world boss as well, with no warning beyond its lockdown state kicking in.
+It is the only boss driven by another system, the floor raid.
+While anyone is raiding, the ground around the Monolith becomes dangerous for every other wizard on their way in or out.
 
 **Drops.**
 Gold, XP and reincarnation points at the high end for a non-apex boss, reflecting that its fight is rarely chosen voluntarily.
 Its signature rune is Toll, since like that Effect rune it is built to punish the strong rather than the newcomer, and it carries a modestly elevated mana-stone chance given how often it is fought unwillingly.
 
 **Group versus solo.**
-A solo floor raider who triggers its lockdown is usually overwhelmed and has to abandon the raid.
-A group raiding together can usually spare one or two wizards to hold it off while the rest continue the floor, which is the intended answer to this boss.
+A solo wizard crossing the Outer Ring during a raid has to outrun it or fight it alone.
+A group can pull it on patrol, when it fights only whoever attacks it, or escort a wizard past it while it stands sentinel.
 
 ### The Collector
 
@@ -252,10 +274,10 @@ A group raiding together can usually spare one or two wizards to hold it off whi
 - **magic defence:** 240
 - **speed:** 100
 - **luck:** 18
-- **Season:** Autumn
-- **Where it stands:** the Ruins of the Fourth Spire, a collapsed early floor's rubble on the world map
+- **Season:** all seasons, present from world generation
+- **Where it stands:** hidden, see `PAQUES.md`
 
-The Collector is a hoarding enemy built from fused rubble and stolen rune-glass, haunting the ruins of a floor that fell before the current run began.
+The Collector is a hoarding enemy built from fused rubble and stolen rune-glass.
 It reads every wizard that engages it for how many Artifacts they currently hold, and converts that count directly into its own strength for the fight.
 
 **Phases.**
@@ -273,6 +295,8 @@ Its mana-stone chance rises with how many Artifacts were held by whoever landed 
 **Group versus solo.**
 In a group, only the member carrying the most Artifacts suffers the scaling penalty, so the smart play is to let a light-Artifact wizard tank it while the rest burn it down.
 A solo wizard gets no such option: if they hold several Artifacts, they fight the full penalty alone.
+
+**How the Collector is met** is an easter egg, kept in `PAQUES.md`.
 
 ### The Twin Omen
 
@@ -317,7 +341,7 @@ A group can designate one member to fight the Twin Omen while leaving their own 
 - **Season:** winter only
 - **Where it stands:** the Deep Rift, a chasm that only opens in winter
 
-The Riven Maw erupts from a chasm that does not exist until winter, a vast, ice-locked enemy built as the run's final-season threat for wizards not yet ready for the roof.
+The Riven Maw erupts from a chasm that does not exist until winter, a vast, ice-locked enemy built as the run's final-season threat for wizards not yet ready for the ROOF.
 It is the strongest entry on this list by a wide margin and is never present outside winter at all.
 
 **Phases.**
@@ -481,6 +505,7 @@ Rather than fighting purely as a single body, it periodically calls additional c
 Add-waves trigger at 75%, 50% and 25% health, each wave's size scaling with how many wizards are present when the threshold is crossed.
 The Choir itself does not change its own attack pattern between waves; the escalation is entirely in what it brings with it.
 
+
 **What makes this fight different.**
 It is the sharpest test of coordination on this list rather than raw output.
 A controlled group that kills adds on sight barely notices the waves; an uncoordinated crowd that ignores adds to focus the Choir gets quickly overwhelmed by the exact numbers that were supposed to help them.
@@ -495,10 +520,9 @@ A disciplined group clears this efficiently; an undisciplined one of the same si
 
 ## Season scaling
 
-The contract states that season "drives... world boss strength" without specifying a formula, so the multipliers below are a concrete proposal, not a decided system.
-
-**General rule, proposed.**
-A world boss that is present across more than one season, or that persists indefinitely, has its `health`, `power` and `magic_defence` multiplied by a compounding seasonal scalar each time the run advances a season while it remains alive:
+**General rule.**
+A world boss present across more than one season, or persisting indefinitely, has its `health`, `power`, `magic_defence`, `mana_pool` and `luck` multiplied by a compounding seasonal scalar each time the run advances a season while it remains alive.
+`speed` never scales.
 
 | Season transition crossed        | Compounding multiplier | Effective multiplier from spring |
 | -------------------------------- | ---------------------- | -------------------------------- |
@@ -508,47 +532,39 @@ A world boss that is present across more than one season, or that persists indef
 | Into winter                      | ×1.25                  | ×1.95                            |
 
 **Season-locked bosses are exempt.**
-The Harrow, the Leaden Saint, the Collector, the Twin Omen, the Riven Maw, Stormcaller Roost, the Drowned King, and the Hollow Choir only ever exist in a single season each, so they never cross a season boundary while alive, and their table stats are their final stats as given.
+The Harrow, the Leaden Saint, the Twin Omen, the Riven Maw, Stormcaller Roost, the Drowned King and the Hollow Choir only ever exist in a single season each, so their table stats are their final stats.
 
 **Multi-season or persistent bosses use the scalar.**
-The Tallyman, the Breach-Warden, Fortune's Thief and the Nightfall Reaper apply the compounding scalar above for every season boundary they survive.
+The Tallyman, the Breach-Warden, the Collector, Fortune's Thief and the Nightfall Reaper apply the compounding scalar above for every season boundary they survive.
 
 **The Rootbound Colossus stacks an additional, boss-specific scalar.**
 On top of the general `+25%` per season, it gains a further `+15%` compounding specifically for surviving a season unkilled, reflecting its unique growth identity, for an effective `+43.75%` compounding per season survived (`1.25 × 1.15`).
 
-⬜ **Open question: does the scalar touch `mana_pool`, `speed` and `luck`?**
-The proposal above only scales `health`, `power` and `magic_defence`, matching how the enemy tier table in the contract treats speed as "varies" and keeps luck mostly flat across world bosses.
-Whether a boss's mana pool, speed or luck should also grow with the season is undecided, and left out of the proposal above rather than guessed at.
-
-⬜ **Open question: does the scalar apply retroactively to a boss already engaged mid-transition?**
-The season boundary falls every 48 hours regardless of whether a fight is in progress.
-Whether an in-progress fight snapshots its stats at engagement or re-evaluates them live across a season boundary is not decided.
+**A season change applies on the spot, even mid-fight.**
+A boss that outlives the boundary grows immediately, with a short growth animation.
+A season-locked boss whose season ends disappears immediately, with a short disappearance animation, fight or no fight.
 
 ## Notes for balancing
 
-**The Riven Maw is deliberately the strongest entry, and that is intentional, not a balancing miss.**
-At roughly 2.7× a baseline world boss's health and 2× its power, it is meant to require a full group and to signal winter's approach, in the same spirit as the Monolith's own Floor 49 window.
+**The Riven Maw is deliberately the strongest entry.**
+At roughly 2.7× a baseline world boss's health and 2× its power, it requires a full group and signals that winter, the last season, has come.
 
-**The Rootbound Colossus is the riskiest number on this list.**
-Its compounding growth has no stated upper bound, and left completely unkilled across all four seasons it would reach roughly `1.4375^3 ≈ 2.97×` its base stats on top of its own baseline, which is already a full-weight world boss.
-That combination could produce an un-killable enemy on a world where nobody bothers with it, and a hard cap on the number of seasons it can grow through is worth adding before this goes live.
+**The Rootbound Colossus grows without a cap.**
+Left unkilled through four seasons it reaches about `1.4375^3 ≈ 2.97×` its base stats.
 
-**Luck values deviate further than the tier table's `±25%` guidance for ordinary enemy tiers.**
-The contract gives world bosses a flat luck of 15 with no explicit `+` or "may go well above," unlike health, power and magic defence.
-Fortune's Thief at luck 30 and the Rootbound Colossus at luck 8 both sit well outside a `±25%` band around that number; they were written for mechanical reasons tied to each boss's identity, but whether the `±25%` discipline is meant to bind world boss luck too is not stated anywhere, and is flagged here rather than assumed.
+**World boss luck is exempt from the `±25%` rule of enemy tiers.**
+Fortune's Thief at 30 and the Rootbound Colossus at 8 follow each boss's identity.
 
-**The Leaden Saint's immunity is read as immune to one Element, a single rune within the Element attribute, not immune to the whole attribute category.**
-Whole-attribute immunity, for example "immune to all Shape runes," does not translate into a coherent combat mechanic the way an elemental immunity does.
-⬜ If whole-attribute immunity is the intended reading instead, the Leaden Saint's mechanic needs to be rewritten.
+**An immunity covers one Element, never a whole attribute.**
+The Leaden Saint is immune to Spark only; immunity to a whole attribute would make a fight unplayable.
 
-**Drop rates are stated only in relative terms, never as numbers.**
-"Elevated," "standard" and "highest on this list" describe intent, not a tuned probability, because the contract gives no baseline mana-stone or life-stone drop rate for any source, world bosses included, only the run-wide target of 3-5 mana-stones and 2-3 life-stones across every source combined.
-⬜ Actual percentages need a pass once the other mana-stone and life-stone sources, dungeons, quests, treasure, are all counted, so that a wizard's run-wide total lands in the stated range rather than a world boss alone blowing past it.
+**Drop rates are relative, not numeric.**
+"Elevated", "standard" and "highest on this list" state intent.
+Percentages are tuned once every mana-stone and life-stone source is counted, so that a wizard's run-wide total lands in the target range.
 
-**The Twin Omen is likely the single most disruptive design here and should be playtested first.**
-Forcibly summoning a wizard's echo mid-session, rather than only while offline, is a new use of an existing mechanic, and whether a decayed echo can actually hold a capital for the full binding-plus-fight duration against a real raiding party is untested.
-If it cannot, the boss effectively has no real risk attached to its headline mechanic and becomes a weaker version of every other fight on this list.
+**The Twin Omen is an accepted exception.**
+It summons a wizard's echo to the capital while that wizard is online, which no other mechanic does, and it is coded as a special case.
+It is the first boss to playtest.
 
-**The Collector and Toll-style "punish the strong" bosses assume Artifact count is readable by an enemy AI at engagement.**
-Nothing in `GLOSSARY.md` says whether a boss's AI can inspect a wizard's current Artifact holdings the way the Effect rune Toll inspects floor count.
-⬜ If that information is not exposed to enemy logic, the Collector's core mechanic needs a different data source or a redesign.
+**Enemy logic can read a wizard's Artifact count.**
+The Collector reads it at engagement, as the Effect rune Toll reads floor count.

@@ -122,7 +122,7 @@ This section will cover the Godot version required, how to open the project, and
 Two things will be settled before the first pull request is accepted, not after:
 
 - a **DCO or CLA**, so that contributions can be accepted without the author losing the ability to license the game differently later;
-- a **linter** (`gdlint` / `gdformat`) wired into CI, so that [`docs/GUIDELINES.md`](docs/GUIDELINES.md) is enforced by a machine rather than by argument.
+- a **linter** (`gdscript-formatter`) wired into CI, so that [`docs/GUIDELINES.md`](docs/GUIDELINES.md) is enforced by a machine rather than by argument.
 
 Bug reports and design discussion are welcome in the meantime.
 

@@ -6,12 +6,12 @@ Where a decision is deferred it carries ⬜ and says what would settle it.
 
 ## Engine and language
 
-| Choice      | Decision                       | Notes                                                           |
-| ----------- | ------------------------------ | --------------------------------------------------------------- |
-| Engine      | **Godot 4.7.2 stable**         | Pinned. See `GUIDELINES.md`.                                    |
-| Language    | **GDScript**, statically typed | Static typing is mandatory, not optional — see below.           |
-| Linting     | `gdlint` / `gdformat`          | From `godot-gdscript-toolkit`, pip-installable, runs in CI.     |
-| Second lang | **none**                       | No C#, no GDExtension, until a measured bottleneck demands one. |
+| Choice      | Decision                       | Notes                                                            |
+| ----------- | ------------------------------ | ---------------------------------------------------------------- |
+| Engine      | **Godot 4.7.2 stable**         | Pinned. See `GUIDELINES.md`.                                     |
+| Language    | **GDScript**, statically typed | Static typing is mandatory, not optional — see below.            |
+| Linting     | `gdscript-formatter`           | GDQuest's formatter and linter, one binary. See `GUIDELINES.md`. |
+| Second lang | **none**                       | No C#, no GDExtension, until a measured bottleneck demands one.  |
 
 **Static typing is mandatory because of who reviews this code.**
 The project's author reads code but does not write it, so errors must surface at parse time rather than at runtime in front of fifty players.
@@ -78,29 +78,60 @@ A client that could set a number could set its own gold, and one cheater ends a 
 
 ## Persistence
 
-**SQLite only at launch.**
+**PostgreSQL, from the first commit.**
+One database server holds everything that persists.
 
-| Store           | Holds                                                                                                         | Lifetime         |
-| --------------- | ------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `accounts.db`   | Accounts, reincarnation points, talents, cosmetics, owned skins.                                              | Forever.         |
-| `world_<id>.db` | One file per world: the map seed, villages, towers, floors, echoes, inventories, gold, spells, the run clock. | One run, 8 days. |
+| Data     | Holds                                                                                                          | Lifetime         |
+| -------- | -------------------------------------------------------------------------------------------------------------- | ---------------- |
+| accounts | Accounts, reincarnation points, talents, cosmetics, owned skins.                                               | Forever.         |
+| worlds   | Keyed by `world_id`: the map seed, villages, towers, floors, echoes, inventories, gold, spells, the run clock. | One run, 8 days. |
 
-Why this and not more.
-A single authoritative server process serialises every write, which is the workload SQLite is best at.
-One file per world means a world cannot corrupt another, and a backup is a file copy.
-Nothing to install, nothing to administer, no daemon to keep alive on a NAS.
+Why PostgreSQL from the start.
+Worlds overlap by design, so several world processes write the same accounts as soon as a second world opens.
+Starting on the final store removes a migration that would otherwise land in the middle of a live run.
+Schema changes are transactional in PostgreSQL, so a failed migration rolls back instead of leaving a half-changed database.
 
 **Writes that move value are transactional.**
 Buying a village, paying for the ROOF, spending a stone and resolving a raid each commit as one transaction or not at all.
 
-⬜ **PostgreSQL enters when a second world does.**
-Two world processes writing one `accounts.db` contend on locks.
-At that point accounts move to PostgreSQL and `world_<id>.db` stays SQLite per world.
+**Stores considered and rejected.**
 
-⬜ **Redis enters only on a measured need.**
-Its sorted sets are the right structure for the North Wall, and its pub/sub is the right channel between world processes.
+| Store       | Why not                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| SQLite      | One writer per file; overlapping worlds would contend on a shared accounts file.               |
+| MariaDB     | Viable, but a schema migration cannot be rolled back as one transaction.                       |
+| MongoDB     | SSPL licence, not open source, and a document model for data made of ownership transfers.      |
+| ArangoDB    | Business Source Licence, not open source.                                                      |
+| VoltDB      | Its public repository no longer exists.                                                        |
+| TimescaleDB | A PostgreSQL extension for time series; addable later on the same server if analytics need it. |
+
+**The game server reaches PostgreSQL through PostgREST.**
+Godot ships no PostgreSQL driver, and the reference pure-GDScript client is archived, untouched since March 2023.
+PostgREST (MIT) exposes the database as an HTTP API on the private network, and Godot calls it with its own `HTTPRequest`.
+
+| Rule                                               | Why                                                                                       |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Tables live in a schema never exposed.             | PostgREST only publishes the `api` schema, so a table cannot be read or written directly. |
+| One value-moving write is one SQL function.        | A call is one transaction: it commits whole or leaves nothing behind.                     |
+| Rows that move value are locked with `FOR UPDATE`. | Two simultaneous purchases with gold for one cannot both succeed.                         |
+| `HTTPRequest.use_threads` is on.                   | Without it a call waits on the frame loop.                                                |
+| Only the game server talks to PostgREST.           | A client never does.                                                                      |
+
+Spike of 2026-11-07, Godot 4.7.2 headless against PostgreSQL 17 and PostgREST 16.5:
+
+- A purchase succeeds, and a purchase without enough gold is refused.
+- A function that debits then fails leaves gold and ownership untouched.
+- Two purchases fired in the same frame, with gold for only one, give exactly one success; the second waits for the first lock, then sees the new balance.
+- Writing to a table directly returns 404.
+- A call takes about 1 ms at PostgREST, 7 ms from Godot with `use_threads`, and 34 ms without it.
+
+Rejected routes: a GDExtension over `libpq`, which is a C++ binding to maintain, and a small service in another language, which is a second codebase.
+
+⬜ **A cache enters only on a measured need.**
+Sorted sets are the right structure for the North Wall, and pub/sub is the right channel between world processes.
 Neither is justified at fifty players and one world, where a SQL query is faster to write and impossible to lose.
-Redis is in-memory first, so anything it holds must be re-derivable or cheap to lose — never gold, never ownership.
+If a cache enters, it is **Valkey** (BSD-3-Clause), not Redis, whose licence has changed twice since 2024.
+A cache is in-memory first, so anything it holds must be re-derivable or cheap to lose — never gold, never ownership.
 
 ## Crash recovery
 
@@ -117,39 +148,64 @@ A restart must cost players a few seconds of position, never a minute of income 
 
 ## Hosting
 
-**Phase one: a home NAS.**
-Enough for development, playtesting and the first real world.
+**Internal test: the home NAS, and nothing more.**
+It never runs a public world.
 
-Four things that will bite, in order of likelihood:
+| Part    | Value                                                      |
+| ------- | ---------------------------------------------------------- |
+| Model   | UGREEN DXP2800 GT                                          |
+| CPU     | AMD Ryzen Embedded R2514, 4 cores, 8 threads               |
+| Memory  | 8 GB DDR4-3200                                             |
+| Storage | 2 × 1 TB M.2 SSD in RAID 0, 2 × 16 TB WD Red Pro in RAID 1 |
 
-**Residential upload is the bottleneck, not the CPU.**
-Fifty clients receiving state updates is an upload problem, and home connections are asymmetric.
+**The test database never relies on the RAID 0 volume alone.**
+RAID 0 loses everything if either SSD fails, so the PostgreSQL data lives on the RAID 1 volume or is backed up off the array.
 
-**The NAS cannot reboot mid-run.**
+⬜ **Public worlds: a dedicated host, not chosen yet.**
+Settled by the upload measured per player during the internal test, multiplied by fifty.
+
+Three constraints the public host must meet:
+
+**Upload is the bottleneck, not the CPU.**
+Fifty clients receiving state updates is an upload problem.
+
+**The host cannot reboot mid-run.**
 A power cut or an automatic update at hour 100 interrupts a world eight days long, which is exactly why crash recovery is not optional.
 
-**A game server exposed from home is attack surface.**
-Port forwarding, a firewall, fail2ban, and no service on that host that does not need to be there.
-
-⬜ **The NAS model is unrecorded.**
-A low-power ARM NAS will struggle with fifty players plus echo AI plus enemy simulation. Record the CPU and the upload rate, then measure before trusting it.
-
-**Phase two: a real server**, when the first world fills or the upload saturates.
+**A game server is attack surface.**
+A firewall, fail2ban, and no service on that host that does not need to be there.
 
 ## Multiple worlds
 
 A second world opens when either the queue fills to fifty, or the first world reaches **autumn**.
 
-The autumn trigger is deliberate: it staggers world end times instead of letting every world finish at once.
-Its consequence is the PostgreSQL migration above, because overlapping worlds mean concurrent writers on accounts.
+The autumn trigger is deliberate:
+it staggers world end times instead of letting every world finish at once.
+Overlapping worlds mean concurrent writers on accounts, which is why persistence starts on PostgreSQL.
 
 ## Accounts and identity
 
 Reincarnation points, talents and cosmetics survive death and cross worlds, so the project needs persistent identity.
 
-⬜ The authentication method is undecided.
-The options are a self-hosted account with email and password, or delegating to an external identity provider.
-Self-hosting means owning password storage and reset flows; delegating means a dependency the project does not control.
+**Local accounts, with optional sign-in through Google, GitHub or GitLab.**
+
+**Identity lives in a self-hosted OpenID Connect provider, never in GDScript.**
+Godot's `Crypto` class has no password-hashing function, so storing passwords in game code would mean writing one.
+The provider owns password storage, resets, email verification and two-factor, and brokers the Google, GitHub and GitLab sign-ins, so the game only ever sees one kind of account.
+
+The login flow follows OAuth 2.0 for native apps (RFC 8252, with PKCE):
+
+- The game opens the system browser on the provider's login page.
+- The player signs in there, locally or through a social account.
+- The token returns to the game through a loopback redirect.
+- The game server validates the token with the provider before accepting the connection.
+
+**The provider is ZITADEL** (AGPL-3.0), on PostgreSQL alone.
+It is built for customer identity, the case of strangers signing themselves up.
+Since v4 its login page is a second container, routed on the same domain as the API.
+It runs as its **own instance**, never the one guarding the homelab: an identity provider open to public sign-up must not also hold the keys to private services.
+The AGPL binds only a modified copy offered over the network; running it unmodified imposes nothing on this project.
+Still to verify by a spike: the three social sign-ins and a loopback login from Godot.
 
 ## Protocol version
 
@@ -175,8 +231,9 @@ Scope is the wizard's body and robes only — never weapons, because a wizard vi
 | itch.io         | Player-facing home for a noncommercial build.        |
 | Steam           | Rejected. Its model expects commercial distribution. |
 
-Linux is distributed as a binary in an archive first.
-⬜ Whether to add an AppImage, and later a Flatpak, is a convenience decision to revisit once there are players.
+Before 1.0, Linux is distributed as a binary in an archive.
+With the PCK embedded, a Godot export is already a single executable.
+⬜ From 1.0, Linux ships as an AppImage or a Flatpak, whichever proves better at that point.
 
 ## What is deliberately absent
 

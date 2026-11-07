@@ -162,6 +162,6 @@ Splitting its two effects across two items is the cleaner fix if it proves domin
 The common grants one point of headroom; the rare grants a point to **every** Grimoire position.
 Watch that the rare does not become mandatory for any wizard holding three or more spells.
 
-⬜ **`Beggar's Locket`'s doubled bonus needs its trigger ratified beyond autumn.**
-A **losing position** is defined as holding **no village and no floor from autumn onward**.
-Before autumn a wizard can legitimately own nothing without losing, so the check cannot fire in spring or summer.
+**`Beggar's Locket`'s doubled bonus fires only in a losing position.**
+A **losing position** is holding **no village and no floor from autumn onward**.
+Before autumn a wizard can legitimately own nothing without losing, so the check never fires in spring or summer.
