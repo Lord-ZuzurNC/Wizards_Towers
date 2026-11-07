@@ -84,8 +84,8 @@ A spell is assembled from runes, each belonging to one attribute:
 Runes come in **common**, **rare** and **legendary** grades, which change how strongly a rune acts rather than what it does.
 **Artifacts** from the Monolith are rarer than any of them, and they corrupt the wizard who carries them.
 
-Finished spells live in your **Grimoire**, whose level sets how many you may hold at once.
-Replacing a spell already in place costs a mana-stone, so a build is a commitment.
+Finished spells live in your **Grimoire**, which gains a position with each wizard level, up to ten.
+Unlocking a position costs a mana-stone, and a spell can only be edited from your own tower, so a build is a commitment.
 
 Nobody is given a list of valid recipes.
 Discovering combinations is the game.

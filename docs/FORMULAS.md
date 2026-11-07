@@ -62,20 +62,21 @@ Source: `GLOSSARY.md`, queue.
 **Grimoire positions.**
 
 ```text
-grimoire_positions = max(1, wizard_level - 1)
+grimoire_positions = min(10, max(1, wizard_level - 1))
 ```
 
 Source: `GLOSSARY.md`, Grimoire position.
 Each position beyond the first costs one mana-stone to unlock.
+Ten is the cap, one per number key from 1 to 0, reached at level 11.
 
-**Mana-stones per run.**
+**Target level.**
 
 ```text
-mana_stones_per_run ≈ max_wizard_level + 3
+the most active wizard reaches about wizard_level 15 on day 8
 ```
 
-Source: `GLOSSARY.md`, mana-stone.
-This is a **target** for tuning drop rates, not a computation the game runs.
+There is no level cap; the XP curve is built so this target holds, and the curve itself becomes the ceiling.
+Dungeon level ranges, up to 13 – 16, are set against it.
 
 ⬜ The XP needed for each `wizard_level`.
 
