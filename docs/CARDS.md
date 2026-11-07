@@ -32,10 +32,23 @@ The card catalogue itself is not designed yet; this document sets the rules ever
 | **Weapon**  | A weapon of the wizard type's own kind.                                                                     |
 | **Special** | Anything no other family covers; each Special card is unique, one copy per deck at most, and has no rarity. |
 
-**Two Special cards are already designed.**
+**Special cards designed so far.**
 
 - **Keepsake Wisp.** Taking it summons the Keepsake Wisp for the rest of the run: a spirit carrying nothing mechanical, which greets the wizard by the name of their previous life. See `SPIRITS_GUARDIANS.md`.
-- **A world boss summon.** It is never offered: when drawn, it is played on the spot, its world boss spawns where that boss always stands, it leaves the run deck, and another card is drawn in its place. The wizard learns the boss is coming at the same moment as everyone around.
+- **Dungeon and maze cards.** Never drawn: each one adds **one vote** for its dungeon or maze in a draw, without guaranteeing it. A dungeon card counts when the world draws its 20 dungeons, a maze card each time a season replaces its mazes; the votes of every deck in the world's queue add up.
+
+**World boss summons.**
+A summon is never offered: when drawn, it is played on the spot, it leaves the run deck, and another card is drawn in its place.
+The wizard learns what it did at the same moment as everyone around.
+
+| The boss                        | What the summon does                                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------ |
+| Not in the world                | It spawns where it always stands.                                                          |
+| Already in the world            | It gains one season step of growth for free, as if it had just survived a season boundary. |
+| Outside the seasons it lives in | Nothing; the card is replaced like any other summon.                                       |
+
+Only bosses that cross seasons have a summon: the Tallyman, the Rootbound Colossus, the Breach-Warden, Fortune's Thief and the Nightfall Reaper.
+A season-locked boss has none, and neither does the Collector, whose meeting is an easter egg.
 
 ## Rarity
 
@@ -116,6 +129,6 @@ RP also unlock the weapons that may drop during a run; see `GLOSSARY.md`, talent
 
 - ⬜ **The catalogue: 150 to 200 cards**, enough for three or four truly different decks per wizard type, even if most players' decks will share a large common base.
 - ⬜ **The starter deck of each wizard type**, and what share of it each family takes.
-- ⬜ **World boss summons:** whether they summon bosses that exist only through a card, or ordinary bosses whose card is earned by landing the killing blow.
+- ⬜ **How a world boss summon is earned:** by landing the killing blow on that boss, or otherwise.
 - ⬜ **The lock price**, see `FORMULAS.md`.
 - ⬜ **The achievements**, and which card each one allows.
