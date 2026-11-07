@@ -165,7 +165,7 @@ A maze that is honest about being personally gated, and says so to the player ra
 - **Stage 2 — the mirror chamber.** A mirror image of the wizard's current loadout stands opposite a sealed exit — not the wizard's actual echo. Swapping a weapon or a Grimoire spell changes the mirror's resulting stat, and the exit opens once a generated stat threshold is crossed.
 
 **Difficulty:** Medium-high.
-**Reward:** medium-large XP, a small amount of RP, consistent with the glossary's statement that dungeons grant RP.
+**Reward:** medium-large XP.
 
 ### 4.4 The Umbral Processional
 
@@ -238,7 +238,7 @@ A late-run, higher-stakes maze; prototype it carefully before building more like
 - **Stage 2 — the choice.** An exit offering a mana-stone shortcut or a second, harder generated puzzle for free.
 
 **Difficulty:** High.
-**Reward:** large XP, a rare rune, and RP consistent with its difficulty.
+**Reward:** large XP and a rare rune.
 
 ### 4.10 The North Wall Archive
 
@@ -274,7 +274,7 @@ A deduction-heavy maze pitched as a late-run finale: nothing here is a luck roll
 - **Stage 2 — the prism gate.** A gate reading the wizard's live cost bar, open only while a cast holds the bar's fill inside a marked, generated band.
 
 **Difficulty:** High.
-**Reward:** large XP, a rare rune, RP.
+**Reward:** large XP and a rare rune.
 
 ### 4.13 The Archmage's Final Lock
 
@@ -287,7 +287,7 @@ The capstone of this batch, the only maze in the roster using three mechanics ra
 - **Stage 3 — the final vault.** Effect-Order Plates, generated outcome, guarding the exit chest.
 
 **Difficulty:** Very high.
-**Reward:** very large XP, a rare or legendary-rarity rune, meaningful RP.
+**Reward:** very large XP and a rare or legendary-rarity rune.
 Never an Artifact, consistent with Artifacts being floor-bound only.
 
 ---
@@ -339,9 +339,8 @@ Recommend capping the toll amounts low enough that a mid-run wizard's typical go
 **`Echo Mirror Chamber`'s name risks colliding with the real echo system, the floor defender snapshot, even though the mechanic is a mirror image that never fights and never persists.**
 ⬜ Worth a rename pass before this reaches a glossary entry, to avoid the collision entirely.
 
-**Whether a maze grants RP at all is inherited from an open glossary item, not decided here.**
-`GLOSSARY.md` lists dungeons as an RP source alongside wizard kills, world bosses and floors, and this document has assumed that a maze, being a dungeon, inherits that.
-⬜ That inheritance has not been confirmed anywhere, and the `dungeon` entry itself is still open.
+**A maze grants no RP directly.**
+Like a dungeon, completing one counts toward the wizard's score, which converts into RP when it is banked; see `FORMULAS.md`.
 
 **No reward number in section 4 is a real number.**
 They are relative — small, medium, large — because the XP curve behind `wizard_level` is explicitly open, glossary item 32.5, and inventing numbers here would be answering a design question this document is not allowed to answer.

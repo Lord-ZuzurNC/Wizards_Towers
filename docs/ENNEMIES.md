@@ -90,7 +90,7 @@ The Flame Wisp and the Frost Warden are deliberate opposites: one fades exactly 
 
 The gold a village loses when a crop row is finished by Cabbage Grub, Wild Boar or The Rootbound Elder is defined with the crop rules, in `UPGRADES_VILLAGE.md`.
 
-⬜ Whether ordinary non-seasonal enemy stats drift upward across a run has not been decided.
+Ordinary enemies never grow across a run; only the season table above changes an enemy's stats.
 
 ## Notes for balancing
 

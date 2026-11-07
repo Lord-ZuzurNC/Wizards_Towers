@@ -63,7 +63,7 @@ If a wizard takes Floor 49 before winter ends, they win the run.
 If nobody does, the world ends anyway when winter does.
 
 Death is permanent, and almost everything is lost with it — villages, towers, floors, gold, runes, spells.
-What survives is **Reincarnation Points**, earned from kills, dungeons, world bosses and floors, and spent between runs on **Talents**:
+What survives is **Reincarnation Points**, converted from your run's score when you die or the world ends, and spent between runs on **Talents**:
 small permanent stat bonuses, other kinds of wizard, other weapons, and the chance for a rune you have unlocked to appear somewhere in your next world.
 
 Unlocking a rune does not hand it to you.

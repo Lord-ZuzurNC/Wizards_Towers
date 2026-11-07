@@ -78,6 +78,39 @@ the most active wizard reaches about wizard_level 15 on day 8
 There is no level cap; the XP curve is built so this target holds, and the curve itself becomes the ceiling.
 Dungeon level ranges, up to 13 – 16, are set against it.
 
+**Stat growth.**
+
+```text
+health        = 100 + 20 × (wizard_level - 1)
+power         =  10 +  2 × (wizard_level - 1)
+magic_defence =  10 +  2 × (wizard_level - 1)
+luck          =   5 + floor((wizard_level - 1) / 2)
+speed         = 100                                      never grows with level
+```
+
+Growth is linear, a starting point to tune once fights can be measured.
+Weapons, talents, flags and Artifacts stack on top of these base values.
+
+| `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool |
+| -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: |
+|              1 |    100 |    10 |            10 |                   14 % |    5 |             50 |
+|              4 |    160 |    16 |            16 |                   21 % |    6 |             76 |
+|              7 |    220 |    22 |            22 |                   27 % |    8 |             86 |
+|             11 |    300 |    30 |            30 |                   33 % |   10 |             94 |
+|             15 |    380 |    38 |            38 |                   39 % |   12 |            100 |
+
+A wizard at level 7 roughly matches a veteran enemy, and at the level-15 target blocks about what a champion blocks.
+
+**Base mana pool.**
+
+```text
+base_mana_pool = round(50 × (1 + ln(wizard_level) / ln(15)))
+mana_pool      = base_mana_pool + tower income
+```
+
+Logarithmic: every level adds mana, each a little less than the one before, from +13 at level 2 to +1 a level from level 14 on.
+It doubles from 50 at level 1 to 100 at the level-15 target, and keeps creeping up beyond.
+
 ⬜ The XP needed for each `wizard_level`.
 
 ## Combat
@@ -85,15 +118,14 @@ Dungeon level ranges, up to 13 – 16, are set against it.
 **Damage is multiplicative.**
 
 ```text
-damage = raw_damage × K / (K + effective_magic_defence)
+damage = raw_damage × K / (K + effective_magic_defence)            K = 60
 effective_magic_defence = magic_defence × (1 - penetration)      penetration in [0, 1]
 ```
 
 Defence never brings a hit to zero, and each point of `magic_defence` adds the same amount of survival.
-`K` is the defence that halves a hit.
+`K` is the defence that halves a hit: at 60, a champion's 40 `magic_defence` blocks 40 % of a hit.
 Penetration is how Stone ignores a portion of defence and Rust ignores all of it.
 
-⬜ `K`, set once stat growth per level is known.
 ⬜ `raw_damage`, from the spell's magnitude and the caster's `power`.
 
 ## Magic
@@ -157,7 +189,7 @@ appears/present: every stat × 1.0
 
 Source: `ENNEMIES.md`, Scaling across the four seasons.
 
-⬜ Whether ordinary enemies drift upward across a run.
+Enemies never grow with the run: no enemy gains anything for surviving a season.
 
 ## World bosses
 
@@ -179,7 +211,9 @@ Source: `WORLD_BOSSES.md`, Season scaling.
 **Contribution tickets.**
 
 ```text
-contribution(w) = a × damage_dealt(w) + b × healing_done(w) + c × damage_taken(w)
+contribution(w) = a × part(damage_dealt, w) + b × part(healing_done, w) + c × part(damage_taken, w)
+part(x, w)      = x(w) / Σ x over every wizard who fought        0 when nobody did any x
+a = 1.0, b = 0.9, c = 1.1
 tickets(w)      = contribution(w)
 ```
 
@@ -187,7 +221,6 @@ tickets(w)      = contribution(w)
 share(w)      = tickets(w) / Σ tickets over every wizard who fought
 gold(w)       = gold_pool × share(w)
 xp(w)         = xp_pool   × share(w)
-rp(w)         = rp_pool   × share(w)
 rune winners  = the three wizards with the most tickets
 ```
 
@@ -198,9 +231,12 @@ P(w wins a stone) = tickets(w) / Σ tickets over the wizards who chose Want
 Source: `WORLD_BOSSES.md`, Rewards and the kill.
 A wizard who has not answered when the stone draw closes counts as Want.
 
-⬜ The weights `a`, `b` and `c`.
-⬜ Whether `damage_taken` counts all damage, or only damage taken while the boss was attacking someone else.
-⬜ The size of `gold_pool`, `xp_pool` and `rp_pool` per boss.
+Each term is the wizard's share of the group's total, not a raw amount: a group deals the boss's whole health in damage but heals far less, so raw amounts would bury healing under damage.
+`damage_taken` counts every hit the wizard takes from the boss itself, whoever the boss was aiming at, so drawing its attention counts; damage from anything else in the fight does not.
+Standing in harm's way on purpose does earn tickets, and that is accepted: a hit one wizard takes is a hit another does not.
+Tickets add up across the run and feed the score, see below; a world boss grants no RP directly.
+
+⬜ The size of `gold_pool` and `xp_pool` per boss, set so a group of ten wizards ends the fight well rewarded.
 
 ## Dungeons
 
@@ -230,7 +266,17 @@ open(d)          = whole run           ordinary dungeon
 
 Source: `DUNGEONS.md`, What a dungeon is.
 The catalogue holds 30, so a world draws two dungeons in three.
-⬜ Mana-stone and life-stone drop chance per dungeon, set low on purpose.
+
+**A dungeon pays out once per world.**
+The first wizard to complete it takes its rewards, and the dungeon then stays empty until the world ends.
+
+```text
+completions per dungeon per world = 1
+season-gated dungeon : mana-stone and life-stone, guaranteed
+ordinary dungeon     : P(mana-stone) = 15 %, P(life-stone) = 8 %      proposed
+```
+
+⬜ The ordinary stone chances: with one completion per dungeon, a whole world draws about 3 mana-stones and 1.6 life-stones from its ordinary dungeons.
 
 ## Economy
 
@@ -243,7 +289,7 @@ price(type, n) = base_price(type) × multiplier(type) ^ n
 `n` counts every purchase of that type this run, including holdings since sold or lost, and never resets.
 Source: `GLOSSARY.md`, escalating price.
 
-⬜ `base_price` and `multiplier` for each purchase type.
+⬜ `base_price` and `multiplier` for each purchase type, set once combat and dungeon gold is known: easy early, steep fast, so that a wizard holding seven or eight villages is very wealthy.
 ⬜ Whether tower upgrades count per tower or per wizard, see `UPGRADES_TOWER.md`.
 
 ## Flags
@@ -262,6 +308,26 @@ Source: `GLOSSARY.md`, flag.
 
 ## Score and reincarnation points
 
+Nothing grants RP directly.
+Dungeons, mazes, world bosses, floors and kills raise the **score**, and the score converts into RP once, when it is banked at the wizard's death or at the end of the run.
+
+```text
+score = Σ weight(i) × component(i)
+RP    = conversion(score)
+```
+
+| Component            | Counted as                                          |
+| -------------------- | --------------------------------------------------- |
+| Contribution tickets | Total accumulated over the run.                     |
+| Villages             | Villages owned, plus their upgrades.                |
+| Towers               | Towers owned, plus their upgrades.                  |
+| Floors               | Floors held, counted once per season each was held. |
+| Dungeons and mazes   | Completions.                                        |
+| `wizard_level`       | At banking.                                         |
+| Raids                | Floors taken from another wizard.                   |
+| Kills                | Wizards killed.                                     |
+| Gold rank            | At banking.                                         |
+
 ```text
 score_gain = gain × 0.25      while the world is in overtime
              gain             otherwise
@@ -269,10 +335,10 @@ score_gain = gain × 0.25      while the world is in overtime
 
 Source: `GLOSSARY.md`, overtime and score.
 
-⬜ What a score is made of.
-⬜ How a score converts into RP.
-⬜ The winner's bonus.
-⬜ RP per dungeon, per world boss, per floor and per wizard kill.
+⬜ `weight(i)` for each component, and which components go through a ratio.
+⬜ `conversion`, from score to RP.
+The winner's bonus is tied to taking the ROOF.
+⬜ The size of that bonus.
 
 ## Endings
 
@@ -290,20 +356,18 @@ Source: `GLOSSARY.md`, sudden death.
 
 Gathered here so they can be answered in one pass, roughly in the order the game needs them.
 
-| Formula                                         | Needed by                        | Blocks                      |
-| ----------------------------------------------- | -------------------------------- | --------------------------- |
-| `K` and `raw_damage`                            | every fight                      | any balancing at all        |
-| Stat growth per `wizard_level`                  | `GLOSSARY.md`                    | `K`, every fight            |
-| Crit and favourable rolls, from `luck`          | every fight, drops               | Spark, crits, drop rates    |
-| Mana cost, from `spell_weight`                  | `RUNES.md`                       | the spell builder           |
-| Cooldown, from Duration and Element             | `RUNES.md`                       | the spell builder           |
-| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`        | maze rewards, Grimoire pace |
-| Contribution ticket weights `a`, `b`, `c`       | `WORLD_BOSSES.md`                | every world boss reward     |
-| Reward pools per world boss                     | `WORLD_BOSSES.md`                | world boss economy          |
-| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md`    | the whole economy           |
-| Score composition and RP conversion             | `GLOSSARY.md`                    | meta-progression            |
-| RP per source                                   | `DUNGEONS.md`, `WORLD_BOSSES.md` | meta-progression            |
-| Stone drop chances                              | `DUNGEONS.md`                    | Grimoire pace               |
+| Formula                                         | Needed by                     | Blocks                      |
+| ----------------------------------------------- | ----------------------------- | --------------------------- |
+| `raw_damage`                                    | every fight                   | any balancing at all        |
+| Stat growth per `wizard_level`                  | `GLOSSARY.md`                 | `K`, every fight            |
+| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates    |
+| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder           |
+| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder           |
+| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace |
+| Reward pools per world boss                     | `WORLD_BOSSES.md`             | world boss economy          |
+| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy           |
+| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression            |
+| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace               |
 
 **Stat growth comes first, then `K`.**
 The shape of the damage formula is settled; its constant only means something once the range of `magic_defence` across a run is known.

@@ -3,7 +3,7 @@
 This document lists the world bosses available to a run.
 A world boss is a PvE entity standing on the open world map, outside the Monolith; exceptions are kept in `PAQUES.md`.
 It is never a floor boss and never a dungeon boss.
-Its strength is tied to the season, and killing one is one of the best sources of gold, XP, reincarnation points and rare runes in the game.
+Its strength is tied to the season, and killing one is one of the best sources of gold, XP, score and rare runes in the game.
 
 - [World bosses — Wizards Towers](#world-bosses--wizards-towers)
   - [How to read this document](#how-to-read-this-document)
@@ -51,7 +51,6 @@ At the end of the fight, each wizard who fought holds tickets in proportion to t
 | ------- | --------------------------------------------------------------------------------------- |
 | gold    | One pool per boss, split in proportion to tickets.                                      |
 | XP      | Split like gold.                                                                        |
-| RP      | Split like gold.                                                                        |
 | runes   | Each boss has a rune pool; the three wizards holding the most tickets each receive one. |
 | stones  | A draw among the wizards who want the stone, see below.                                 |
 | special | A boss-specific condition stated in its own section, such as the Tallyman's purse.      |
@@ -126,7 +125,7 @@ The Harrow is the clearest example of a boss that punishes being ignored rather 
 A wizard who leaves it alive past its enrage threshold is trading their own safety for a village's income, and the two outcomes are explicit, not implied.
 
 **Drops.**
-Gold at a common-world-boss rate, a meaningful XP and reincarnation point award, and a chance at a Verdure-attribute rune, since its own attacks are built from that element.
+Gold at a common-world-boss rate, a meaningful XP award, and a chance at a Verdure-attribute rune, since its own attacks are built from that element.
 A small chance at a mana-stone, no higher than any other non-apex world boss.
 
 **Group versus solo.**
@@ -188,7 +187,7 @@ It is the only boss whose difficulty is not fixed by the designer's season-stren
 Every other boss resets its threat at season start; this one carries its growth forward, compounding on top of the normal seasonal scalar described in [Season scaling](#season-scaling).
 
 **Drops.**
-Scales with how long it lived: gold, XP and reincarnation points all rise with its accumulated growth, rewarding the group that finally ends a long-ignored Colossus.
+Scales with how long it lived: gold and XP both rise with its accumulated growth, rewarding the group that finally ends a long-ignored Colossus.
 Its signature rune is Growth, matching its own mechanic, and its mana-stone and life-stone chance both rise the longer it survived before dying.
 
 **Group versus solo.**
@@ -219,7 +218,7 @@ It is the list's clearest answer to "immune to one element."
 A wizard who built around Spark, the element RUNES.md calls "the only element with built-in randomness," gets nothing from this fight and has to swap into Stone or Null to make any progress at all.
 
 **Drops.**
-A Stone-attribute rune at an elevated chance, reflecting what counters it, plus the baseline gold, XP and reincarnation points.
+A Stone-attribute rune at an elevated chance, reflecting what counters it, plus the baseline gold and XP.
 Its mana-stone chance is standard; it carries no particular life-stone bias.
 
 **Group versus solo.**
@@ -258,7 +257,7 @@ It is the only boss driven by another system, the floor raid.
 While anyone is raiding, the ground around the Monolith becomes dangerous for every other wizard on their way in or out.
 
 **Drops.**
-Gold, XP and reincarnation points at the high end for a non-apex boss, reflecting that its fight is rarely chosen voluntarily.
+Gold and XP at the high end for a non-apex boss, reflecting that its fight is rarely chosen voluntarily.
 Its signature rune is Toll, since like that Effect rune it is built to punish the strong rather than the newcomer, and it carries a modestly elevated mana-stone chance given how often it is fought unwillingly.
 
 **Group versus solo.**
@@ -289,7 +288,7 @@ Every other boss treats every wizard the same.
 This one explicitly punishes success elsewhere in the run, turning a floor-holder's collection of Artifacts into a liability the moment they step up to fight it.
 
 **Drops.**
-A guaranteed rare rune on top of the baseline gold, XP and reincarnation points, biased toward whichever attribute slot the engaging Artifact-heavy wizard is weakest in.
+A guaranteed rare rune on top of the baseline gold and XP, biased toward whichever attribute slot the engaging Artifact-heavy wizard is weakest in.
 Its mana-stone chance rises with how many Artifacts were held by whoever landed the killing blow, a small but deliberate reward for taking the risk.
 
 **Group versus solo.**
@@ -322,7 +321,7 @@ This is the one boss built entirely around the game's existing echo-defends-the-
 Fighting it means trusting an echo to hold a village alone while its owner is occupied elsewhere, with no way to intervene until the fight ends.
 
 **Drops.**
-The baseline gold, XP and reincarnation point award, plus an Anchor-attribute rune, fitting for a boss whose whole identity is tying two fixed points together.
+The baseline gold and XP award, plus an Anchor-attribute rune, fitting for a boss whose whole identity is tying two fixed points together.
 Its mana-stone and life-stone chances are both standard, with no bias either way.
 
 **Group versus solo.**
@@ -355,7 +354,7 @@ It is the only boss on this list explicitly designed to outscale a solo wizard a
 Its appearance only in winter also means it is the run's clearest signal that time is running out before a bad ending.
 
 **Drops.**
-The best non-capital-floor loot in the game: a guaranteed rare rune, elevated reincarnation points, and the highest mana-stone and life-stone chance of any world boss on this list.
+The best non-capital-floor loot in the game: a guaranteed rare rune, and the highest mana-stone and life-stone chance of any world boss on this list.
 Its signature rune is Judgement, the heaviest Shape rune in the game, fitting for the heaviest boss.
 
 **Group versus solo.**
@@ -386,7 +385,7 @@ It is the clearest "punishes a crowd" design on this list, deliberately rewardin
 Clustering to maximise damage output against it is the wrong read; its pulse scales faster than a crowd's extra damage compensates for.
 
 **Drops.**
-A Gale-attribute rune as its signature drop, plus the baseline gold, XP and reincarnation points.
+A Gale-attribute rune as its signature drop, plus the baseline gold and XP.
 Its mana-stone chance is standard, unmodified by how many wizards took part.
 
 **Group versus solo.**
@@ -417,7 +416,7 @@ It is the list's soft answer to crowd control, distinct from Stormcaller Roost's
 A crowd's damage does not accumulate evenly here, because during every submersion only one wizard's damage counts at all, effectively forcing the fight through a single duelist in rotation.
 
 **Drops.**
-A Brine-attribute rune as its signature drop, since its corrosive, water-born nature matches that element, plus the baseline gold, XP and reincarnation points.
+A Brine-attribute rune as its signature drop, since its corrosive, water-born nature matches that element, plus the baseline gold and XP.
 Its mana-stone chance is standard.
 
 **Group versus solo.**
@@ -448,7 +447,7 @@ It is the only boss whose difficulty is directly a function of the engaging wiza
 A low-luck wizard can find this fight noticeably harder than its stat block alone would suggest, and a high-luck wizard noticeably easier.
 
 **Drops.**
-A Mark-attribute rune as its signature drop, plus the baseline gold, XP and reincarnation points.
+A Mark-attribute rune as its signature drop, plus the baseline gold and XP.
 Its drop table has the second-highest mana-stone chance on this list, after the Riven Maw, in keeping with its "fortune" theme.
 
 **Group versus solo.**
@@ -479,7 +478,7 @@ It is the hardest direct punishment of opportunistic kill-stealing on this list.
 Where the Drowned King softly restricts who can land a hit, the Nightfall Reaper actively hurts everyone who is not the wizard actually carrying the fight.
 
 **Drops.**
-A Gloom-attribute rune as its signature drop, matching the ambush theme RUNES.md already assigns to that element, plus the baseline gold, XP and reincarnation points.
+A Gloom-attribute rune as its signature drop, matching the ambush theme RUNES.md already assigns to that element, plus the baseline gold and XP.
 Its mana-stone chance is standard.
 
 **Group versus solo.**
@@ -511,7 +510,7 @@ It is the sharpest test of coordination on this list rather than raw output.
 A controlled group that kills adds on sight barely notices the waves; an uncoordinated crowd that ignores adds to focus the Choir gets quickly overwhelmed by the exact numbers that were supposed to help them.
 
 **Drops.**
-A Reprise-attribute rune as its signature drop, plus the baseline gold, XP and reincarnation points, with a bonus reincarnation point award for clearing a wave without losing a wizard.
+A Reprise-attribute rune as its signature drop, plus the baseline gold and XP, with bonus contribution tickets for clearing a wave without losing a wizard.
 Its mana-stone chance is elevated, in line with the other winter-only boss on this list.
 
 **Group versus solo.**
