@@ -87,13 +87,23 @@ Cards, weapons, flags and Artifacts stack on top of these base values.
 **Base mana pool.**
 
 ```text
-base_mana_pool = round(50 + (wizard_level - 1) + 21 × ln(wizard_level) / ln(30))
+base_mana_pool = round(100 + 4 × (wizard_level - 1) + 84 × ln(wizard_level) / ln(30))
 mana_pool      = base_mana_pool + tower income
 ```
 
-A logarithmic curve on top of one point per level: every level adds mana, the early ones much more than the late ones, from +5 at level 2 down to +1 or +2 past level 10.
-The single point per level is there because a pure logarithm stretched over thirty levels adds less than one point a level from level 15 on, and rounding would leave levels that add nothing.
-It doubles from 50 at level 1 to 100 at the level-30 target, and keeps rising beyond.
+A logarithmic curve on top of four points per level: every level adds a felt amount, the early ones the most, from +21 at level 2 down to about +5 from level 15 on.
+It triples from 100 at level 1 to 300 at the level-30 target, and keeps rising beyond.
+Spell costs, corruption drains and mana income are sized against this scale.
+
+**Weight limit.**
+
+```text
+weight_limit = 31 + (wizard_level - 1)
+```
+
+The size of the weight bar, a stat of its own, separate from the mana pool since 2026-11-07.
+The heaviest possible spell weighs 52, five legendary runes at the top weight of each attribute, so the limit fits 60 % of it at level 1 and all of it at level 22.
+Tomes add headroom on top.
 
 **Grimoire positions.**
 
@@ -105,16 +115,16 @@ Source: `GLOSSARY.md`, Grimoire position.
 One position every three levels, each beyond the first costing one mana-stone to unlock.
 Ten is the cap, one per number key from 1 to 0, reached at level 28.
 
-| `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool | Grimoire positions |
-| -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: | -----------------: |
-|              1 |    100 |    10 |            10 |                   14 % |    5 |             50 |                  1 |
-|              4 |    130 |    13 |            13 |                   18 % |    5 |             62 |                  2 |
-|              7 |    160 |    16 |            16 |                   21 % |    6 |             68 |                  3 |
-|             10 |    190 |    19 |            19 |                   24 % |    7 |             73 |                  4 |
-|             16 |    250 |    25 |            25 |                   29 % |    8 |             82 |                  6 |
-|             22 |    310 |    31 |            31 |                   34 % |   10 |             90 |                  8 |
-|             28 |    370 |    37 |            37 |                   38 % |   11 |             98 |                 10 |
-|             30 |    390 |    39 |            39 |                   39 % |   12 |            100 |                 10 |
+| `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool | Weight limit | Grimoire positions |
+| -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: | -----------: | -----------------: |
+|              1 |    100 |    10 |            10 |                   14 % |    5 |            100 |           31 |                  1 |
+|              4 |    130 |    13 |            13 |                   18 % |    5 |            146 |           34 |                  2 |
+|              7 |    160 |    16 |            16 |                   21 % |    6 |            172 |           37 |                  3 |
+|             10 |    190 |    19 |            19 |                   24 % |    7 |            193 |           40 |                  4 |
+|             16 |    250 |    25 |            25 |                   29 % |    8 |            228 |           46 |                  6 |
+|             22 |    310 |    31 |            31 |                   34 % |   10 |            260 |           52 |                  8 |
+|             28 |    370 |    37 |            37 |                   38 % |   11 |            290 |           58 |                 10 |
+|             30 |    390 |    39 |            39 |                   39 % |   12 |            300 |           60 |                 10 |
 
 A wizard at level 10 roughly matches a veteran enemy, and at the level-30 target blocks about what a champion blocks, before any card.
 
@@ -157,12 +167,12 @@ Magnitude grows faster than weight, so a rarer rune is always worth its extra we
 
 ```text
 spell_weight   = Σ rune_weight over the spell's runes
-weight_bar_max = mana_pool
+weight_bar_max = weight_limit + headroom granted by a tome
 headroom       = weight_bar_max - spell_weight
 ```
 
 Source: `GLOSSARY.md`, weight bar.
-The bar runs from 1 to the wizard's `mana_pool`, and no figure is ever shown to the player.
+The bar runs from 1 to the wizard's weight limit, not their mana pool, and no figure is ever shown to the player.
 
 ⬜ The mana cost of a spell, computed from `spell_weight`.
 ⬜ The cooldown of a spell, computed from its Duration and Element.
@@ -331,6 +341,14 @@ lock_price(n) = base_lock_price × lock_multiplier ^ n      n = locks already bo
 
 Source: `CARDS.md`.
 A reroll costs one mana-stone and an extra pick one life-stone, always.
+
+**Card rarity.**
+
+```text
+rarity rolled when a card is drawn: common 85 %, rare 10 %, legendary 5 %
+stat, mana, special card : bonus × 1.0 common, × 1.5 rare, × 2.0 legendary
+rune card                : grants the rune at the rolled rarity, scaled as in RUNES.md
+```
 
 ⬜ `base_lock_price` and `lock_multiplier`.
 
