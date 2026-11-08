@@ -122,6 +122,8 @@ func _card_button(card: Card, index: int) -> Button:
 		box.border_color = grade
 		box.set_border_width_all(3 if card.rarity == Rarity.COMMON else 5)
 		box.set_corner_radius_all(4)
+		# Rounded corners stay on the pixel grid: no half-transparent pixels at the curve.
+		box.anti_aliasing = false
 		button.add_theme_stylebox_override(state, box)
 	button.pressed.connect(_on_card_pressed.bind(index))
 	return button
