@@ -135,16 +135,31 @@ A wizard at level 10 roughly matches a veteran enemy, and at the level-30 target
 **Damage is multiplicative.**
 
 ```text
-damage = raw_damage × K / (K + effective_magic_defence)            K = 60
+damage = max(1, raw_damage × K / (K + effective_magic_defence))   K = 60, rounded down
 effective_magic_defence = magic_defence × (1 - penetration)      penetration in [0, 1]
 ```
 
 Defence never brings a hit to zero, and each point of `magic_defence` adds the same amount of survival.
+Rounding down alone would break that promise for small hits, so a hit that lands always deals at least 1.
 `K` is the defence that halves a hit: at 60, a champion's 40 `magic_defence` blocks 40 % of a hit.
 Penetration is how Stone ignores a portion of defence and Rust ignores all of it.
 
 ⬜ `raw_damage`, from the spell's magnitude and the caster's `power`.
-⬜ Hazard damage, Ember on a rift bank in summer and Rime on the glacier in winter, and whether `magic_defence` reduces it; see `WORLD_MAP.md`, section *Hazards*.
+
+**Hazards.**
+
+```text
+hazard_raw_damage = 1                                   provisional
+hazard_damage     = max(1, hazard_raw_damage × K / (K + effective_magic_defence))
+hazard_interval   = 15 simulation ticks, so 2 hits a second
+```
+
+Dealt at each hazard hit to every combatant standing on the ground, with the rune's side effect, which runs its usual time after the combatant steps off.
+Ember on a rift bank in summer, Rime on the glacier in winter.
+Source: `WORLD_MAP.md`, section *Hazards*.
+
+`hazard_raw_damage` is a placeholder for testing.
+⬜ It becomes the base damage of the Ember or Rime rune once `raw_damage` exists.
 
 ## Magic
 
@@ -439,20 +454,15 @@ Source: `GLOSSARY.md`, sudden death.
 
 Gathered here so they can be answered in one pass, roughly in the order the game needs them.
 
-| Formula                                         | Needed by                     | Blocks                            |
-| ----------------------------------------------- | ----------------------------- | --------------------------------- |
-| `raw_damage`                                    | every fight                   | any balancing at all              |
-| Stat growth per `wizard_level`                  | `GLOSSARY.md`                 | `K`, every fight                  |
-| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates          |
-| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder                 |
-| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder                 |
-| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace       |
-| Reward pools per world boss                     | `WORLD_BOSSES.md`             | world boss economy                |
-| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy                 |
-| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression                  |
-| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace                     |
-| Lock price                                      | `CARDS.md`                    | the card choice                   |
-| Hazard damage                                   | `WORLD_MAP.md`                | rift banks, the glacier in winter |
-
-**Stat growth comes first, then `K`.**
-The shape of the damage formula is settled; its constant only means something once the range of `magic_defence` across a run is known.
+| Formula                                         | Needed by                     | Blocks                               |
+| ----------------------------------------------- | ----------------------------- | ------------------------------------ |
+| `raw_damage`                                    | every fight                   | any balancing at all                 |
+| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates             |
+| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder                    |
+| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder                    |
+| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace          |
+| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy                    |
+| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression                     |
+| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace                        |
+| `base_lock_price` and `lock_multiplier`         | `CARDS.md`                    | the card choice                      |
+| Element rune base damage                        | `WORLD_MAP.md`, `RUNES.md`    | hazard damage beyond the placeholder |

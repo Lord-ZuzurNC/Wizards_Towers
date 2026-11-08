@@ -210,16 +210,16 @@ Score is banked under every ending, world or wizard, without exception.
 
 How the map is laid out lives in `WORLD_MAP.md`; these are the words it uses.
 
-| Term             | Definition                                                                                                                                 | Code           | Status |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ------ |
-| **mask**         | The coarse picture a world is generated from: 256 × 256 points, one biome each. Shown on the queue screen.                                 | `WorldMask`    | ✅      |
-| **biome**        | One of the eight zones of a mask: plains, forest, marsh, glacier, desert, mountain, volcanic, coast. Each appears once.                    | `Biome`        | ✅      |
-| **spine**        | The crest line of a mountain chain. Never walkable.                                                                                        | `spine`        | ✅      |
-| **crater**       | The centre of a volcano, a fifth of its round patch by area. Never walkable.                                                               | `crater`       | ✅      |
-| **rift core**    | The burning chasm down the middle of a rift. Never walkable.                                                                               | `rift_core`    | ✅      |
-| **rift bank**    | The ground either side of a rift core. Walkable, and a **hazard** in summer.                                                               | `rift_bank`    | ✅      |
-| **frozen water** | The sea and the glacier's lake in winter, frozen and walkable. Never a hazard by itself.                                                   | `frozen_water` | ✅      |
-| **hazard**       | Ground dealing elemental damage in one season: Ember on rift banks in summer, Rime on the glacier in winter. Amount open in `FORMULAS.md`. | `Hazard`       | ⬜      |
+| Term             | Definition                                                                                                                                                                                              | Code           | Status |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------ |
+| **mask**         | The coarse picture a world is generated from: 256 × 256 points, one biome each. Shown on the queue screen.                                                                                              | `WorldMask`    | ✅      |
+| **biome**        | One of the eight zones of a mask: plains, forest, marsh, glacier, desert, mountain, volcanic, coast. Each appears once.                                                                                 | `Biome`        | ✅      |
+| **spine**        | The crest line of a mountain chain. Never walkable.                                                                                                                                                     | `spine`        | ✅      |
+| **crater**       | The centre of a volcano, a fifth of its round patch by area. Never walkable.                                                                                                                            | `crater`       | ✅      |
+| **rift core**    | The burning chasm down the middle of a rift. Never walkable.                                                                                                                                            | `rift_core`    | ✅      |
+| **rift bank**    | The ground either side of a rift core. Walkable, and a **hazard** in summer.                                                                                                                            | `rift_bank`    | ✅      |
+| **frozen water** | The sea and the glacier's lake in winter, frozen and walkable. Never a hazard by itself.                                                                                                                | `frozen_water` | ✅      |
+| **hazard**       | Ground dealing elemental damage in one season: Ember on rift banks in summer, Rime on the glacier in winter. Hits every combatant on it twice a second, with the rune's side effect. See `FORMULAS.md`. | `Hazard`       | ✅      |
 
 ## Offline and ownership
 

@@ -48,8 +48,6 @@ The Monolith's ring is the one place no layer covers.
 
 ## Scale
 
-Provisional, until the art style fixes the size of a tile in pixels.
-
 | Measure                  | Value                                               |
 | ------------------------ | --------------------------------------------------- |
 | Normal walk, `speed` 100 | 4 tiles a second                                    |
@@ -84,8 +82,12 @@ The volcano and the rift are placed and steered away from them; a thin strip of 
 
 ## Hazards
 
-**Some ground hurts, depending on the season.**
-A wizard standing on it takes damage of the matching element.
+**Some ground hurts, in its season only.**
+Every combatant standing on it, wizard, enemy or world boss alike, takes the base damage of the matching Element rune at each hazard hit.
+`magic_defence` reduces it like any other hit, see `FORMULAS.md`, section *Combat*.
+The rune's side effect comes with it and outlasts the ground.
+Ember's burn keeps burning for its usual time after the combatant steps off, and Rime's slow keeps slowing.
+A wizard who drags a world boss onto a rift bank in summer burns with it, and anything that plays on a burning or slowed target plays on them both.
 
 | Ground       | Season | Element | Note                                                                 |
 | ------------ | ------ | ------- | -------------------------------------------------------------------- |
@@ -93,11 +95,7 @@ A wizard standing on it takes damage of the matching element.
 | Glacier      | winter | Rime    | The whole glacier, its frozen lake included.                         |
 | Frozen water | winter | none    | The frozen sea is walkable and harmless, less cold than the glacier. |
 
-Still open:
-
-- ⬜ The amount, and whether `magic_defence` reduces it, see `FORMULAS.md`.
-- ⬜ Whether the element's side effect applies too, Ember's burn or Rime's slow.
-- ⬜ Whether a hazard hurts every combatant or wizards only.
+A hazard hits twice a second; its damage is a placeholder of 1 until the runes have base damage, see `FORMULAS.md`.
 
 ## Placement
 
@@ -124,7 +122,5 @@ In winter the whole sea freezes, and so does the lake in the glacier.
 
 ## Open questions
 
-- ⬜ **The size of a tile in pixels**, fixed with the art style.
-- ⬜ **A minimum width for every zone**, so no biome ends up as a thin strip between two others.
 - ⬜ **The theme of every dungeon and world boss**, assigned to a biome; the table above is a first pass.
 - ⬜ **Hand-painted masks**: whether some worlds use a curated mask instead of a generated one.
