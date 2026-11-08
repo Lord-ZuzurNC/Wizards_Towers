@@ -14,7 +14,9 @@ const COLORS := [
 ]
 const SPINE_COLOR := Color("4a4a4a")
 const CRATER_COLOR := Color("5c0f0a")  # a volcano's central crater: never walkable
-const RIFT_COLOR := Color("8e1a12")  # a volcanic rift: never walkable, over its whole width
+const RIFT_CORE_COLOR := Color("8e1a12")  # a rift's burning chasm: never walkable
+const RIFT_BANK_COLOR := Color("f05a3c")  # a rift's banks: walkable, Ember damage in summer
+const RIFT_CORE_R := 2.0  # half-width of a rift's core, in mask points; the brush is about 5
 const CRATER_SHARE := 0.20  # the crater's share of the volcano's round patch, by area
 const LAKE_COLOR := Color("8fd6ff")
 const ISLAND_COLOR := Color("f2e3b0")
@@ -25,7 +27,7 @@ var monolith := Vector2(W / 2.0, H / 2.0)
 var grid := PackedByteArray()
 var spine := PackedByteArray()
 var crater := PackedByteArray()
-var rift := PackedByteArray()
+var rift := PackedByteArray()  # 0 none, 1 bank, 2 core
 var painting_rift := false  # set while the rift's brush walks, so _brush marks what it paints
 var ring := PackedByteArray()  # cells no overlay may cover: the Monolith and its Outer Ring
 var feature := PackedByteArray()  # 0 none, 1 Frostfang lake, 2 Frostfang island
@@ -366,7 +368,7 @@ func _validate() -> String:
 			if Vector2(x, y).distance_to(monolith) <= RING_RADIUS and grid[y * W + x] != PLAINS:
 				return "Outer Ring not in plains"
 	# All walkable ground, every plains piece included, must be reachable on foot from the Monolith.
-	# The sea, the mountain spine, a volcano's crater and a rift are the only things that cannot be walked.
+	# The sea, the mountain spine, a volcano's crater and a rift's core are the only things that cannot be walked.
 	var reach := _distance_field(func(i: int) -> bool: return i == int(monolith.y) * W + int(monolith.x), 100000, true)
 	for i in W * H:
 		if _walkable(i) and reach[i] >= 100000:
@@ -455,11 +457,11 @@ func _brush(c: Vector2, r: float, biome: int, spine_r := 0.0) -> void:
 			grid[i] = biome
 			spine[i] = 1 if keep_spine or (biome == MOUNTAIN and d <= spine_r) else 0
 			if painting_rift:
-				rift[i] = 1
+				rift[i] = 2 if rift[i] == 2 or d <= RIFT_CORE_R else 1
 
 
 func _walkable(i: int) -> bool:
-	return grid[i] != COAST and spine[i] == 0 and crater[i] == 0 and rift[i] == 0
+	return grid[i] != COAST and spine[i] == 0 and crater[i] == 0 and rift[i] != 2
 
 
 func _random_point(min_monolith: float, margin: float, ok: Callable) -> Vector2:
@@ -561,8 +563,10 @@ func _render() -> Image:
 				c = SPINE_COLOR
 			elif crater[i] == 1:
 				c = CRATER_COLOR
+			elif rift[i] == 2:
+				c = RIFT_CORE_COLOR
 			elif rift[i] == 1:
-				c = RIFT_COLOR
+				c = RIFT_BANK_COLOR
 			if feature[i] == 1:
 				c = LAKE_COLOR
 			elif feature[i] == 2:

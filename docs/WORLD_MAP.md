@@ -8,6 +8,7 @@ How a world's map is laid out: a **mask** of biomes first, then the terrain gene
   - [Layers](#layers)
   - [Scale](#scale)
   - [Biomes](#biomes)
+  - [Hazards](#hazards)
   - [Placement](#placement)
   - [The Frostfang exception](#the-frostfang-exception)
   - [Open questions](#open-questions)
@@ -63,22 +64,40 @@ At 16 pixels a tile, `speed` 100 is 64 pixels a second and the map is 40 960 pix
 
 ## Biomes
 
-| Biome    | Mask colour | Rule                                                                                                                                           |
-| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plains   | yellow      | The largest zone, and the one holding the Monolith; the only one the chain or a rift may cut.                                                  |
-| Forest   | green       | Always borders the plains. Never touches volcanic ground.                                                                                      |
-| Marsh    | brown       | Always borders the forest.                                                                                                                     |
-| Glacier  | white       | Never touches volcanic ground.                                                                                                                 |
-| Desert   | orange      | Its decor borrows from its neighbours, dried out: dead trees beside the forest, cracked mud beside the marsh.                                  |
-| Mountain | mid grey    | A long chain that touches at most one map edge; its central spine cannot be crossed.                                                           |
-| Volcanic | red         | A round volcano, a winding rift, or both. The volcano's central crater, 20 % of its round patch by area, and the whole rift cannot be crossed. |
-| Coast    | blue        | The sea along a map edge: never walkable except Frostfang's frozen way in winter; its sites stand on the shore.                                |
+| Biome    | Mask colour | Rule                                                                                                                                                                                           |
+| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plains   | yellow      | The largest zone, and the one holding the Monolith; the only one the chain or a rift may cut.                                                                                                  |
+| Forest   | green       | Always borders the plains. Never touches volcanic ground.                                                                                                                                      |
+| Marsh    | brown       | Always borders the forest.                                                                                                                                                                     |
+| Glacier  | white       | Never touches volcanic ground.                                                                                                                                                                 |
+| Desert   | orange      | Its decor borrows from its neighbours, dried out: dead trees beside the forest, cracked mud beside the marsh.                                                                                  |
+| Mountain | mid grey    | A long chain that touches at most one map edge; its central spine cannot be crossed.                                                                                                           |
+| Volcanic | red         | A round volcano, a winding rift, or both. The volcano's central crater, 20 % of its round patch by area, cannot be crossed. A rift is wide: its burning core cannot be crossed, its banks can. |
+| Coast    | blue        | The sea along a map edge: never walkable, except in winter, when the whole sea freezes; its sites stand on the shore.                                                                          |
 
 **Everything walkable is reachable from the Monolith.**
-Only the sea, a mountain spine, a volcano's crater and a rift block movement; a mask leaving any ground unreachable on foot is thrown away.
+Only the sea, a mountain spine, a volcano's crater and a rift's core block movement.
+The check treats the sea as open water even though it freezes in winter, so all ground stays reachable in every season; a mask leaving any ground unreachable on foot is thrown away.
 
 **Forest and glacier keep away from volcanic ground on their own.**
 The volcano and the rift are placed and steered away from them; a thin strip of another biome is never painted between them to fake the rule.
+
+## Hazards
+
+**Some ground hurts, depending on the season.**
+A wizard standing on it takes damage of the matching element.
+
+| Ground       | Season | Element | Note                                                                 |
+| ------------ | ------ | ------- | -------------------------------------------------------------------- |
+| Rift bank    | summer | Ember   | The burning core beside it cannot be crossed at all.                 |
+| Glacier      | winter | Rime    | The whole glacier, its frozen lake included.                         |
+| Frozen water | winter | none    | The frozen sea is walkable and harmless, less cold than the glacier. |
+
+Still open:
+
+- ⬜ The amount, and whether `magic_defence` reduces it, see `FORMULAS.md`.
+- ⬜ Whether the element's side effect applies too, Ember's burn or Rime's slow.
+- ⬜ Whether a hazard hurts every combatant or wizards only.
 
 ## Placement
 
@@ -100,7 +119,8 @@ A dungeon's entrance is placed in the zone matching its theme, a world boss stan
 
 When Frostfang Caverns is drawn, the map makes room for it.
 Either a small island appears off the coast, or a lake appears inside the glacier with an island in its middle.
-The dungeon's entrance stands on that island, and the way to it freezes over in winter, opening the passage.
+The dungeon's entrance stands on that island, reachable on foot only in winter.
+In winter the whole sea freezes, and so does the lake in the glacier.
 
 ## Open questions
 

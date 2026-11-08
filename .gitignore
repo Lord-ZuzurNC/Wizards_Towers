@@ -341,20 +341,7 @@ build/
 # Brag
 brag*/
 
-# Godot
-# Exported artifacts: .zip, .pck
-project/export_presets.cfg
-project/export
-# Godot-specific ignores
-project/.import/
-project/logs/
-# Imported translations (automatically generated from CSV files)
-project/*.translation
-# Mono-specific ignores
-project/.mono/
-project/data_*/
-# Gut ignores
-project/.gut*
+# Godot: see project/.gitignore
 # Keystores, passwords
 secrets
 

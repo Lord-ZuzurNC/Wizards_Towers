@@ -144,6 +144,7 @@ Defence never brings a hit to zero, and each point of `magic_defence` adds the s
 Penetration is how Stone ignores a portion of defence and Rust ignores all of it.
 
 ⬜ `raw_damage`, from the spell's magnitude and the caster's `power`.
+⬜ Hazard damage, Ember on a rift bank in summer and Rime on the glacier in winter, and whether `magic_defence` reduces it; see `WORLD_MAP.md`, section *Hazards*.
 
 ## Magic
 
@@ -438,19 +439,20 @@ Source: `GLOSSARY.md`, sudden death.
 
 Gathered here so they can be answered in one pass, roughly in the order the game needs them.
 
-| Formula                                         | Needed by                     | Blocks                      |
-| ----------------------------------------------- | ----------------------------- | --------------------------- |
-| `raw_damage`                                    | every fight                   | any balancing at all        |
-| Stat growth per `wizard_level`                  | `GLOSSARY.md`                 | `K`, every fight            |
-| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates    |
-| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder           |
-| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder           |
-| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace |
-| Reward pools per world boss                     | `WORLD_BOSSES.md`             | world boss economy          |
-| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy           |
-| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression            |
-| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace               |
-| Lock price                                      | `CARDS.md`                    | the card choice             |
+| Formula                                         | Needed by                     | Blocks                            |
+| ----------------------------------------------- | ----------------------------- | --------------------------------- |
+| `raw_damage`                                    | every fight                   | any balancing at all              |
+| Stat growth per `wizard_level`                  | `GLOSSARY.md`                 | `K`, every fight                  |
+| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates          |
+| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder                 |
+| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder                 |
+| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace       |
+| Reward pools per world boss                     | `WORLD_BOSSES.md`             | world boss economy                |
+| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy                 |
+| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression                  |
+| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace                     |
+| Lock price                                      | `CARDS.md`                    | the card choice                   |
+| Hazard damage                                   | `WORLD_MAP.md`                | rift banks, the glacier in winter |
 
 **Stat growth comes first, then `K`.**
 The shape of the damage formula is settled; its constant only means something once the range of `magic_defence` across a run is known.

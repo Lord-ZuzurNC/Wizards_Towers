@@ -15,7 +15,9 @@ one concept, one word, one spelling, everywhere — in the design document, in t
   - [Endings](#endings)
     - [World endings](#world-endings)
     - [Wizard endings](#wizard-endings)
+  - [World map](#world-map)
   - [Offline and ownership](#offline-and-ownership)
+  - [Netcode](#netcode)
   - [Banned synonyms](#banned-synonyms)
 
 ## How to use it
@@ -204,6 +206,21 @@ Score is banked under every ending, world or wizard, without exception.
 | **Claimed by …**            | Killed by a **world boss**, named for the boss that did it — `Claimed by the Harrow`, `Claimed by the Riven Maw`, one per boss. The name is cosmetic and changes nothing about the reward. | `CLAIMED_BY`          | ✅      |
 | **Outlived the World**      | Survived to the run's end without winning. Not a death, and not a victory.                                                                                                                 | `OUTLIVED`            | ✅      |
 
+## World map
+
+How the map is laid out lives in `WORLD_MAP.md`; these are the words it uses.
+
+| Term             | Definition                                                                                                                                 | Code           | Status |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------- | ------ |
+| **mask**         | The coarse picture a world is generated from: 256 × 256 points, one biome each. Shown on the queue screen.                                 | `WorldMask`    | ✅      |
+| **biome**        | One of the eight zones of a mask: plains, forest, marsh, glacier, desert, mountain, volcanic, coast. Each appears once.                    | `Biome`        | ✅      |
+| **spine**        | The crest line of a mountain chain. Never walkable.                                                                                        | `spine`        | ✅      |
+| **crater**       | The centre of a volcano, a fifth of its round patch by area. Never walkable.                                                               | `crater`       | ✅      |
+| **rift core**    | The burning chasm down the middle of a rift. Never walkable.                                                                               | `rift_core`    | ✅      |
+| **rift bank**    | The ground either side of a rift core. Walkable, and a **hazard** in summer.                                                               | `rift_bank`    | ✅      |
+| **frozen water** | The sea and the glacier's lake in winter, frozen and walkable. Never a hazard by itself.                                                   | `frozen_water` | ✅      |
+| **hazard**       | Ground dealing elemental damage in one season: Ember on rift banks in summer, Rime on the glacier in winter. Amount open in `FORMULAS.md`. | `Hazard`       | ⬜      |
+
 ## Offline and ownership
 
 | Term                    | Definition                                                                                                                                                                                                                                                                                                                                | Code              | Status |
@@ -216,6 +233,15 @@ Score is banked under every ending, world or wizard, without exception.
 | **untouchable**         | The state of a level-1 wizard who logs off owning no village: nothing can be taken because nothing is held. Not an exploit — such a wizard is the weakest on the server and still loses a level on an offline death.                                                                                                                      | `is_untouchable`  | ✅      |
 | **skin**                | A **`.zip`** archive replacing the wizard's own visual assets, loaded by Godot's `load_resource_pack()` and chosen through an in-game selector. Carries a small `skin.json` manifest with name, author and version. Local to the player who installs it; the server never redistributes it. Skin authors license their work as they wish. | `Skin`, `skin_id` | ✅      |
 | **skin scope**          | A skin may replace **only the wizard's own body and robes**. Weapons and equipment are **never** skinnable, because a wizard visibly wears what they carry and that sight is competitive information a rival is entitled to.                                                                                                              | `SKIN_SCOPE`      | ✅      |
+
+## Netcode
+
+How client and server stay in step lives in `TECH_STACK.md`, section *Netcode*.
+
+| Term                | Definition                                                                                                        | Code              | Status |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------- | ------ |
+| **simulation tick** | One fixed step of the world, thirty a second, on server and client. Not the economy's tick, which paces `income`. | `simulation_tick` | ✅      |
+| **state update**    | What the server sends a client after a simulation tick: where everything stands and what changed.                 | `StateUpdate`     | ✅      |
 
 ## Banned synonyms
 
@@ -245,3 +271,5 @@ The same word can be legal elsewhere: `Invasion of Monsters` is a valid ending n
 | `melee_power`, `magic_power`           | **`power`**           | One stat for both. `attack type` says which, descriptively.                                                                                        |
 | `grimoire_level`                       | **`wizard_level`**    | Grimoire capacity is derived from `wizard_level`, see `FORMULAS.md`.                                                                               |
 | spell slot (as a wizard's spell count) | **Grimoire position** | `spell slot` is a position *inside* a spell that a rune fills.                                                                                     |
+| snapshot (of the network state)        | **state update**      | `snapshot` names what an echo is taken from.                                                                                                       |
+| server tick, server frame              | **simulation tick**   | A frame is what the client draws, sixty a second; the world steps thirty.                                                                          |
