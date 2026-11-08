@@ -84,6 +84,10 @@ The version is pinned in CI and bumped deliberately.
 | `gdscript-formatter --check <files>` | CI, pre-commit  | Fails if a file is not formatted.          |
 | `gdscript-formatter lint <files>`    | CI, pre-commit  | Fails on a naming or convention violation. |
 
+**On layout, the formatter has the last word.**
+Where this document and `gdscript-formatter` disagree on whitespace, wrapping or indentation, the formatter's output is right and this document is the one to fix.
+Every GDScript example in this document is kept as the formatter writes it, so copying one never produces a file the check rejects.
+
 **Static typing is enforced by the engine, not by the linter.**
 A linter reads text and cannot know a type.
 `project.godot` raises these GDScript warnings to **error**, so an untyped declaration does not run:
@@ -104,10 +108,12 @@ These are the ones people break most often, so they are repeated here rather tha
 - **Tabs** for indentation.
   Never spaces.
 - **LF** line endings, **UTF-8 without BOM**, one trailing newline per file.
-- **Two indent levels** for continuation lines, to distinguish them from a nested block.
-  - Exception: arrays, dictionaries and enums use a single level.
-- **Trailing comma** on the last element of a multi-line array, dictionary or enum.
+- **Long lines wrap inside their brackets**, the way `gdscript-formatter` lays them out:
+  one indent level, one element per line, the closing bracket alone on its line.
+  This replaces the upstream two-level continuation rule, which the formatter never produces.
+- **Trailing comma** on the last element of a multi-line array, dictionary, enum, argument list or parameter list.
   None on single-line ones.
+- **A space inside dictionary braces**, so `{ "gold": 10 }` and `{ }`.
 - **Two blank lines** between functions and between class definitions.
 - `and` / `or` / `not`, never `&&` / `||` / `!`.
 - One statement per line.
@@ -206,8 +212,10 @@ floor_claimed.emit(floor_index, wizard_id)
 # Setter
 func set_mana(new_mana: int) -> void:
 
+
 # Initializer
 func _init(init_mana: int) -> void:
+
 
 # Exported PackedScene — snake_case, typed, no UpperCamelCase
 @export var spell_effect_scene: PackedScene
@@ -230,6 +238,7 @@ class SomeClass:
 	pass
 
 # -----------------------------------------------------------------------------
+
 
 class SomeOtherClass:
 	pass
@@ -260,6 +269,7 @@ extends Node
 ## Resolves a component list into an effect, charges the caster's mana and
 ## spawns the visual. Casting is refused when mana is insufficient;
 ## see [method can_cast].
+
 
 ## Casts [param spell] on behalf of [param caster].
 ##
@@ -292,7 +302,7 @@ var unlocked_component_ids: Array[StringName]
 # Only when a typed collection genuinely cannot express the shape:
 ## key: (StringName) component id
 ## value: (Dictionary) raw component definition as loaded from JSON
-var _component_defs := {}
+var _component_defs := { }
 ```
 
 Typed arrays exist since Godot 4.0, typed dictionaries since 4.4.
@@ -342,7 +352,11 @@ Objects that serialize themselves use these exact function names, so the pattern
 
 ```gdscript
 func from_json_string_array(array: Array) -> void:
+
+
 func from_json_dict(json: Dictionary) -> void:
+
+
 func to_json_dict() -> Dictionary:
 ```
 

@@ -23,4 +23,12 @@ fi
 # A fresh clone has no class cache: without it, class_name does not resolve in --script mode.
 "$godot" --headless --path "$project_dir" --import >/dev/null 2>&1
 
-"$godot" --headless --path "$project_dir" --script res://tests/run.gd -- "$@"
+# Leaks are only reported as the engine exits, after the runner has given its verdict,
+# so the script reads them from the output and fails the run itself.
+output="$(mktemp)"
+trap 'rm -f "$output"' EXIT
+"$godot" --headless --path "$project_dir" --script res://tests/run.gd -- "$@" 2>&1 | tee "$output"
+if grep -qE "instances were leaked|resources still in use" "$output"; then
+	echo "Objects leaked at exit: rerun with --verbose to see which." >&2
+	exit 1
+fi

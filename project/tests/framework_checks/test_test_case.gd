@@ -62,8 +62,22 @@ func test_a_failure_points_at_the_calling_line() -> void:
 	assert_true(failures[0].contains(own_file + ":"), failures[0])
 
 
+func test_wait_until_returns_at_once_when_already_true() -> void:
+	assert_true(await wait_until(_constant.bind(true)))
+
+
+func test_wait_until_gives_up_after_its_timeout() -> void:
+	var started := Time.get_ticks_msec()
+	assert_false(await wait_until(_constant.bind(false), 0.2))
+	assert_true(Time.get_ticks_msec() - started >= 200)
+
+
 func test_take_failures_empties_the_list() -> void:
 	var probe := TestCase.new()
 	probe.fail("once")
 	probe.take_failures()
 	assert_eq(probe.take_failures().size(), 0)
+
+
+func _constant(value: bool) -> bool:
+	return value

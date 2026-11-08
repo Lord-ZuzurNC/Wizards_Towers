@@ -72,9 +72,9 @@ func _run_test(script: GDScript, method_name: String) -> void:
 	var instance: Object = script.new()
 	var test := instance as TestCase
 	_catcher.take_errors()
-	test.before_each()
+	await test.before_each()
 	await test.call(method_name)
-	test.after_each()
+	await test.after_each()
 	var problems := test.take_failures() + _catcher.take_errors()
 	for warning in _catcher.take_warnings():
 		print("    warning: %s" % warning)

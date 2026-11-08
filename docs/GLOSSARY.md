@@ -238,10 +238,11 @@ How the map is laid out lives in `WORLD_MAP.md`; these are the words it uses.
 
 How client and server stay in step lives in `TECH_STACK.md`, section *Netcode*.
 
-| Term                | Definition                                                                                                        | Code              | Status |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------- | ------ |
-| **simulation tick** | One fixed step of the world, thirty a second, on server and client. Not the economy's tick, which paces `income`. | `simulation_tick` | ✅      |
-| **state update**    | What the server sends a client after a simulation tick: where everything stands and what changed.                 | `StateUpdate`     | ✅      |
+| Term                 | Definition                                                                                                        | Code               | Status |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------ | ------ |
+| **simulation tick**  | One fixed step of the world, thirty a second, on server and client. Not the economy's tick, which paces `income`. | `simulation_tick`  | ✅      |
+| **state update**     | What the server sends a client after a simulation tick: where everything stands and what changed.                 | `StateUpdate`      | ✅      |
+| **protocol version** | The number a client announces when it connects; the server refuses any client whose number differs from its own.  | `Protocol.VERSION` | ✅      |
 
 ## Banned synonyms
 

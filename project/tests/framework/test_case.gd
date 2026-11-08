@@ -49,6 +49,19 @@ func fail(message: String) -> void:
 	_record("failed", message)
 
 
+## Waits frame after frame until [param condition] returns true, for at most
+## [param timeout] seconds. Returns whether the condition came true in time.
+## Call it with [code]await[/code]: [code]assert_true(await wait_until(f))[/code].
+func wait_until(condition: Callable, timeout := 2.0) -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	var deadline := Time.get_ticks_msec() + int(timeout * 1000.0)
+	while not condition.call():
+		if Time.get_ticks_msec() > deadline:
+			return false
+		await tree.process_frame
+	return true
+
+
 ## Hands the recorded failures to the runner and forgets them.
 func take_failures() -> PackedStringArray:
 	var failures := _failures
