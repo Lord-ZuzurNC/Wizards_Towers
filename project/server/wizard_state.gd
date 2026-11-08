@@ -18,6 +18,14 @@ var ready_tick := 0
 var card_choices: Array[PackedStringArray] = []
 ## Every card taken this run, in order.
 var cards_taken: PackedStringArray = []
+var gold := 0
+## Villages bought this run, kept or not: the n of the escalating price (FORMULAS.md).
+var village_purchases := 0
+## A village asked for and not yet judged, by its index in the room; -1 for none. It is
+## judged once the movement input [member purchase_after] has been applied, so the wizard
+## stands where its player saw it when pressing the key.
+var pending_purchase := -1
+var purchase_after := 0
 
 
 func max_health() -> int:
@@ -30,6 +38,14 @@ func mana_pool() -> int:
 
 func power() -> int:
 	return Levels.power(wizard_level)
+
+
+func village_price(values: PlaceholderValues) -> int:
+	return Price.escalating(
+		values.village_base_price,
+		values.village_price_multiplier,
+		village_purchases,
+	)
 
 
 ## Adds [param amount] XP and levels up as many times as it pays for. Each level-up raises

@@ -34,10 +34,11 @@ A CC-BY-SA piece that is modified must stay under CC-BY-SA, not under the projec
 | Pixel density      | One resolution everywhere: no pixel sprites over high-definition backgrounds                            |
 | Speed 100          | 4 tiles, so 64 pixels, a second; see `WORLD_MAP.md`                                                     |
 | Native resolution  | 640 × 360 for the whole screen, scaled by whole numbers: ×2 to 720p, ×3 to 1080p, ×4 to 1440p, ×6 to 4K |
+| Drawing            | At screen resolution: an art pixel keeps its size, but things move by finer steps, so motion is smooth  |
 | On screen          | 40 × 22.5 tiles; crossing the screen at speed 100 takes 10 seconds                                      |
 | Characters         | 24 to 32 pixels tall                                                                                    |
 | Large world bosses | 48 to 64 pixels tall                                                                                    |
-| Frame rate         | 60 frames a second for the game, so the camera scrolls about one pixel a frame at speed 100             |
+| Frame rate         | Follows the screen's refresh rate, never capped; the simulation itself stays at 30 ticks a second       |
 | Animation          | About 10 frames a second, independent of the game's frame rate                                          |
 | Frames per action  | Idle 2 to 4, walk 4 to 6, spell or attack 4 to 6, death 4 to 8                                          |
 

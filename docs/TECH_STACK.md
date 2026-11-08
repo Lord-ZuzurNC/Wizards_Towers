@@ -101,7 +101,7 @@ On every simulation tick the server applies the inputs it received, moves everyt
 | Setting             | Value                             | Where                                                                         |
 | ------------------- | --------------------------------- | ----------------------------------------------------------------------------- |
 | Simulation tick     | 30 a second, on server and client | `physics/common/physics_ticks_per_second` = 30                                |
-| Display             | 60 frames a second                | `physics/common/physics_interpolation` on: frames between ticks are smoothed. |
+| Display             | The screen's rate, never capped   | `physics/common/physics_interpolation` on: frames between ticks are smoothed. |
 | Interpolation delay | 100 ms, three simulation ticks    | Tunable; measured on a real network before it changes.                        |
 
 Why thirty and not sixty:

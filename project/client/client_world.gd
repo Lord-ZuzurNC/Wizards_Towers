@@ -1,6 +1,7 @@
 class_name ClientWorld
 extends Node2D
-## What the player sees of the world: the room, the wizards, the dummies, the spells.
+## What the player sees of the world: the room, the wizards, the dummies, the spells and
+## the villages.
 ##
 ## The player's wizard is predicted, see [MovementPredictor]. Every other wizard is drawn
 ## [constant INTERPOLATION_TICKS] simulation ticks in the past, between two positions
@@ -26,6 +27,14 @@ const OTHER_COLOR := Color("8cff9b")
 const DUMMY_COLOR := Color("cdc599")
 const HEALTH_COLOR := Color("ff695a")
 const SPELL_COLOR := Color("ff695a")
+const VILLAGE_WALL_COLOR := Color("895654")
+const VILLAGE_ROOF_COLOR := Color("b23c40")
+## The flag under a village no one holds; a held one flies its holder's colour.
+const FREE_FLAG_COLOR := Color("909edd")
+## A village drawn around its tile centre: walls, then a roof on top.
+const VILLAGE_WALLS := Rect2(-10.0, -6.0, 20.0, 12.0)
+const VILLAGE_ROOF := Rect2(-12.0, -12.0, 24.0, 6.0)
+const VILLAGE_FLAG := Rect2(-10.0, 7.0, 20.0, 2.0)
 ## A correction larger than this, in pixels, is a jump rather than a nudge: the wizard is
 ## placed there at once instead of gliding.
 const SNAP_DISTANCE := 8.0
@@ -35,6 +44,9 @@ var rooms: Dictionary[StringName, RoomData] = { }
 ## Cards by id, to show a choice. Loaded from [constant CardCatalog.DEFAULT_FOLDER] unless a
 ## test sets them.
 var cards: Dictionary[StringName, Card] = { }
+## Every number the design has not settled; see [PlaceholderValues]. The client needs the
+## village reach to say when a village can be bought.
+var values: PlaceholderValues
 ## Stands in for the keyboard when set to a direction code from 0 to 8; tests use it.
 var input_override := -1
 var room: RoomData
@@ -51,6 +63,7 @@ var _predictor := MovementPredictor.new()
 var _own_marker: WizardMarker
 var _others: Dictionary[int, WizardMarker] = { }
 var _overlay := Overlay.new()
+var _village_owners: PackedInt32Array = []
 var _latest_tick := 0
 var _render_tick := 0.0
 
@@ -84,6 +97,10 @@ func _physics_process(_delta: float) -> void:
 	_own_marker.position = _predictor.position
 	if input_override < 0 and Input.is_action_just_pressed(&"cast_1"):
 		cast(get_global_mouse_position() - (_predictor.position + Projectile.BODY_OFFSET))
+	if input_override < 0 and Input.is_action_just_pressed(&"interact"):
+		var village := village_in_reach()
+		if village >= 0:
+			buy_village(village)
 
 
 func _draw() -> void:
@@ -100,6 +117,11 @@ func _draw() -> void:
 			Rect2(Vector2(room_exit.area.position) * tile, Vector2(room_exit.area.size) * tile),
 			EXIT_COLOR,
 		)
+	for i in room.villages.size():
+		var at := room.tile_center(room.villages[i].tile)
+		draw_rect(Rect2(at + VILLAGE_WALLS.position, VILLAGE_WALLS.size), VILLAGE_WALL_COLOR)
+		draw_rect(Rect2(at + VILLAGE_ROOF.position, VILLAGE_ROOF.size), VILLAGE_ROOF_COLOR)
+		draw_rect(Rect2(at + VILLAGE_FLAG.position, VILLAGE_FLAG.size), _flag_color(i))
 
 
 ## Connects the world to its channel, once the session has started.
@@ -112,6 +134,8 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
 		cards = CardCatalog.load_folder()
+	if values == null:
+		values = PlaceholderValues.load_default()
 
 
 ## Asks the server to cast the spell of Grimoire position 1 toward [param aim].
@@ -119,6 +143,51 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 func cast(aim: Vector2) -> void:
 	if _channel != null:
 		_channel.send_cast(1, aim)
+
+
+## Asks the server to buy village [param index] of the current room. Nothing changes until
+## the server accepts it.
+func buy_village(index: int) -> void:
+	if _channel != null:
+		_channel.send_buy_village(index, _predictor.last_sequence())
+
+
+## The nearest village of the room within reach of the player's wizard, or -1.
+func village_in_reach() -> int:
+	if room == null or values == null:
+		return -1
+	var reach := values.village_reach_tiles * Simulation.TILE_SIZE
+	var nearest := -1
+	var nearest_distance := INF
+	for i in room.villages.size():
+		var distance := _predictor.position.distance_to(room.tile_center(room.villages[i].tile))
+		if distance <= reach and distance < nearest_distance:
+			nearest = i
+			nearest_distance = distance
+	return nearest
+
+
+## What pressing the key would do for village [param index], by the server's own rules.
+func village_verdict(index: int) -> VillagePurchase.Verdict:
+	return VillagePurchase.judge(
+		_predictor.position.distance_to(room.tile_center(room.villages[index].tile)),
+		values.village_reach_tiles * Simulation.TILE_SIZE,
+		village_owner(index),
+		status.wizard_level,
+		status.villages_held,
+		status.gold,
+		status.village_price,
+	)
+
+
+## The peer id holding village [param index] of the room, as last received; 0 for none.
+func village_owner(index: int) -> int:
+	return _village_owners[index] if index < _village_owners.size() else 0
+
+
+## Whether village [param index] of the room is the player's.
+func owns_village(index: int) -> bool:
+	return village_owner(index) == _own_peer_id
 
 
 ## Takes card [param index] of the oldest waiting choice.
@@ -172,6 +241,9 @@ func _on_state_update_received(update: StateUpdate) -> void:
 			_others[peer_id].queue_free()
 			_others.erase(peer_id)
 	_overlay.show_update(update)
+	if update.village_owners != _village_owners:
+		_village_owners = update.village_owners
+		queue_redraw()
 	status = update
 	status_changed.emit()
 
@@ -183,6 +255,13 @@ func _on_card_choices_received(pending: int, card_ids: PackedStringArray) -> voi
 		if cards.has(id):
 			offered_cards.append(cards[id])
 	card_choices_changed.emit()
+
+
+func _flag_color(index: int) -> Color:
+	var holder := village_owner(index)
+	if holder == 0:
+		return FREE_FLAG_COLOR
+	return OWN_COLOR if holder == _own_peer_id else OTHER_COLOR
 
 
 func _enter_room(new_room: RoomData) -> void:

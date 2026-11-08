@@ -44,6 +44,13 @@ func reconcile(acknowledged: int, server_room: RoomData, server_position: Vector
 		position = Movement.step(position, entry.y, speed, room)
 
 
+## The sequence number of the last input applied here. An action the player takes now
+## comes after that input, so the server waits for it before acting, and judges the action
+## from where the player saw their wizard.
+func last_sequence() -> int:
+	return _next_sequence - 1
+
+
 func pending_count() -> int:
 	return _pending.size()
 

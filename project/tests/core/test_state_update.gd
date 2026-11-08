@@ -9,6 +9,10 @@ func test_a_message_round_trips() -> void:
 	assert_eq(read.to_message(), update.to_message())
 	assert_eq(read.xp, 7)
 	assert_eq(read.dummy_health, PackedInt32Array([20]))
+	assert_eq(read.village_owners, PackedInt32Array([0, 2]))
+	assert_eq(read.gold, 35)
+	assert_eq(read.village_price, 40)
+	assert_eq(read.villages_held, 1)
 
 
 func test_a_message_of_the_wrong_length_is_refused() -> void:
@@ -29,9 +33,15 @@ func test_lists_that_disagree_in_length_are_refused() -> void:
 	assert_true(StateUpdate.from_message(update.to_message()) == null)
 
 
+func test_villages_without_as_many_owners_are_refused() -> void:
+	var update := _sample()
+	update.village_owners.append(3)
+	assert_true(StateUpdate.from_message(update.to_message()) == null)
+
+
 func test_a_short_status_is_refused() -> void:
 	var message := _sample().to_message()
-	message[9] = PackedInt32Array([1, 2, 3])
+	message[message.size() - 1] = PackedInt32Array([1, 2, 3])
 	assert_true(StateUpdate.from_message(message) == null)
 
 
@@ -46,6 +56,8 @@ func _sample() -> StateUpdate:
 	update.dummy_health = PackedInt32Array([20])
 	update.dummy_max_health = PackedInt32Array([30])
 	update.projectile_positions = PackedVector2Array([Vector2(7, 8)])
+	update.village_positions = PackedVector2Array([Vector2(9, 10), Vector2(11, 12)])
+	update.village_owners = PackedInt32Array([0, 2])
 	update.health = 100
 	update.max_health = 100
 	update.mana = 50
@@ -53,4 +65,7 @@ func _sample() -> StateUpdate:
 	update.wizard_level = 1
 	update.xp = 7
 	update.xp_to_next = 10
+	update.gold = 35
+	update.village_price = 40
+	update.villages_held = 1
 	return update

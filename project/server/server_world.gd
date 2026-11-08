@@ -7,7 +7,8 @@ extends Node
 ## again; mana comes back. Then every client gets a [StateUpdate] of its room, with the
 ## sequence number of the last input applied so it can reconcile its prediction.
 ##
-## A cast and a card taken arrive as requests: each is checked here before anything changes.
+## A cast, a card taken and a village bought arrive as requests: each is checked here before
+## anything changes.
 
 ## Rooms by id. Loaded from [constant RoomCatalog.DEFAULT_FOLDER] unless a test sets them.
 var rooms: Dictionary[StringName, RoomData] = { }
@@ -22,6 +23,7 @@ var tick := 0
 var _channel: WorldChannel
 var _wizards: Dictionary[int, WizardState] = { }
 var _dummies: Dictionary[StringName, Array] = { }
+var _villages: Dictionary[StringName, Array] = { }
 var _projectiles: Array[Projectile] = []
 
 
@@ -35,9 +37,14 @@ func _init() -> void:
 
 func _physics_process(_delta: float) -> void:
 	tick += 1
-	for wizard: WizardState in _wizards.values():
-		_walk(wizard)
-		_regain_mana(wizard)
+	for peer_id: int in _wizards:
+		var wizard_state := _wizards[peer_id]
+		_walk(wizard_state)
+		_regain_mana(wizard_state)
+		if wizard_state.pending_purchase >= 0:
+			if wizard_state.inputs.last_applied >= wizard_state.purchase_after:
+				_buy_village(peer_id, wizard_state.pending_purchase)
+				wizard_state.pending_purchase = -1
 	_move_projectiles()
 	for room_dummies: Array in _dummies.values():
 		for dummy: TrainingDummy in room_dummies:
@@ -52,6 +59,7 @@ func setup(channel: WorldChannel) -> bool:
 	_channel.move_requested.connect(_on_move_requested)
 	_channel.cast_requested.connect(_on_cast_requested)
 	_channel.take_card_requested.connect(_on_take_card_requested)
+	_channel.buy_village_requested.connect(_on_buy_village_requested)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
@@ -63,6 +71,7 @@ func setup(channel: WorldChannel) -> bool:
 		return false
 	for room_id: StringName in rooms:
 		_dummies[room_id] = _place_dummies(rooms[room_id])
+		_villages[room_id] = _place_villages(rooms[room_id])
 	return true
 
 
@@ -70,6 +79,7 @@ func add_wizard(peer_id: int) -> void:
 	var wizard := WizardState.new()
 	wizard.room_id = start_room
 	wizard.position = rooms[start_room].tile_center(rooms[start_room].spawn_tile)
+	wizard.gold = values.starting_gold
 	_wizards[peer_id] = wizard
 
 
@@ -97,6 +107,20 @@ func dummies_in(room_id: StringName) -> Array:
 	return _dummies.get(room_id, [])
 
 
+func villages_in(room_id: StringName) -> Array:
+	return _villages.get(room_id, [])
+
+
+## How many villages [param peer_id] holds, in every room.
+func villages_held(peer_id: int) -> int:
+	var held := 0
+	for room_villages: Array in _villages.values():
+		for village: VillageState in room_villages:
+			if village.owner_peer_id == peer_id:
+				held += 1
+	return held
+
+
 func _place_dummies(room: RoomData) -> Array:
 	var placed: Array = []
 	for tile in room.dummy_tiles:
@@ -106,6 +130,16 @@ func _place_dummies(room: RoomData) -> Array:
 		dummy.health = values.dummy_health
 		dummy.magic_defence = values.dummy_magic_defence
 		placed.append(dummy)
+	return placed
+
+
+func _place_villages(room: RoomData) -> Array:
+	var placed: Array = []
+	for site in room.villages:
+		var village := VillageState.new()
+		village.site = site
+		village.position = room.tile_center(site.tile)
+		placed.append(village)
 	return placed
 
 
@@ -143,16 +177,17 @@ func _strike(projectile: Projectile) -> bool:
 		if dummy.is_destroyed() or not projectile.hits(dummy.position):
 			continue
 		if dummy.take_hit(projectile.raw_damage, tick, values.dummy_respawn_ticks):
-			_reward(projectile.caster_peer_id, values.dummy_xp)
+			_reward(projectile.caster_peer_id, values.dummy_xp, values.dummy_gold)
 		return true
 	return false
 
 
-## XP for a kill goes to whoever dealt the destroying hit, if still in the world.
-func _reward(peer_id: int, xp: int) -> void:
+## The reward for a kill goes to whoever dealt the destroying hit, if still in the world.
+func _reward(peer_id: int, xp: int, gold: int) -> void:
 	if not _wizards.has(peer_id):
 		return
 	var wizard_state := _wizards[peer_id]
+	wizard_state.gold += gold
 	var levels_gained := wizard_state.gain_xp(xp, values.xp_per_level)
 	for i in levels_gained:
 		wizard_state.card_choices.append(_draw_card_choice())
@@ -196,6 +231,9 @@ func _send_state_updates() -> void:
 			shared.wizard_level = wizard_state.wizard_level
 			shared.xp = wizard_state.xp
 			shared.xp_to_next = values.xp_per_level
+			shared.gold = wizard_state.gold
+			shared.village_price = wizard_state.village_price(values)
+			shared.villages_held = villages_held(peer_id)
 			_channel.send_state_update(peer_id, shared)
 
 
@@ -214,6 +252,9 @@ func _room_state(room_id: StringName, peer_ids: PackedInt32Array) -> StateUpdate
 	for projectile in _projectiles:
 		if projectile.room_id == room_id:
 			update.projectile_positions.append(projectile.position)
+	for village: VillageState in _villages.get(room_id, []):
+		update.village_positions.append(village.position)
+		update.village_owners.append(village.owner_peer_id)
 	return update
 
 
@@ -257,3 +298,36 @@ func _on_take_card_requested(peer_id: int, card_index: int) -> void:
 	wizard_state.cards_taken.append(offered[card_index])
 	wizard_state.card_choices.pop_front()
 	_send_card_choices(peer_id)
+
+
+## Kept until the inputs sent before it have been applied; a newer request replaces it.
+func _on_buy_village_requested(peer_id: int, village_index: int, after_sequence: int) -> void:
+	if not _wizards.has(peer_id) or village_index < 0:
+		return
+	_wizards[peer_id].pending_purchase = village_index
+	_wizards[peer_id].purchase_after = after_sequence
+
+
+## A village of the wizard's own room, by its place in the room's list, checked by the same
+## [VillagePurchase] rules the client shows. Anything refused is ignored without a word.
+func _buy_village(peer_id: int, village_index: int) -> void:
+	var wizard_state := _wizards[peer_id]
+	var room_villages: Array = _villages.get(wizard_state.room_id, [])
+	if village_index < 0 or village_index >= room_villages.size():
+		return
+	var village: VillageState = room_villages[village_index]
+	var price := wizard_state.village_price(values)
+	var verdict := VillagePurchase.judge(
+		wizard_state.position.distance_to(village.position),
+		values.village_reach_tiles * Simulation.TILE_SIZE,
+		village.owner_peer_id,
+		wizard_state.wizard_level,
+		villages_held(peer_id),
+		wizard_state.gold,
+		price,
+	)
+	if verdict != VillagePurchase.Verdict.ALLOWED:
+		return
+	wizard_state.gold -= price
+	wizard_state.village_purchases += 1
+	village.owner_peer_id = peer_id

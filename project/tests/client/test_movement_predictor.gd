@@ -44,6 +44,14 @@ func test_a_server_correction_is_replayed_on() -> void:
 	assert_eq(predictor.position, expected)
 
 
+func test_the_last_sequence_is_the_last_input_applied() -> void:
+	var predictor := _predictor()
+	assert_eq(predictor.last_sequence(), 0)
+	predictor.apply_local(RIGHT)
+	predictor.apply_local(RIGHT)
+	assert_eq(predictor.last_sequence(), 2)
+
+
 func test_only_the_latest_unacknowledged_inputs_are_sent() -> void:
 	var predictor := _predictor()
 	for i in 7:

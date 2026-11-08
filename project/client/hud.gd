@@ -1,11 +1,15 @@
 class_name Hud
 extends CanvasLayer
-## The player's numbers along the bottom of the screen, and the level-up card choice.
+## The player's numbers along the bottom of the screen, what the interact key would do, and
+## the level-up card choice.
 ##
 ## A level-up never opens its choice by itself: the world does not pause, so a choice that
 ## covered the screen mid-fight would be a trap (CARDS.md, The level-up choice). A badge
 ## says a choice waits; [kbd]C[/kbd] opens it, a click takes a card, [kbd]C[/kbd] again
 ## closes it untouched.
+##
+## Text uses the project theme's font, Pixel Operator, at the 16 pixels it is drawn for:
+## any other size breaks its pixel grid.
 
 const TEXT_COLOR := Color("ffffeb")
 const BADGE_COLOR := Color("ffe091")
@@ -17,6 +21,8 @@ const CARD_SIZE := Vector2(120, 160)
 var connection := Label.new()
 ## Says how many card choices wait; hidden when none does.
 var badge := Label.new()
+## Says what the interact key would do here; empty when it would do nothing.
+var prompt := Label.new()
 
 var _world: ClientWorld
 var _numbers := Label.new()
@@ -28,15 +34,20 @@ func _init(world: ClientWorld) -> void:
 	_world = world
 	_world.status_changed.connect(_refresh_numbers)
 	_world.card_choices_changed.connect(_refresh_choices)
-	# Below the room, which fills the top 320 of the 360 lines.
-	connection.position = Vector2(8, 340)
-	_numbers.position = Vector2(8, 324)
-	badge.position = Vector2(440, 324)
-	badge.add_theme_color_override(&"font_color", BADGE_COLOR)
+	# Two lines below the room, which fills the top 320 of the 360 lines: on the left what
+	# is, on the right what to do.
+	_numbers.position = Vector2(8, 320)
+	connection.position = Vector2(8, 339)
+	for label: Label in [badge, prompt]:
+		label.size = Vector2(316, 18)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	badge.position = Vector2(316, 320)
+	prompt.position = Vector2(316, 339)
 	for label: Label in [connection, _numbers]:
 		label.add_theme_color_override(&"font_color", TEXT_COLOR)
-	for label: Label in [connection, _numbers, badge]:
-		label.add_theme_font_size_override(&"font_size", 12)
+	for label: Label in [badge, prompt]:
+		label.add_theme_color_override(&"font_color", BADGE_COLOR)
+	for label: Label in [connection, _numbers, badge, prompt]:
 		add_child(label)
 	_build_panel()
 	_refresh_choices()
@@ -83,7 +94,7 @@ func _build_panel() -> void:
 func _refresh_numbers() -> void:
 	var status := _world.status
 	_numbers.text = (
-		"Health %d/%d   Mana %d/%d   Level %d   XP %d/%d"
+		"Health %d/%d  Mana %d/%d  Level %d  XP %d/%d  Gold %d"
 		% [
 			status.health,
 			status.max_health,
@@ -92,13 +103,35 @@ func _refresh_numbers() -> void:
 			status.wizard_level,
 			status.xp,
 			status.xp_to_next,
+			status.gold,
 		]
 	)
+	prompt.text = _prompt_text()
+
+
+func _prompt_text() -> String:
+	var index := _world.village_in_reach()
+	if index < 0:
+		return ""
+	var title := _world.room.villages[index].title
+	var status := _world.status
+	match _world.village_verdict(index):
+		VillagePurchase.Verdict.ALLOWED:
+			return "E: buy %s, %d gold" % [title, status.village_price]
+		VillagePurchase.Verdict.OWNED:
+			if _world.owns_village(index):
+				return "%s is yours" % title
+			return "%s is held by another wizard" % title
+		VillagePurchase.Verdict.LEVEL_TOO_LOW:
+			return "Level %d to hold a second village" % VillagePurchase.SECOND_VILLAGE_LEVEL
+		VillagePurchase.Verdict.NOT_ENOUGH_GOLD:
+			return "%s: %d gold, you have %d" % [title, status.village_price, status.gold]
+	return ""
 
 
 func _refresh_choices() -> void:
 	var pending := _world.pending_choices
-	badge.text = "▲ %d card choice%s: press C" % [pending, "" if pending == 1 else "s"]
+	badge.text = "%d card choice%s: press C" % [pending, "" if pending == 1 else "s"]
 	badge.visible = pending > 0
 	for child in _row.get_children():
 		child.queue_free()

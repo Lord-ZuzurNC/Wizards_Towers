@@ -23,6 +23,8 @@ const MAX_SIZE := Vector2i(40, 20)
 @export var spawn_tile := Vector2i()
 ## Where training dummies stand, one per tile.
 @export var dummy_tiles: Array[Vector2i] = []
+## The villages standing in the room. A village is known by its place in this list.
+@export var villages: Array[VillageSite] = []
 
 
 ## The room's size in tiles.
@@ -85,6 +87,13 @@ func validate(known_rooms: Array[StringName]) -> PackedStringArray:
 	for tile in dummy_tiles:
 		if is_solid(tile):
 			problems.append("the dummy tile %s is not floor" % tile)
+	for village in villages:
+		if village == null:
+			problems.append("a village entry is empty")
+		elif is_solid(village.tile):
+			problems.append(
+				"the village '%s' stands on %s, not floor" % [village.title, village.tile]
+			)
 	for room_exit in exits:
 		if not Rect2i(Vector2i.ZERO, size()).encloses(room_exit.area):
 			problems.append("an exit lies outside the room: %s" % room_exit.area)

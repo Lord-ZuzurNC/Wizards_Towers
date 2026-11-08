@@ -20,7 +20,8 @@ enum Answer {
 
 ## Bumped whenever a message shape or a persisted field changes.
 ## 2: movement inputs and room state updates.
-const VERSION := 2
+## 3: casting, cards, gold and villages; the state update carries them all.
+const VERSION := 3
 const DEFAULT_PORT := 7777
 ## Sized for fifty wizards a world, see TECH_STACK.md.
 const MAX_CONNECTIONS := 50

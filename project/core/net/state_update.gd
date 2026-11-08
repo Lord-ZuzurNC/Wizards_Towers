@@ -16,8 +16,13 @@ const _FIELD_TYPES: Array[int] = [
 	TYPE_PACKED_INT32_ARRAY, # dummy_health
 	TYPE_PACKED_INT32_ARRAY, # dummy_max_health
 	TYPE_PACKED_VECTOR2_ARRAY, # projectile_positions
-	TYPE_PACKED_INT32_ARRAY, # status: see [method status_values]
+	TYPE_PACKED_VECTOR2_ARRAY, # village_positions
+	TYPE_PACKED_INT32_ARRAY, # village_owners
+	TYPE_PACKED_INT32_ARRAY, # the player's own numbers, in the order of _STATUS_SIZE's comment
 ]
+## health, max_health, mana, mana_pool, wizard_level, xp, xp_to_next, gold, village_price,
+## villages_held.
+const _STATUS_SIZE := 10
 
 var tick := 0
 var room_id: StringName
@@ -30,6 +35,10 @@ var dummy_positions: PackedVector2Array = []
 var dummy_health: PackedInt32Array = []
 var dummy_max_health: PackedInt32Array = []
 var projectile_positions: PackedVector2Array = []
+## The villages of the room, in the room's order.
+var village_positions: PackedVector2Array = []
+## The peer id holding each village; 0 for none.
+var village_owners: PackedInt32Array = []
 var health := 0
 var max_health := 0
 var mana := 0
@@ -37,6 +46,10 @@ var mana_pool := 0
 var wizard_level := 1
 var xp := 0
 var xp_to_next := 0
+var gold := 0
+## What the next village would cost this wizard.
+var village_price := 0
+var villages_held := 0
 
 
 ## Reads a message; null when it is malformed.
@@ -46,8 +59,8 @@ static func from_message(message: Array) -> StateUpdate:
 	for i in message.size():
 		if typeof(message[i]) != _FIELD_TYPES[i]:
 			return null
-	var status: PackedInt32Array = message[9]
-	if status.size() != 7:
+	var status: PackedInt32Array = message[11]
+	if status.size() != _STATUS_SIZE:
 		return null
 	var update := StateUpdate.new()
 	update.tick = message[0]
@@ -59,6 +72,8 @@ static func from_message(message: Array) -> StateUpdate:
 	update.dummy_health = message[6]
 	update.dummy_max_health = message[7]
 	update.projectile_positions = message[8]
+	update.village_positions = message[9]
+	update.village_owners = message[10]
 	update.health = status[0]
 	update.max_health = status[1]
 	update.mana = status[2]
@@ -66,10 +81,14 @@ static func from_message(message: Array) -> StateUpdate:
 	update.wizard_level = status[4]
 	update.xp = status[5]
 	update.xp_to_next = status[6]
+	update.gold = status[7]
+	update.village_price = status[8]
+	update.villages_held = status[9]
 	var sizes_match := (
 		update.wizard_ids.size() == update.wizard_positions.size()
 		and update.dummy_positions.size() == update.dummy_health.size()
 		and update.dummy_health.size() == update.dummy_max_health.size()
+		and update.village_positions.size() == update.village_owners.size()
 	)
 	return update if sizes_match else null
 
@@ -85,5 +104,20 @@ func to_message() -> Array:
 		dummy_health,
 		dummy_max_health,
 		projectile_positions,
-		PackedInt32Array([health, max_health, mana, mana_pool, wizard_level, xp, xp_to_next]),
+		village_positions,
+		village_owners,
+		PackedInt32Array(
+			[
+				health,
+				max_health,
+				mana,
+				mana_pool,
+				wizard_level,
+				xp,
+				xp_to_next,
+				gold,
+				village_price,
+				villages_held,
+			],
+		),
 	]

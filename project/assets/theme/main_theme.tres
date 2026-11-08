@@ -1,0 +1,7 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/PixelOperator.ttf" id="1_e04sg"]
+
+[resource]
+default_font = ExtResource("1_e04sg")
+default_font_size = 16

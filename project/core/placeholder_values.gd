@@ -21,10 +21,19 @@ const DEFAULT_PATH := "res://data/placeholder_values.tres"
 @export var spell_cooldown_ticks := 15
 @export var spell_projectile_speed := 8.0
 @export var spell_range_tiles := 12.0
+@export_group("Gold and villages")
+## Gold a wizard enters the world with.
+@export var starting_gold := 0
+## FORMULAS.md: base_price and multiplier for villages ⬜.
+@export var village_base_price := 20
+@export var village_price_multiplier := 2.0
+## How close a wizard's feet must stand to a village's centre to buy it, in tiles.
+@export var village_reach_tiles := 1.5
 @export_group("Training dummy")
 @export var dummy_health := 30
 @export var dummy_magic_defence := 10
 @export var dummy_xp := 10
+@export var dummy_gold := 10
 @export var dummy_respawn_ticks := 90
 
 

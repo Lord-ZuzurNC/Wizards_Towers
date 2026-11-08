@@ -89,6 +89,7 @@ func test_destroying_the_dummy_levels_up_and_offers_the_three_cards() -> void:
 	var wizard := server.world.wizard(client.peer_id())
 	assert_eq(wizard.wizard_level, 2)
 	assert_eq(wizard.xp, 0)
+	assert_eq(wizard.gold, _values.dummy_gold)
 	var ids: Array[StringName] = []
 	for card in client.world.offered_cards:
 		ids.append(card.id)

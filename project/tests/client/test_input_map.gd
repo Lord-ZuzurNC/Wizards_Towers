@@ -31,8 +31,8 @@ func test_each_action_answers_to_a_letter_and_an_arrow() -> void:
 			assert_true(keys.has(key), "%s lacks key %d" % [action, key])
 
 
-func test_casting_and_the_card_choice_have_their_keys() -> void:
-	var expected := { &"cast_1": KEY_1, &"open_card_choice": KEY_C }
+func test_casting_the_card_choice_and_interacting_have_their_keys() -> void:
+	var expected := { &"cast_1": KEY_1, &"open_card_choice": KEY_C, &"interact": KEY_E }
 	for action: StringName in expected:
 		assert_true(InputMap.has_action(action), action)
 		var event := InputMap.action_get_events(action)[0] as InputEventKey

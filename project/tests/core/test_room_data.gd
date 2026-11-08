@@ -50,6 +50,16 @@ func test_a_spawn_on_a_wall_is_a_problem() -> void:
 	assert_eq(room.validate([]).size(), 1)
 
 
+func test_a_village_on_a_wall_is_a_problem() -> void:
+	var room := RoomFixtures.make(&"r", PackedStringArray(["####", "#..#", "####"]))
+	var site := VillageSite.new()
+	site.title = "Walled"
+	room.villages = [site]
+	var problems := room.validate([])
+	assert_eq(problems.size(), 1)
+	assert_true(problems[0].contains("Walled"), problems[0])
+
+
 func test_an_exit_to_an_unknown_room_is_a_problem() -> void:
 	var rooms := RoomFixtures.two_joined_rooms()
 	var problems := rooms[&"left"].validate([&"left"])
