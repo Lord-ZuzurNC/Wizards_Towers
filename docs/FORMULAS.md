@@ -431,6 +431,7 @@ minimap_size(m) = original_size × (1 - 0.10 × (m - 5))      for 5 ≤ m ≤ 15
 ```
 
 `m` is whole minutes since the ROOF fight began; the minimap reaches zero at minute 15.
+The minimap is the ROOF's arena, a rectangle of 120 × 60 tiles to begin with, shrinking toward its centre on both axes alike.
 Source: `GLOSSARY.md`, sudden death.
 
 ## Missing formulas

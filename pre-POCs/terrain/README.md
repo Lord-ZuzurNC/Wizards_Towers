@@ -51,6 +51,7 @@ Whole map, mask 3 of the same sheet:
 | Time                    | 24 s                          | 65 s              |
 | PNG                     | 2.8 MB                        | 11.1 MB           |
 
+The 1/8 image is not kept in the repository, for its size.
 At full scale the map is 40,960 pixels a side, about 7,300 screens of 640 × 360: too large for one image, hence the reduced versions.
 Shrinking by keeping one pixel out of 8 or 16 creates a fine moiré on textured ground and turns sprites into specks; neither happens in the game, which is drawn at full scale.
 

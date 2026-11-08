@@ -7,8 +7,8 @@ The look every sprite, tile and screen aims for, so art from several hands still
   - [Who makes the art](#who-makes-the-art)
   - [View and scale](#view-and-scale)
   - [Palettes](#palettes)
+  - [Rooms and camera](#rooms-and-camera)
   - [Look](#look)
-  - [Open questions](#open-questions)
 
 ## How to read this document
 
@@ -49,11 +49,22 @@ Characters, spells and items travel between the world, dungeons and mazes, so th
 **COMFORT44S for the menus, the title screen and the ROOF.**
 Its pastel tones set those screens apart; on the ROOF, only the environment uses it, while the wizards keep their own colours.
 
-**APOLLO in reserve for dungeons and mazes**, if BLK NX64 turns out short of dark tones there.
-BLK NX64 has 10 colours darker than a lightness of 25 out of 100, pure black included; APOLLO has 13.
+**APOLLO's 15 darkest colours reinforce BLK NX64 in dark rooms** of dungeons and mazes, those of lightness 30 or less out of 100; a lit room stays in BLK NX64 alone.
+BLK NX64 alone runs short of dark tones there: in the test of `pre-POCs/dungeon_light`, the dim parts of a room keep 6 colours in BLK NX64, 14 once reinforced.
 
 **Light stays within the palette.**
 Darkness and light sources are computed, then every pixel on screen is snapped back to the nearest colour of the palette in use, light falling in visible steps blended by an ordered dither.
+
+## Rooms and camera
+
+| Place                                   | Size                                                                                      | Camera             |
+| --------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------ |
+| Dungeon room, maze room, Monolith floor | One screen at most: 40 × 20 tiles, the rest of the screen holding the HUD                 | Fixed on the room  |
+| The ROOF                                | A battle map of 3 × 3 screens, 120 × 60 tiles, which sudden death closes in from minute 5 | Follows the wizard |
+| The open world                          | The whole map                                                                             | Follows the wizard |
+
+Inside a dungeon or a maze the HUD is simplified, to leave the room as much of the screen as possible: health, mana, the spell bar, and a row of icons opening the menus, kept clear of the room.
+A maze puzzle needing more room spreads over several rooms.
 
 ## Look
 
@@ -64,7 +75,3 @@ Drawn from the references the author keeps privately, in an `inspiration/` folde
 - **An earthy base with saturated accents**, so what matters in a fight stands out: loot, spells, danger.
 - **Vivid rather than faded colours.**
 - **Never seen from the side, nor straight from above.**
-
-## Open questions
-
-- ⬜ **Rooms**: the size of a dungeon room, a maze room and a Monolith floor.
