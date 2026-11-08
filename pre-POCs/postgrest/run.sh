@@ -10,7 +10,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-: "${GODOT:?Set GODOT to a Godot 4.7.2 binary}"
+: "${GODOT:?Set GODOT to a Godot 4.7.x binary}"
 
 cleanup() {
 	docker rm -f wt-poc-api wt-poc-db >/dev/null 2>&1 || true

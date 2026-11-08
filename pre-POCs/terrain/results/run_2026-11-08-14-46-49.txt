@@ -1,0 +1,9 @@
+view 1  plains and forest  centred on tile 1605, 785
+night view: pixels outside BLK NX64: 0
+view 2  forest and marsh  centred on tile 2165, 225
+view 3  glacier  centred on tile 925, 1725
+view 4  desert  centred on tile 2165, 1645
+view 5  mountain spine  centred on tile 1625, 1505
+view 6  volcanic rift  centred on tile 1485, 1985
+view 7  coast  centred on tile 1045, 165
+mask 1 of sheet_2026-11-08-14-43-04.png; pixels outside BLK NX64 in the views: 0

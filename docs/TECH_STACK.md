@@ -9,6 +9,7 @@ Where a decision is deferred it carries ⬜ and says what would settle it.
   - [View and projection](#view-and-projection)
   - [Client and server](#client-and-server)
   - [Authority model](#authority-model)
+  - [Netcode](#netcode)
   - [Persistence](#persistence)
   - [Crash recovery](#crash-recovery)
   - [Hosting](#hosting)
@@ -21,12 +22,12 @@ Where a decision is deferred it carries ⬜ and says what would settle it.
 
 ## Engine and language
 
-| Choice      | Decision                       | Notes                                                            |
-| ----------- | ------------------------------ | ---------------------------------------------------------------- |
-| Engine      | **Godot 4.7.2 stable**         | Pinned. See `GUIDELINES.md`.                                     |
-| Language    | **GDScript**, statically typed | Static typing is mandatory, not optional — see below.            |
-| Linting     | `gdscript-formatter`           | GDQuest's formatter and linter, one binary. See `GUIDELINES.md`. |
-| Second lang | **none**                       | No C#, no GDExtension, until a measured bottleneck demands one.  |
+| Choice      | Decision                       | Notes                                                                      |
+| ----------- | ------------------------------ | -------------------------------------------------------------------------- |
+| Engine      | **Godot 4.7.x stable**         | Pinned to the 4.7 branch: patch releases yes, 4.8 no. See `GUIDELINES.md`. |
+| Language    | **GDScript**, statically typed | Static typing is mandatory, not optional — see below.                      |
+| Linting     | `gdscript-formatter`           | GDQuest's formatter and linter, one binary. See `GUIDELINES.md`.           |
+| Second lang | **none**                       | No C#, no GDExtension, until a measured bottleneck demands one.            |
 
 **Static typing is mandatory because of who reviews this code.**
 The project's author reads code but does not write it, so errors must surface at parse time rather than at runtime in front of fifty players.
@@ -90,6 +91,57 @@ The client is authoritative over one thing only: **its own input**.
 It may predict its own movement for responsiveness; the server corrects it.
 
 A client that could set a number could set its own gold, and one cheater ends a world in an hour.
+
+## Netcode
+
+**The world advances in fixed steps, thirty a second.**
+Each step is a **simulation tick** of about 33 ms, never to be confused with the per-tick `income` of the economy.
+On every simulation tick the server applies the inputs it received, moves everything, resolves spells, and sends each client a state update.
+
+| Setting             | Value                             | Where                                                                         |
+| ------------------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| Simulation tick     | 30 a second, on server and client | `physics/common/physics_ticks_per_second` = 30                                |
+| Display             | 60 frames a second                | `physics/common/physics_interpolation` on: frames between ticks are smoothed. |
+| Interpolation delay | 100 ms, three simulation ticks    | Tunable; measured on a real network before it changes.                        |
+
+Why thirty and not sixty:
+
+- Every spell travels; none hits instantly.
+- Dodging a projectile is decided over hundreds of milliseconds, not over one step.
+- Top-down competitive games built on travelling skillshots run their servers at thirty ticks a second.
+- Upload is the host's bottleneck, see [Hosting](#hosting), and sixty would double it for fifty players with no difference a player can feel.
+
+**The client predicts its own movement, and nothing else.**
+
+- The client applies its own movement input at once and sends it to the server with a sequence number.
+- The server answers with the authoritative position and the sequence number of the last input it applied.
+- The client moves back to that position and replays every input the server has not applied yet.
+
+Nothing in [Authority model](#authority-model) is ever predicted:
+no damage, mana, gold, hit, death or ownership is shown before the server says so.
+A cast may start its animation at once, as a visual only; the spell itself exists when the server has accepted it.
+
+**Every other combatant is drawn 100 ms in the past.**
+The client keeps the latest state updates and draws other wizards, enemies and spells between two positions it already knows.
+A lost update is covered by the next one instead of freezing the picture.
+
+| Message                            | ENet mode            | Why                                                                        |
+| ---------------------------------- | -------------------- | -------------------------------------------------------------------------- |
+| Movement input                     | `unreliable_ordered` | Each packet repeats the last few inputs, so one lost packet costs nothing. |
+| State update                       | `unreliable_ordered` | A late position is worthless; the next update replaces it.                 |
+| A cast, a purchase, any `_request` | `reliable`           | It must arrive.                                                            |
+
+Prediction and interpolation are written in the project.
+An addon providing them would be an engine plugin, see [What is deliberately absent](#what-is-deliberately-absent).
+
+During development the server runs as a headless process and the client connects to it on `localhost`, both on the same machine.
+
+⬜ **Lag compensation**, the server judging a hit as the caster saw it, is deferred.
+Settled by playing over a real network.
+On `localhost` the latency is zero and hides the question.
+
+⬜ **Interest management**, each client receiving only what stands near it, is deferred.
+Required before fifty wizards share a 2 560-tile map, not before.
 
 ## Persistence
 

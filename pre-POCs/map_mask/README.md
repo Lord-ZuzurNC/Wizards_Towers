@@ -21,7 +21,8 @@ Can Godot generate, with nothing but its own `FastNoiseLite`, a random biome mas
 4. Any part of a zone narrower than 8 mask points joins the zones beside it.
 5. The mountain chain over them, a random walk steered away from the Monolith and from every edge but the one it may start from, its spine marked impassable; it may run out over the sea.
 6. The volcanic ground over everything: a round volcano, a winding rift, or both, placed and steered away from forest and glacier, never filled in with a strip of another biome; narrow parts left by these two layers are thinned out again.
-7. Every rule is checked, including that all ground is reachable on foot from the Monolith, the sea and the spine being the only obstacles; a mask breaking one is thrown away and the next seed is tried.
+   The volcano's central crater, 20 % of its round patch by area, and the whole width of the rift are marked impassable.
+7. Every rule is checked, including that all ground is reachable on foot from the Monolith, the sea, the spine, the crater and the rift being the only obstacles; a mask breaking one is thrown away and the next seed is tried.
 8. Half the time, Frostfang Caverns is assumed drawn: an island off the coast, or a lake with an island inside the glacier.
 
 ## Results
@@ -34,6 +35,7 @@ Each run writes `results/sheet_<date-time>.png` and `results/run_<date-time>.txt
 | 2026-11-07 18:36:59 | Monolith within 10 % of the centre, plains allowed to be cut by the chain.          |
 | 2026-11-07 20:15:46 | Layers, the sea not walkable, volcanic ground steered away from forest and glacier. |
 | 2026-11-07 22:57:23 | Minimum zone width of 8 mask points.                                                |
+| 2026-11-08 14:43:04 | Crater and rift impassable.                                                         |
 
 The second run had two faults: plains cut off with only the sea beyond them, and thin strips of plains painted between forest and volcanic ground.
 Both are fixed in the third.
@@ -55,7 +57,7 @@ Third run, measured with Godot 4.7.2 headless:
 | The chain running out over the sea                                            | 2 masks                                                      |
 | Frostfang                                                                     | 3 islands off the coast, 2 lakes in the glacier, 5 not drawn |
 
-The mask colours follow `docs/WORLD_MAP.md`; the dark grey line in each mountain chain is its spine, light blue is a Frostfang lake, sand is a Frostfang island, and the black dot and ring are the Monolith and its Outer Ring.
+The mask colours follow `docs/WORLD_MAP.md`; the dark grey line in each mountain chain is its spine, dark red is a volcano's crater, deep red is a rift, light blue is a Frostfang lake, sand is a Frostfang island, and the black dot and ring are the Monolith and its Outer Ring.
 
 ## Conclusions
 
@@ -65,6 +67,12 @@ Only the mask is covered here; the terrain pass, decor included, is the next ste
 The fourth run adds a minimum zone width.
 Counted on the pixels, as zone parts more than 4 points away from any part at least 8 points wide, 40 pixels or more in size: 4 such strips in the third run, 1 in the fourth, a desert sliver touching only volcanic ground, which the rule keeps on purpose.
 The run takes about 21 s instead of 8 s; every other rule check still passes, and forest or glacier touching volcanic ground stays at 0.
+The fifth run makes the crater and the rift impassable.
+On the same seeds, nine masks of ten come out identical to the fourth run's, impassable cells aside.
+Mask 8 is the exception:
+the fourth run's version left ground unreachable once the new obstacles count, so it was rejected and the next seed taken, 5 rejections for unreachable ground instead of 4.
+Counted on the pixels, every crater is 20 % of its volcano's patch.
+Two masks of ten draw a rift and no volcano, so they hold no walkable volcanic ground at all.
 
 ## Run it
 

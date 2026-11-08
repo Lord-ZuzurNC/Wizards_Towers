@@ -19,6 +19,7 @@ const RANK := [1, 2, 3, 4, 5, 6, 7, 0, 6]
 const MASK_COLORS := {
 	"e8d44d": PLAINS, "3e9a3e": FOREST, "7a5230": MARSH, "f4f8fb": GLACIER, "ee8a2a": DESERT,
 	"8c8c8c": MOUNTAIN, "4a4a4a": SPINE, "cc2b20": VOLCANIC, "2f6fd0": COAST,
+	"5c0f0a": VOLCANIC, "8e1a12": VOLCANIC,  # crater, rift: volcanic until they get art
 	"8fd6ff": GLACIER, "f2e3b0": GLACIER, "000000": PLAINS, "303030": PLAINS,
 }
 

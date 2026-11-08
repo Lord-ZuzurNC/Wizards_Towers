@@ -24,7 +24,7 @@ if [[ "${1:-}" == "down" ]]; then
 	rm -f admin.pat client_id.txt
 	exit 0
 fi
-: "${GODOT:?Set GODOT to a Godot 4.7.2 binary}"
+: "${GODOT:?Set GODOT to a Godot 4.7.x binary}"
 
 # 1. Upstream files and fresh secrets, once.
 [[ -f docker-compose.yml ]] || curl -fsSLO "$UPSTREAM/docker-compose.yml"

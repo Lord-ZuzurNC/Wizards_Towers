@@ -1,7 +1,7 @@
 <!--
   Wizards Towers - style and documentation guideline.
 
-  Target engine: Godot 4.7.2 (stable).
+  Target engine: Godot 4.7.x (stable).
 -->
 
 # Wizards Towers — style guideline

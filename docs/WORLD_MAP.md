@@ -63,19 +63,19 @@ At 16 pixels a tile, `speed` 100 is 64 pixels a second and the map is 40 960 pix
 
 ## Biomes
 
-| Biome    | Mask colour | Rule                                                                                                            |
-| -------- | ----------- | --------------------------------------------------------------------------------------------------------------- |
-| Plains   | yellow      | The largest zone, and the one holding the Monolith; the only one the chain or a rift may cut.                   |
-| Forest   | green       | Always borders the plains. Never touches volcanic ground.                                                       |
-| Marsh    | brown       | Always borders the forest.                                                                                      |
-| Glacier  | white       | Never touches volcanic ground.                                                                                  |
-| Desert   | orange      | Its decor borrows from its neighbours, dried out: dead trees beside the forest, cracked mud beside the marsh.   |
-| Mountain | mid grey    | A long chain that touches at most one map edge; its central spine cannot be crossed.                            |
-| Volcanic | red         | A round volcano, a winding rift, or both.                                                                       |
-| Coast    | blue        | The sea along a map edge: never walkable except Frostfang's frozen way in winter; its sites stand on the shore. |
+| Biome    | Mask colour | Rule                                                                                                                                           |
+| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plains   | yellow      | The largest zone, and the one holding the Monolith; the only one the chain or a rift may cut.                                                  |
+| Forest   | green       | Always borders the plains. Never touches volcanic ground.                                                                                      |
+| Marsh    | brown       | Always borders the forest.                                                                                                                     |
+| Glacier  | white       | Never touches volcanic ground.                                                                                                                 |
+| Desert   | orange      | Its decor borrows from its neighbours, dried out: dead trees beside the forest, cracked mud beside the marsh.                                  |
+| Mountain | mid grey    | A long chain that touches at most one map edge; its central spine cannot be crossed.                                                           |
+| Volcanic | red         | A round volcano, a winding rift, or both. The volcano's central crater, 20 % of its round patch by area, and the whole rift cannot be crossed. |
+| Coast    | blue        | The sea along a map edge: never walkable except Frostfang's frozen way in winter; its sites stand on the shore.                                |
 
 **Everything walkable is reachable from the Monolith.**
-Only the sea and a mountain spine block movement; a mask leaving any ground unreachable on foot is thrown away.
+Only the sea, a mountain spine, a volcano's crater and a rift block movement; a mask leaving any ground unreachable on foot is thrown away.
 
 **Forest and glacier keep away from volcanic ground on their own.**
 The volcano and the rift are placed and steered away from them; a thin strip of another biome is never painted between them to fake the rule.

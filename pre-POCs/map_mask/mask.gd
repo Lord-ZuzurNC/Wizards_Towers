@@ -13,6 +13,9 @@ const COLORS := [
 	Color("ee8a2a"), Color("8c8c8c"), Color("cc2b20"), Color("2f6fd0"),
 ]
 const SPINE_COLOR := Color("4a4a4a")
+const CRATER_COLOR := Color("5c0f0a")  # a volcano's central crater: never walkable
+const RIFT_COLOR := Color("8e1a12")  # a volcanic rift: never walkable, over its whole width
+const CRATER_SHARE := 0.20  # the crater's share of the volcano's round patch, by area
 const LAKE_COLOR := Color("8fd6ff")
 const ISLAND_COLOR := Color("f2e3b0")
 const RING_RADIUS := 12.5  # the Outer Ring, which must stand entirely in plains
@@ -21,6 +24,9 @@ const MIN_HALF_WIDTH := 4  # a zone narrower than twice this, in mask points, is
 var monolith := Vector2(W / 2.0, H / 2.0)
 var grid := PackedByteArray()
 var spine := PackedByteArray()
+var crater := PackedByteArray()
+var rift := PackedByteArray()
+var painting_rift := false  # set while the rift's brush walks, so _brush marks what it paints
 var ring := PackedByteArray()  # cells no overlay may cover: the Monolith and its Outer Ring
 var feature := PackedByteArray()  # 0 none, 1 Frostfang lake, 2 Frostfang island
 var rng := RandomNumberGenerator.new()
@@ -92,6 +98,10 @@ func _generate(seed_value: int) -> String:
 	grid.fill(NONE)
 	spine.resize(W * H)
 	spine.fill(0)
+	crater.resize(W * H)
+	crater.fill(0)
+	rift.resize(W * H)
+	rift.fill(0)
 	ring.resize(W * H)
 	ring.fill(0)
 	feature.resize(W * H)
@@ -232,6 +242,7 @@ func _paint_volcanic() -> bool:
 			return grid[i] != COAST and away[i] >= int(r * 1.3) + 4)
 		if c.x < 0:
 			return false
+		var patch := PackedInt32Array()
 		for y in range(maxi(0, int(c.y - r * 1.4)), mini(H, int(c.y + r * 1.4) + 1)):
 			for x in range(maxi(0, int(c.x - r * 1.4)), mini(W, int(c.x + r * 1.4) + 1)):
 				var i := y * W + x
@@ -239,13 +250,22 @@ func _paint_volcanic() -> bool:
 						and Vector2(x, y).distance_to(c) <= r * (1.0 + 0.25 * edge_noise.get_noise_2d(x * 2, y * 2)):
 					grid[i] = VOLCANIC
 					spine[i] = 0
+					patch.append(i)
+		# The crater is the patch's central share, counted on the cells actually painted.
+		var by_distance := Array(patch)
+		by_distance.sort_custom(func(a: int, b: int) -> bool:
+			return Vector2(a % W, a / W).distance_squared_to(c) < Vector2(b % W, b / W).distance_squared_to(c))
+		for k in roundi(by_distance.size() * CRATER_SHARE):
+			crater[by_distance[k]] = 1
 	if mode != 0:
 		var s := _random_point(50.0, 30.0, func(p: Vector2) -> bool:
 			var i := int(p.y) * W + int(p.x)
 			return grid[i] != COAST and away[i] >= 14)
 		if s.x < 0:
 			return false
+		painting_rift = true
 		_walk(s, rng.randf_range(-PI, PI), rng.randf_range(0.35, 0.5) * W, 5.0, 0.3, VOLCANIC, 0.0, -1, away)
+		painting_rift = false
 	return true
 
 
@@ -346,7 +366,7 @@ func _validate() -> String:
 			if Vector2(x, y).distance_to(monolith) <= RING_RADIUS and grid[y * W + x] != PLAINS:
 				return "Outer Ring not in plains"
 	# All walkable ground, every plains piece included, must be reachable on foot from the Monolith.
-	# The sea and the mountain spine are the only things that cannot be walked.
+	# The sea, the mountain spine, a volcano's crater and a rift are the only things that cannot be walked.
 	var reach := _distance_field(func(i: int) -> bool: return i == int(monolith.y) * W + int(monolith.x), 100000, true)
 	for i in W * H:
 		if _walkable(i) and reach[i] >= 100000:
@@ -434,10 +454,12 @@ func _brush(c: Vector2, r: float, biome: int, spine_r := 0.0) -> void:
 			var keep_spine := biome == MOUNTAIN and grid[i] == MOUNTAIN and spine[i] == 1
 			grid[i] = biome
 			spine[i] = 1 if keep_spine or (biome == MOUNTAIN and d <= spine_r) else 0
+			if painting_rift:
+				rift[i] = 1
 
 
 func _walkable(i: int) -> bool:
-	return grid[i] != COAST and spine[i] == 0
+	return grid[i] != COAST and spine[i] == 0 and crater[i] == 0 and rift[i] == 0
 
 
 func _random_point(min_monolith: float, margin: float, ok: Callable) -> Vector2:
@@ -537,6 +559,10 @@ func _render() -> Image:
 			var c: Color = COLORS[grid[i]]
 			if spine[i] == 1:
 				c = SPINE_COLOR
+			elif crater[i] == 1:
+				c = CRATER_COLOR
+			elif rift[i] == 1:
+				c = RIFT_COLOR
 			if feature[i] == 1:
 				c = LAKE_COLOR
 			elif feature[i] == 2:
