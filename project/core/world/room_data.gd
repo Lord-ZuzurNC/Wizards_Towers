@@ -17,6 +17,8 @@ const FLOOR := "."
 const MAX_SIZE := Vector2i(40, 20)
 
 @export var id: StringName
+## The name shown to the player; the id when empty.
+@export var title := ""
 @export var rows: PackedStringArray = []
 @export var exits: Array[RoomExit] = []
 ## The tile where a wizard entering the world appears.
@@ -60,6 +62,11 @@ func exit_at(position: Vector2) -> RoomExit:
 	return null
 
 
+## The name shown to the player.
+func display_name() -> String:
+	return title if not title.is_empty() else String(id)
+
+
 ## Everything wrong with the room, one line each. Empty when the room is sound.
 ## [param known_rooms] lists the room ids an exit may lead to.
 func validate(known_rooms: Array[StringName]) -> PackedStringArray:
@@ -74,13 +81,14 @@ func validate(known_rooms: Array[StringName]) -> PackedStringArray:
 		if rows[y].length() != width:
 			problems.append("row %d is %d tiles long, not %d" % [y, rows[y].length(), width])
 		for character in rows[y]:
-			if character != WALL and character != FLOOR:
-				problems.append("row %d holds '%s', neither wall nor floor" % [y, character])
+			if not _is_legal(character):
+				problems.append("row %d holds '%s', which means nothing here" % [y, character])
 				break
-	if width > MAX_SIZE.x or rows.size() > MAX_SIZE.y:
+	var max_size := _max_size()
+	if width > max_size.x or rows.size() > max_size.y:
 		problems.append(
 			"the room is %d × %d tiles, more than %d × %d"
-			% [width, rows.size(), MAX_SIZE.x, MAX_SIZE.y]
+			% [width, rows.size(), max_size.x, max_size.y]
 		)
 	if is_solid(spawn_tile):
 		problems.append("the spawn tile %s is not floor" % spawn_tile)
@@ -100,3 +108,13 @@ func validate(known_rooms: Array[StringName]) -> PackedStringArray:
 		if not known_rooms.has(room_exit.target_room):
 			problems.append("an exit leads to an unknown room '%s'" % room_exit.target_room)
 	return problems
+
+
+## Whether [param character] may appear in [member rows]. A world map knows more of them.
+func _is_legal(character: String) -> bool:
+	return character == WALL or character == FLOOR
+
+
+## The largest layout allowed. A world map is far larger than a room.
+func _max_size() -> Vector2i:
+	return MAX_SIZE

@@ -78,6 +78,10 @@ func test_a_room_larger_than_one_screen_is_a_problem() -> void:
 
 func test_the_shipped_rooms_are_sound_and_joined() -> void:
 	var rooms := RoomCatalog.load_folder()
+	var known: Array[StringName] = []
+	known.assign(rooms.keys())
+	for id: StringName in rooms:
+		assert_eq(rooms[id].validate(known).size(), 0, "%s: %s" % [id, rooms[id].validate(known)])
 	assert_true(rooms.has(&"first_room") and rooms.has(&"second_room"), str(rooms.keys()))
 	for id: StringName in rooms:
 		for room_exit in rooms[id].exits:

@@ -45,7 +45,7 @@ func _start_client(host: String, port: int) -> void:
 	add_child(_hud)
 	_status = _hud.connection
 	var address := "%s:%d" % [host, port]
-	client.session_started.connect(_show.bind("in session with %s" % address))
+	client.session_started.connect(_on_client_session_started.bind(address))
 	client.session_refused.connect(_on_client_session_refused)
 	client.session_ended.connect(_show.bind("session ended by the server"))
 	client.connection_failed.connect(_show.bind("cannot reach %s" % address))
@@ -68,12 +68,18 @@ func _on_server_session_refused(peer_id: int, reason: String) -> void:
 	_log("refused peer %d: %s" % [peer_id, reason])
 
 
+func _on_client_session_started(address: String) -> void:
+	_log("in session with %s" % address)
+	_hud.show_location(true)
+
+
 func _on_client_session_refused(reason: String) -> void:
 	_show("refused: %s" % reason)
 
 
 ## Shows a line on the client's screen, and prints it for the terminal too.
 func _show(text: String) -> void:
+	_hud.show_location(false)
 	_status.text = text
 	_log(text)
 

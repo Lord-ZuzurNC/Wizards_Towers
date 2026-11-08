@@ -103,6 +103,15 @@ func wizard_room(peer_id: int) -> StringName:
 	return _wizards[peer_id].room_id
 
 
+## The biome under a wizard's feet; -1 outside a world map. Hazards will hang on it.
+func wizard_biome(peer_id: int) -> int:
+	var wizard_state := _wizards[peer_id]
+	var world_map := rooms[wizard_state.room_id] as WorldMapData
+	if world_map == null:
+		return -1
+	return world_map.biome_at(world_map.tile_at(wizard_state.position))
+
+
 func dummies_in(room_id: StringName) -> Array:
 	return _dummies.get(room_id, [])
 

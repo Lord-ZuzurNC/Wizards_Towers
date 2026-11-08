@@ -12,6 +12,27 @@ static func make(id: StringName, rows: PackedStringArray, spawn_tile := Vector2i
 	return room
 
 
+## A 50 × 30 world map, larger than the screen: the sea along the top, bottom and left
+## edges, plains in the middle and forest from column 30 on. Its spawn is tile (10, 15).
+static func small_world() -> WorldMapData:
+	var rows := PackedStringArray()
+	for y in 30:
+		var row := ""
+		for x in 50:
+			if y == 0 or y == 29 or x < 2:
+				row += "~"
+			elif x >= 30:
+				row += "f"
+			else:
+				row += "."
+		rows.append(row)
+	var world := WorldMapData.new()
+	world.id = &"world"
+	world.rows = rows
+	world.spawn_tile = Vector2i(10, 15)
+	return world
+
+
 ## Two 8 × 3 rooms joined by a door: [code]left[/code] opens on its right edge into
 ## [code]right[/code], which opens on its left edge back into [code]left[/code].
 static func two_joined_rooms() -> Dictionary[StringName, RoomData]:

@@ -14,11 +14,16 @@ extends CanvasLayer
 const TEXT_COLOR := Color("ffffeb")
 const BADGE_COLOR := Color("ffe091")
 const PANEL_COLOR := Color("12173dee")
+const BAND_COLOR := Color("12173d")
 const CARD_COLOR := Color("293268")
 const CARD_SIZE := Vector2(120, 160)
 
-## The status line, with the connection state; [code]main.gd[/code] writes to it.
+## The connection state; [code]main.gd[/code] writes to it. Shown until the session opens,
+## and again if it ends.
 var connection := Label.new()
+## Where the player is: a room, or the biome underfoot on a world map. Shown in place of
+## the connection state while the session is open.
+var location := Label.new()
 ## Says how many card choices wait; hidden when none does.
 var badge := Label.new()
 ## Says what the interact key would do here; empty when it would do nothing.
@@ -34,20 +39,28 @@ func _init(world: ClientWorld) -> void:
 	_world = world
 	_world.status_changed.connect(_refresh_numbers)
 	_world.card_choices_changed.connect(_refresh_choices)
+	# An opaque band under the text: a world map scrolls on beneath it.
+	var band := ColorRect.new()
+	band.color = BAND_COLOR
+	band.position = Vector2(0, 320)
+	band.size = Vector2(640, 40)
+	add_child(band)
 	# Two lines below the room, which fills the top 320 of the 360 lines: on the left what
 	# is, on the right what to do.
 	_numbers.position = Vector2(8, 320)
 	connection.position = Vector2(8, 339)
+	location.position = Vector2(8, 339)
+	location.hide()
 	for label: Label in [badge, prompt]:
 		label.size = Vector2(316, 18)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	badge.position = Vector2(316, 320)
 	prompt.position = Vector2(316, 339)
-	for label: Label in [connection, _numbers]:
+	for label: Label in [connection, location, _numbers]:
 		label.add_theme_color_override(&"font_color", TEXT_COLOR)
 	for label: Label in [badge, prompt]:
 		label.add_theme_color_override(&"font_color", BADGE_COLOR)
-	for label: Label in [connection, _numbers, badge, prompt]:
+	for label: Label in [connection, location, _numbers, badge, prompt]:
 		add_child(label)
 	_build_panel()
 	_refresh_choices()
@@ -57,6 +70,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"open_card_choice"):
 		toggle_choice()
 		get_viewport().set_input_as_handled()
+
+
+## Shows where the player is in place of the connection state, or the other way round.
+func show_location(shown: bool) -> void:
+	location.visible = shown
+	connection.visible = not shown
 
 
 ## Opens the oldest waiting choice, or closes the open one without taking anything.
@@ -107,6 +126,7 @@ func _refresh_numbers() -> void:
 		]
 	)
 	prompt.text = _prompt_text()
+	location.text = _world.location_name()
 
 
 func _prompt_text() -> String:

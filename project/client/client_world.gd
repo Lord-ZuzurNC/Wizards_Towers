@@ -10,7 +10,8 @@ extends Node2D
 ## them is predicted.
 ##
 ## Everything is a flat coloured shape from the BLK NX64 palette, standing in until its art
-## exists.
+## exists. A world map is coloured by biome; a camera follows the player's wizard across
+## anything larger than the screen.
 
 ## The player's own numbers changed: health, mana, level or XP.
 signal status_changed
@@ -35,6 +36,38 @@ const FREE_FLAG_COLOR := Color("909edd")
 const VILLAGE_WALLS := Rect2(-10.0, -6.0, 20.0, 12.0)
 const VILLAGE_ROOF := Rect2(-12.0, -12.0, 24.0, 6.0)
 const VILLAGE_FLAG := Rect2(-10.0, 7.0, 20.0, 2.0)
+## Each biome's ground in [enum Biome.Kind] order, and a second shade scattered over it so
+## walking shows on wide open ground. From the terrain pre-POC.
+## Two flat lists rather than a list of pairs: in Godot 4.7.2, reading a Color out of a
+## constant Array[PackedColorArray] gives an empty Color.
+const BIOME_GROUND: Array[Color] = [
+	Color("afd370"),
+	Color("22896e"),
+	Color("5c5d41"),
+	Color("c1d9f2"),
+	Color("ffe091"),
+	Color("7b6aa5"),
+	Color("3f1f3c"),
+	Color("3e83d1"),
+]
+const BIOME_SCATTER: Array[Color] = [
+	Color("919b45"),
+	Color("14665b"),
+	Color("353f23"),
+	Color("909edd"),
+	Color("ffaa6e"),
+	Color("53427f"),
+	Color("61393b"),
+	Color("354ab2"),
+]
+const SPINE_COLOR := Color("3c2c68")
+const CRATER_COLOR := Color("ff695a")
+const RIFT_CORE_COLOR := Color("ff695a")
+const RIFT_BANK_COLOR := Color("723352")
+const LAKE_COLOR := Color("50b9eb")
+## The screen in art pixels, and the HUD band along its bottom that the map scrolls above.
+const SCREEN := Vector2i(640, 360)
+const HUD_HEIGHT := 40
 ## A correction larger than this, in pixels, is a jump rather than a nudge: the wizard is
 ## placed there at once instead of gliding.
 const SNAP_DISTANCE := 8.0
@@ -63,6 +96,9 @@ var _predictor := MovementPredictor.new()
 var _own_marker: WizardMarker
 var _others: Dictionary[int, WizardMarker] = { }
 var _overlay := Overlay.new()
+var _camera := Camera2D.new()
+## The wizard's position on the tick before, to place the camera between two ticks.
+var _own_drawn_from := Vector2.ZERO
 var _village_owners: PackedInt32Array = []
 var _latest_tick := 0
 var _render_tick := 0.0
@@ -73,6 +109,11 @@ func _init() -> void:
 	_overlay.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_overlay.z_index = 2
 	add_child(_overlay)
+	# Placed every frame on the wizard as drawn, so it needs no smoothing of its own.
+	_camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_camera.limit_left = 0
+	_camera.limit_top = 0
+	add_child(_camera)
 
 
 func _process(delta: float) -> void:
@@ -84,6 +125,10 @@ func _process(delta: float) -> void:
 		_render_tick = target
 	for marker: WizardMarker in _others.values():
 		marker.position = marker.position_at(_render_tick)
+	if _own_marker != null:
+		# Where the engine draws the wizard between two ticks: the camera stays on it.
+		var fraction := Engine.get_physics_interpolation_fraction()
+		_camera.position = _own_drawn_from.lerp(_own_marker.position, fraction)
 
 
 func _physics_process(_delta: float) -> void:
@@ -94,6 +139,7 @@ func _physics_process(_delta: float) -> void:
 		_predictor.first_unacknowledged(Protocol.INPUTS_SENT_PER_MESSAGE),
 		_predictor.unacknowledged_codes(Protocol.INPUTS_SENT_PER_MESSAGE),
 	)
+	_own_drawn_from = _own_marker.position
 	_own_marker.position = _predictor.position
 	if input_override < 0 and Input.is_action_just_pressed(&"cast_1"):
 		cast(get_global_mouse_position() - (_predictor.position + Projectile.BODY_OFFSET))
@@ -108,9 +154,14 @@ func _draw() -> void:
 		return
 	var tile := Vector2(Simulation.TILE_SIZE, Simulation.TILE_SIZE)
 	var size := room.size()
+	var world_map := room as WorldMapData
 	for y in size.y:
 		for x in size.x:
-			var color := WALL_COLOR if room.is_solid(Vector2i(x, y)) else FLOOR_COLOR
+			var color: Color
+			if world_map != null:
+				color = terrain_color(world_map, Vector2i(x, y))
+			else:
+				color = WALL_COLOR if room.is_solid(Vector2i(x, y)) else FLOOR_COLOR
 			draw_rect(Rect2(Vector2(x, y) * tile, tile), color)
 	for room_exit in room.exits:
 		draw_rect(
@@ -196,6 +247,28 @@ func take_card(index: int) -> void:
 		_channel.send_take_card(index)
 
 
+## Where the player is: the biome under their wizard's feet on a world map, the room's
+## name anywhere else. Empty before the first update.
+func location_name() -> String:
+	if room == null:
+		return ""
+	var biome := current_biome()
+	return Biome.label(biome) if biome >= 0 else room.display_name()
+
+
+## The middle of what the camera shows, after the map's edges have stopped it.
+func camera_center() -> Vector2:
+	return _camera.get_screen_center_position()
+
+
+## The biome under the player's wizard's feet; -1 outside a world map.
+func current_biome() -> int:
+	var world_map := room as WorldMapData
+	if world_map == null:
+		return -1
+	return world_map.biome_at(world_map.tile_at(_predictor.position))
+
+
 ## Where the player's own wizard stands, as predicted.
 func own_position() -> Vector2:
 	return _predictor.position
@@ -257,6 +330,25 @@ func _on_card_choices_received(pending: int, card_ids: PackedStringArray) -> voi
 	card_choices_changed.emit()
 
 
+## The colour [param tile] of [param world_map] is drawn in.
+static func terrain_color(world_map: WorldMapData, tile: Vector2i) -> Color:
+	match world_map.feature_at(tile):
+		Biome.Feature.SPINE:
+			return SPINE_COLOR
+		Biome.Feature.CRATER:
+			return CRATER_COLOR
+		Biome.Feature.RIFT_CORE:
+			return RIFT_CORE_COLOR
+		Biome.Feature.RIFT_BANK:
+			return RIFT_BANK_COLOR
+		Biome.Feature.WATER:
+			if world_map.biome_at(tile) == Biome.Kind.GLACIER:
+				return LAKE_COLOR
+	var biome := world_map.biome_at(tile)
+	# A fixed scatter of the second shade: about one tile in six.
+	return BIOME_SCATTER[biome] if hash(tile) % 6 == 0 else BIOME_GROUND[biome]
+
+
 func _flag_color(index: int) -> Color:
 	var holder := village_owner(index)
 	if holder == 0:
@@ -267,6 +359,10 @@ func _flag_color(index: int) -> Color:
 func _enter_room(new_room: RoomData) -> void:
 	var first_room := room == null
 	room = new_room
+	var size := room.size() * Simulation.TILE_SIZE
+	_camera.limit_right = maxi(size.x, SCREEN.x)
+	# The HUD band hides the screen's bottom lines: the map may scroll on above it.
+	_camera.limit_bottom = maxi(size.y + HUD_HEIGHT, SCREEN.y)
 	for marker: WizardMarker in _others.values():
 		marker.queue_free()
 	_others.clear()
@@ -275,6 +371,7 @@ func _enter_room(new_room: RoomData) -> void:
 		# Drawn above the others, so the player never loses sight of their own wizard.
 		_own_marker.z_index = 1
 		add_child(_own_marker)
+		_camera.make_current()
 	queue_redraw()
 
 
@@ -287,6 +384,7 @@ func _reconcile(acknowledged: int, server_position: Vector2) -> void:
 	if before.distance_to(_predictor.position) > SNAP_DISTANCE:
 		_own_marker.position = _predictor.position
 		_own_marker.reset_physics_interpolation()
+		_own_drawn_from = _predictor.position
 
 
 func _other_marker(peer_id: int) -> WizardMarker:
