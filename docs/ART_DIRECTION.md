@@ -37,6 +37,9 @@ A CC-BY-SA piece that is modified must stay under CC-BY-SA, not under the projec
 | On screen          | 40 × 22.5 tiles; crossing the screen at speed 100 takes 10 seconds                                      |
 | Characters         | 24 to 32 pixels tall                                                                                    |
 | Large world bosses | 48 to 64 pixels tall                                                                                    |
+| Frame rate         | 60 frames a second for the game, so the camera scrolls about one pixel a frame at speed 100             |
+| Animation          | About 10 frames a second, independent of the game's frame rate                                          |
+| Frames per action  | Idle 2 to 4, walk 4 to 6, spell or attack 4 to 6, death 4 to 8                                          |
 
 ## Palettes
 
@@ -64,4 +67,4 @@ Drawn from the references the author keeps privately, in an `inspiration/` folde
 
 ## Open questions
 
-- ⬜ **Animation**: the number of frames per action.
+- ⬜ **Rooms**: the size of a dungeon room, a maze room and a Monolith floor.

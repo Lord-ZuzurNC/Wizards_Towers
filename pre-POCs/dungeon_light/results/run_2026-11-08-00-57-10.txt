@@ -1,0 +1,4 @@
+1  lit, BLK NX64                     palette 64 colours, outside it: 0 px, colours in the dim area: 17, below lightness 15:  2
+2  dark, BLK NX64                    palette 64 colours, outside it: 0 px, colours in the dim area:  6, below lightness 15:  3
+3  dark, APOLLO                      palette 46 colours, outside it: 0 px, colours in the dim area:  8, below lightness 15:  7
+4  dark, BLK NX64 + 15 APOLLO darks  palette 79 colours, outside it: 0 px, colours in the dim area: 14, below lightness 15: 10
