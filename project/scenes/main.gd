@@ -6,6 +6,7 @@ extends Node
 ## For development, [code]server/run-server.sh[/code] starts a headless server.
 
 var _status: Label
+var _hud: Hud
 
 
 func _ready() -> void:
@@ -37,13 +38,12 @@ func _start_server(port: int) -> void:
 
 
 func _start_client(host: String, port: int) -> void:
-	_status = Label.new()
-	# Below the room, which fills the top 320 of the 360 lines: the HUD's place.
-	_status.position = Vector2(8, 332)
-	add_child(_status)
 	var client := GameClient.new()
 	client.name = "GameClient"
 	add_child(client)
+	_hud = Hud.new(client.world)
+	add_child(_hud)
+	_status = _hud.connection
 	var address := "%s:%d" % [host, port]
 	client.session_started.connect(_show.bind("in session with %s" % address))
 	client.session_refused.connect(_on_client_session_refused)

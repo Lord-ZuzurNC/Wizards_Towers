@@ -1,14 +1,20 @@
 class_name ClientWorld
 extends Node2D
-## What the player sees of the world: the room, their own wizard, and the others.
+## What the player sees of the world: the room, the wizards, the dummies, the spells.
 ##
 ## The player's wizard is predicted, see [MovementPredictor]. Every other wizard is drawn
 ## [constant INTERPOLATION_TICKS] simulation ticks in the past, between two positions
 ## already received, so a late or lost update never makes it stutter (TECH_STACK.md,
-## Netcode).
+## Netcode). Spells and dummies are drawn where the last update put them: nothing about
+## them is predicted.
 ##
-## The room and the wizards are flat coloured shapes from the BLK NX64 palette, standing in
-## until their art exists.
+## Everything is a flat coloured shape from the BLK NX64 palette, standing in until its art
+## exists.
+
+## The player's own numbers changed: health, mana, level or XP.
+signal status_changed
+## The pending card choices changed.
+signal card_choices_changed
 
 ## How far in the past other wizards are drawn: 3 ticks, 100 ms.
 const INTERPOLATION_TICKS := 3.0
@@ -17,27 +23,43 @@ const FLOOR_COLOR := Color("293268")
 const EXIT_COLOR := Color("3e83d1")
 const OWN_COLOR := Color("ffaa6e")
 const OTHER_COLOR := Color("8cff9b")
+const DUMMY_COLOR := Color("cdc599")
+const HEALTH_COLOR := Color("ff695a")
+const SPELL_COLOR := Color("ff695a")
 ## A correction larger than this, in pixels, is a jump rather than a nudge: the wizard is
 ## placed there at once instead of gliding.
 const SNAP_DISTANCE := 8.0
 
 ## Rooms by id. Loaded from [constant RoomCatalog.DEFAULT_FOLDER] unless a test sets them.
 var rooms: Dictionary[StringName, RoomData] = { }
+## Cards by id, to show a choice. Loaded from [constant CardCatalog.DEFAULT_FOLDER] unless a
+## test sets them.
+var cards: Dictionary[StringName, Card] = { }
 ## Stands in for the keyboard when set to a direction code from 0 to 8; tests use it.
 var input_override := -1
 var room: RoomData
+## The latest numbers the server sent about the player's own wizard.
+var status := StateUpdate.new()
+## How many card choices wait to be opened.
+var pending_choices := 0
+## The cards of the oldest waiting choice, the one opened next.
+var offered_cards: Array[Card] = []
 
 var _channel: WorldChannel
 var _own_peer_id := 0
 var _predictor := MovementPredictor.new()
 var _own_marker: WizardMarker
 var _others: Dictionary[int, WizardMarker] = { }
+var _overlay := Overlay.new()
 var _latest_tick := 0
 var _render_tick := 0.0
 
 
 func _init() -> void:
 	name = "World"
+	_overlay.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+	_overlay.z_index = 2
+	add_child(_overlay)
 
 
 func _process(delta: float) -> void:
@@ -60,6 +82,8 @@ func _physics_process(_delta: float) -> void:
 		_predictor.unacknowledged_codes(Protocol.INPUTS_SENT_PER_MESSAGE),
 	)
 	_own_marker.position = _predictor.position
+	if input_override < 0 and Input.is_action_just_pressed(&"cast_1"):
+		cast(get_global_mouse_position() - (_predictor.position + Projectile.BODY_OFFSET))
 
 
 func _draw() -> void:
@@ -82,12 +106,28 @@ func _draw() -> void:
 func setup(channel: WorldChannel, own_peer_id: int) -> void:
 	_channel = channel
 	_own_peer_id = own_peer_id
-	_channel.room_state_received.connect(_on_room_state_received)
+	_channel.state_update_received.connect(_on_state_update_received)
+	_channel.card_choices_received.connect(_on_card_choices_received)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
+	if cards.is_empty():
+		cards = CardCatalog.load_folder()
 
 
-## Where the player's own wizard stands, as predicted. For tests and the HUD.
+## Asks the server to cast the spell of Grimoire position 1 toward [param aim].
+## Nothing appears until the server accepts it.
+func cast(aim: Vector2) -> void:
+	if _channel != null:
+		_channel.send_cast(1, aim)
+
+
+## Takes card [param index] of the oldest waiting choice.
+func take_card(index: int) -> void:
+	if _channel != null and pending_choices > 0:
+		_channel.send_take_card(index)
+
+
+## Where the player's own wizard stands, as predicted.
 func own_position() -> Vector2:
 	return _predictor.position
 
@@ -99,6 +139,16 @@ func other_peer_ids() -> Array[int]:
 	return ids
 
 
+## The health of each training dummy in the room, as last received; 0 is destroyed.
+func dummy_health() -> PackedInt32Array:
+	return _overlay.dummy_health
+
+
+## Where the spells in flight were, as last received.
+func projectile_positions() -> PackedVector2Array:
+	return _overlay.projectile_positions
+
+
 func _read_input() -> int:
 	if input_override >= 0:
 		return input_override
@@ -106,27 +156,33 @@ func _read_input() -> int:
 	return Movement.encode(Vector2i(signi(roundi(direction.x)), signi(roundi(direction.y))))
 
 
-func _on_room_state_received(
-	tick: int,
-	room_id: StringName,
-	acknowledged: int,
-	peer_ids: PackedInt32Array,
-	positions: PackedVector2Array,
-) -> void:
-	if tick <= _latest_tick or not rooms.has(room_id) or peer_ids.size() != positions.size():
+func _on_state_update_received(update: StateUpdate) -> void:
+	if update.tick <= _latest_tick or not rooms.has(update.room_id):
 		return
-	_latest_tick = tick
-	if rooms[room_id] != room:
-		_enter_room(rooms[room_id])
-	for i in peer_ids.size():
-		if peer_ids[i] == _own_peer_id:
-			_reconcile(acknowledged, positions[i])
+	_latest_tick = update.tick
+	if rooms[update.room_id] != room:
+		_enter_room(rooms[update.room_id])
+	for i in update.wizard_ids.size():
+		if update.wizard_ids[i] == _own_peer_id:
+			_reconcile(update.acknowledged, update.wizard_positions[i])
 		else:
-			_other_marker(peer_ids[i]).add_sample(tick, positions[i])
+			_other_marker(update.wizard_ids[i]).add_sample(update.tick, update.wizard_positions[i])
 	for peer_id: int in _others.keys():
-		if not peer_ids.has(peer_id):
+		if not update.wizard_ids.has(peer_id):
 			_others[peer_id].queue_free()
 			_others.erase(peer_id)
+	_overlay.show_update(update)
+	status = update
+	status_changed.emit()
+
+
+func _on_card_choices_received(pending: int, card_ids: PackedStringArray) -> void:
+	pending_choices = maxi(0, pending)
+	offered_cards.clear()
+	for id in card_ids:
+		if cards.has(id):
+			offered_cards.append(cards[id])
+	card_choices_changed.emit()
 
 
 func _enter_room(new_room: RoomData) -> void:
@@ -209,3 +265,41 @@ class WizardMarker:
 				var weight := (tick - _ticks[i - 1]) / (_ticks[i] - _ticks[i - 1])
 				return _positions[i - 1].lerp(_positions[i], weight)
 		return _positions[-1]
+
+
+## Training dummies, with a health bar, and spells in flight, as the last update had them.
+class Overlay:
+	extends Node2D
+
+	const DUMMY_BODY := Rect2(-7.0, -20.0, 14.0, 22.0)
+	const BAR := Rect2(-8.0, -25.0, 16.0, 2.0)
+	const SPELL := Rect2(-2.0, -2.0, 4.0, 4.0)
+
+	var dummy_positions: PackedVector2Array = []
+	var dummy_health: PackedInt32Array = []
+	var dummy_max_health: PackedInt32Array = []
+	var projectile_positions: PackedVector2Array = []
+
+
+	func _draw() -> void:
+		for i in dummy_positions.size():
+			if dummy_health[i] <= 0:
+				continue
+			var at := dummy_positions[i]
+			draw_rect(Rect2(at + DUMMY_BODY.position, DUMMY_BODY.size), DUMMY_COLOR)
+			var share := float(dummy_health[i]) / maxi(1, dummy_max_health[i])
+			draw_rect(Rect2(at + BAR.position, BAR.size), WALL_COLOR)
+			draw_rect(
+				Rect2(at + BAR.position, Vector2(BAR.size.x * share, BAR.size.y)),
+				HEALTH_COLOR,
+			)
+		for at in projectile_positions:
+			draw_rect(Rect2(at + SPELL.position, SPELL.size), SPELL_COLOR)
+
+
+	func show_update(update: StateUpdate) -> void:
+		dummy_positions = update.dummy_positions
+		dummy_health = update.dummy_health
+		dummy_max_health = update.dummy_max_health
+		projectile_positions = update.projectile_positions
+		queue_redraw()

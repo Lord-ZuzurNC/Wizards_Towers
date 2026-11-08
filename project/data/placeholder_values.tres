@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="PlaceholderValues" format=3]
+
+[ext_resource type="Script" path="res://core/placeholder_values.gd" id="1_y5cer"]
+
+[resource]
+script = ExtResource("1_y5cer")

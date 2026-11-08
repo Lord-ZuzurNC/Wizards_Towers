@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Card" format=3]
+
+[ext_resource type="Script" path="res://core/cards/card.gd" id="1_27ywi"]
+
+[resource]
+script = ExtResource("1_27ywi")
+id = &"test_legendary"
+title = "Test card"
+rarity = 2
+text = "No effect: it only shows how a legendary card looks."

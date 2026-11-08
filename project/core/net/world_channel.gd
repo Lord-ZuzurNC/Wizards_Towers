@@ -6,55 +6,76 @@ extends Node
 ## This one node, named [code]Channel[/code] under both the [GameServer] and the
 ## [GameClient], carries every world message and turns it into a signal; the server and
 ## the client each listen to the half that concerns them.
+## Every [code]request_[/code] may come from any client: the server checks its arguments.
 
-## A client sent movement inputs. Received on the server only.
+## Received on the server: a client sent movement inputs.
 signal move_requested(peer_id: int, first_sequence: int, codes: PackedByteArray)
-## The server sent the state of the client's room. Received on a client only.
-signal room_state_received(
-	tick: int,
-	room_id: StringName,
-	acknowledged: int,
-	peer_ids: PackedInt32Array,
-	positions: PackedVector2Array,
-)
+## Received on the server: a client asked to cast the spell in a Grimoire position.
+signal cast_requested(peer_id: int, grimoire_position: int, aim: Vector2)
+## Received on the server: a client took a card from its oldest card choice.
+signal take_card_requested(peer_id: int, card_index: int)
+## Received on a client: the state after a simulation tick. Malformed ones never arrive.
+signal state_update_received(update: StateUpdate)
+## Received on a client: its card choices changed.
+signal card_choices_received(pending: int, card_ids: PackedStringArray)
 
 
 func _init() -> void:
 	name = "Channel"
 
 
-## Client side: sends the last few movement inputs to the server.
+## Client side.
 func send_move(first_sequence: int, codes: PackedByteArray) -> void:
 	request_move.rpc_id(1, first_sequence, codes)
 
 
-## Server side: sends one client the state of the room its wizard stands in.
-func send_room_state(
-	peer_id: int,
-	tick: int,
-	room_id: StringName,
-	acknowledged: int,
-	peer_ids: PackedInt32Array,
-	positions: PackedVector2Array,
-) -> void:
-	room_state_sync.rpc_id(peer_id, tick, room_id, acknowledged, peer_ids, positions)
+## Client side.
+func send_cast(grimoire_position: int, aim: Vector2) -> void:
+	request_cast.rpc_id(1, grimoire_position, aim)
 
 
-## Any client may call this: every argument is checked on the server, see [InputBuffer].
+## Client side.
+func send_take_card(card_index: int) -> void:
+	request_take_card.rpc_id(1, card_index)
+
+
+## Server side.
+func send_state_update(peer_id: int, update: StateUpdate) -> void:
+	state_update_sync.rpc_id(peer_id, update.to_message())
+
+
+## Server side: the number of choices waiting, and the cards of the oldest one.
+func send_card_choices(peer_id: int, pending: int, card_ids: PackedStringArray) -> void:
+	card_choices_sync.rpc_id(peer_id, pending, card_ids)
+
+
 @rpc("any_peer", "call_remote", "unreliable_ordered")
 func request_move(first_sequence: int, codes: PackedByteArray) -> void:
-	if not multiplayer.is_server():
-		return
-	move_requested.emit(multiplayer.get_remote_sender_id(), first_sequence, codes)
+	if multiplayer.is_server():
+		move_requested.emit(multiplayer.get_remote_sender_id(), first_sequence, codes)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func request_cast(grimoire_position: int, aim: Vector2) -> void:
+	if multiplayer.is_server():
+		cast_requested.emit(multiplayer.get_remote_sender_id(), grimoire_position, aim)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func request_take_card(card_index: int) -> void:
+	if multiplayer.is_server():
+		take_card_requested.emit(multiplayer.get_remote_sender_id(), card_index)
 
 
 ## Trusted: only the server may call it.
 @rpc("authority", "call_remote", "unreliable_ordered")
-func room_state_sync(
-	tick: int,
-	room_id: StringName,
-	acknowledged: int,
-	peer_ids: PackedInt32Array,
-	positions: PackedVector2Array,
-) -> void:
-	room_state_received.emit(tick, room_id, acknowledged, peer_ids, positions)
+func state_update_sync(message: Array) -> void:
+	var update := StateUpdate.from_message(message)
+	if update != null:
+		state_update_received.emit(update)
+
+
+## Trusted: only the server may call it.
+@rpc("authority", "call_remote", "reliable")
+func card_choices_sync(pending: int, card_ids: PackedStringArray) -> void:
+	card_choices_received.emit(pending, card_ids)

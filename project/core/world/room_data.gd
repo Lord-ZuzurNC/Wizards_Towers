@@ -21,6 +21,8 @@ const MAX_SIZE := Vector2i(40, 20)
 @export var exits: Array[RoomExit] = []
 ## The tile where a wizard entering the world appears.
 @export var spawn_tile := Vector2i()
+## Where training dummies stand, one per tile.
+@export var dummy_tiles: Array[Vector2i] = []
 
 
 ## The room's size in tiles.
@@ -80,6 +82,9 @@ func validate(known_rooms: Array[StringName]) -> PackedStringArray:
 		)
 	if is_solid(spawn_tile):
 		problems.append("the spawn tile %s is not floor" % spawn_tile)
+	for tile in dummy_tiles:
+		if is_solid(tile):
+			problems.append("the dummy tile %s is not floor" % tile)
 	for room_exit in exits:
 		if not Rect2i(Vector2i.ZERO, size()).encloses(room_exit.area):
 			problems.append("an exit lies outside the room: %s" % room_exit.area)

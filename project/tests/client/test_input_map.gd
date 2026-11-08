@@ -31,6 +31,14 @@ func test_each_action_answers_to_a_letter_and_an_arrow() -> void:
 			assert_true(keys.has(key), "%s lacks key %d" % [action, key])
 
 
+func test_casting_and_the_card_choice_have_their_keys() -> void:
+	var expected := { &"cast_1": KEY_1, &"open_card_choice": KEY_C }
+	for action: StringName in expected:
+		assert_true(InputMap.has_action(action), action)
+		var event := InputMap.action_get_events(action)[0] as InputEventKey
+		assert_eq(event.physical_keycode, expected[action])
+
+
 func test_a_physical_key_press_triggers_its_action() -> void:
 	var press := InputEventKey.new()
 	press.physical_keycode = KEY_D
