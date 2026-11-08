@@ -3,6 +3,7 @@ extends Node
 ## Connects to a game server and passes the protocol handshake.
 ##
 ## Like [GameServer], it runs its own [SceneMultiplayer] on its own branch of the tree.
+## Once the session is open, [member world] shows the room and moves the player's wizard.
 
 ## The handshake passed: the session is open.
 signal session_started
@@ -24,9 +25,16 @@ enum State {
 ## The version this client announces. Only tests change it, to play an outdated client.
 var protocol_version := Protocol.VERSION
 var state := State.IDLE
+var world := ClientWorld.new()
 
 var _api := SceneMultiplayer.new()
 var _peer := ENetMultiplayerPeer.new()
+var _channel := WorldChannel.new()
+
+
+func _init() -> void:
+	add_child(_channel)
+	add_child(world)
 
 
 func _exit_tree() -> void:
@@ -51,6 +59,11 @@ func join(address: String = "127.0.0.1", port: int = Protocol.DEFAULT_PORT) -> E
 	_api.multiplayer_peer = _peer
 	state = State.CONNECTING
 	return OK
+
+
+## This client's id on the network, the one the server knows it by.
+func peer_id() -> int:
+	return _api.get_unique_id()
 
 
 ## Closes the connection. Safe to call twice.
@@ -85,6 +98,7 @@ func _on_auth_message(peer_id: int, data: PackedByteArray) -> void:
 
 func _on_connected_to_server() -> void:
 	state = State.IN_SESSION
+	world.setup(_channel, _api.get_unique_id())
 	session_started.emit()
 
 

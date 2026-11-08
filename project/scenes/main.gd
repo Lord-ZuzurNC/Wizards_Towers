@@ -38,7 +38,8 @@ func _start_server(port: int) -> void:
 
 func _start_client(host: String, port: int) -> void:
 	_status = Label.new()
-	_status.position = Vector2(8, 8)
+	# Below the room, which fills the top 320 of the 360 lines: the HUD's place.
+	_status.position = Vector2(8, 332)
 	add_child(_status)
 	var client := GameClient.new()
 	client.name = "GameClient"

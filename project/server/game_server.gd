@@ -6,6 +6,7 @@ extends Node
 ## It runs its own [SceneMultiplayer] on its own branch of the scene tree, so a server and
 ## a client can share one process. That is how the tests run them, and it costs nothing
 ## when the server runs alone.
+## Each admitted client gets a wizard in [member world].
 
 ## A client passed the handshake; from now on it may send requests.
 signal session_started(peer_id: int)
@@ -16,11 +17,19 @@ signal session_refused(peer_id: int, reason: String)
 ## How long a refused client keeps its connection, so the answer reaches it before the drop.
 const REFUSAL_GRACE_SECONDS := 0.5
 
+var world := ServerWorld.new()
+
 var _api := SceneMultiplayer.new()
 var _peer := ENetMultiplayerPeer.new()
+var _channel := WorldChannel.new()
 var _sessions: Array[int] = []
 ## Peers answered with a refusal and waiting to be dropped.
 var _refused: Dictionary[int, bool] = { }
+
+
+func _init() -> void:
+	add_child(_channel)
+	add_child(world)
 
 
 func _exit_tree() -> void:
@@ -33,9 +42,13 @@ func _exit_tree() -> void:
 
 ## Starts listening. The node must already be in the scene tree.
 func start(port: int = Protocol.DEFAULT_PORT) -> Error:
+	if not world.setup(_channel):
+		return ERR_INVALID_DATA
 	var error := _peer.create_server(port, Protocol.MAX_CONNECTIONS)
 	if error != OK:
 		return error
+	# Clients talk to the server only: never let one reach another through it.
+	_api.server_relay = false
 	_api.auth_callback = _on_auth_message
 	_api.peer_connected.connect(_on_peer_connected)
 	_api.peer_disconnected.connect(_on_peer_disconnected)
@@ -80,12 +93,14 @@ func _drop_refused(peer_id: int) -> void:
 
 func _on_peer_connected(peer_id: int) -> void:
 	_sessions.append(peer_id)
+	world.add_wizard(peer_id)
 	session_started.emit(peer_id)
 
 
 func _on_peer_disconnected(peer_id: int) -> void:
 	if _sessions.has(peer_id):
 		_sessions.erase(peer_id)
+		world.remove_wizard(peer_id)
 		session_ended.emit(peer_id)
 
 

@@ -27,6 +27,7 @@
   - [Node access](#node-access)
   - [Referencing engine bugs](#referencing-engine-bugs)
   - [Multiplayer code](#multiplayer-code)
+  - [Tests](#tests)
   - [Scene files (.tscn)](#scene-files-tscn)
   - [Shaders (.gdshader)](#shaders-gdshader)
   - [Shell scripts (.sh)](#shell-scripts-sh)
@@ -446,6 +447,63 @@ func request_cast_spell(spell_id: int) -> void:
 
 `any_peer` means *any client can call this* — treat every parameter as hostile input and validate it server-side.
 Mark it in the doc comment when a call is trusted.
+
+---
+
+## Tests
+
+**Every rule of the game comes with a test that proves it.**
+A rule without a test is a claim, and the author of this project reviews code without writing it, so the tests are what he can trust.
+
+The project has its own small test runner, with no plugin.
+
+| Path                           | Holds                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `tests/run-tests.sh`           | The one command to run, from the `project/` folder.                     |
+| `tests/run.gd`                 | The runner itself.                                                      |
+| `tests/framework/`             | `TestCase`, the base of every test file, and its helpers. Never run.    |
+| `tests/<area>/test_<topic>.gd` | The tests, one folder per area of the code: `core/`, `net/`, and so on. |
+
+Running them:
+
+```bash
+tests/run-tests.sh                 # every test
+tests/run-tests.sh res://tests/net # one folder
+```
+
+The run fails, and exits non-zero, when any of these happens:
+
+- an assertion fails;
+- the engine or a script raises an error while a test runs, since GDScript has no exceptions and a crashed test would otherwise look green;
+- a test file does not load;
+- no test is found at all;
+- objects are still alive when the engine exits, which is a leak.
+
+**Writing one.**
+A test file extends `TestCase`, and every method whose name starts with `test_` is a test.
+Each test gets a fresh instance, so nothing leaks from one test to the next.
+Name a test after the rule it proves, as a sentence: `test_an_outdated_client_is_refused_and_told_why`.
+
+```gdscript
+extends TestCase
+
+
+func test_a_hello_carries_its_version() -> void:
+	assert_eq(Protocol.decode_hello(Protocol.encode_hello(42)), 42)
+```
+
+| Helper                                 | Use                                                                  |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| `assert_eq`, `assert_ne`               | Values, type included: an `int` 1 is not a `float` 1.0.              |
+| `assert_true`, `assert_false`          | Conditions; pass the value as the message so a failure shows it.     |
+| `fail`                                 | A branch that must never run.                                        |
+| `before_each`, `after_each`            | Set up and clean up around every test; both may `await`.             |
+| `await wait_until(condition, timeout)` | Wait frame by frame for something to happen, two seconds by default. |
+| `SignalWatcher.watch(some_signal)`     | Record a signal's emissions to inspect them afterwards.              |
+
+**Prefer named methods to inline lambdas** in tests and elsewhere.
+The formatter spreads every inline lambda over several lines, and a named method bound with `bind()` stays on one:
+`wait_until(_server_has.bind(server, 1))`.
 
 ---
 

@@ -19,10 +19,15 @@ enum Answer {
 }
 
 ## Bumped whenever a message shape or a persisted field changes.
-const VERSION := 1
+## 2: movement inputs and room state updates.
+const VERSION := 2
 const DEFAULT_PORT := 7777
 ## Sized for fifty wizards a world, see TECH_STACK.md.
 const MAX_CONNECTIONS := 50
+## A movement message carries at most this many inputs; anything longer is refused.
+const MAX_INPUTS_PER_MESSAGE := 8
+## How many of its latest unacknowledged inputs a client repeats in each message.
+const INPUTS_SENT_PER_MESSAGE := 5
 
 ## Opens every message, so stray traffic is told apart from ours: "WTWT" in ASCII.
 const _MAGIC := 0x5754_5754
