@@ -142,6 +142,13 @@ func _place_dummies(room: RoomData) -> Array:
 	return placed
 
 
+## How many Grimoire positions a wizard may cast from.
+func _open_positions(wizard_state: WizardState) -> int:
+	if values.open_every_grimoire_position:
+		return Grimoire.MAX_POSITIONS
+	return Grimoire.positions(wizard_state.wizard_level)
+
+
 func _place_villages(room: RoomData) -> Array:
 	var placed: Array = []
 	for site in room.villages:
@@ -243,6 +250,11 @@ func _send_state_updates() -> void:
 			shared.gold = wizard_state.gold
 			shared.village_price = wizard_state.village_price(values)
 			shared.villages_held = villages_held(peer_id)
+			shared.grimoire_positions = _open_positions(wizard_state)
+			var cooldowns := PackedInt32Array()
+			for ready in wizard_state.ready_ticks:
+				cooldowns.append(maxi(0, ready - tick))
+			shared.cooldowns = cooldowns
 			_channel.send_state_update(peer_id, shared)
 
 
@@ -261,6 +273,7 @@ func _room_state(room_id: StringName, peer_ids: PackedInt32Array) -> StateUpdate
 	for projectile in _projectiles:
 		if projectile.room_id == room_id:
 			update.projectile_positions.append(projectile.position)
+			update.projectile_spells.append(projectile.grimoire_position)
 	for village: VillageState in _villages.get(room_id, []):
 		update.village_positions.append(village.position)
 		update.village_owners.append(village.owner_peer_id)
@@ -272,26 +285,33 @@ func _on_move_requested(peer_id: int, first_sequence: int, codes: PackedByteArra
 		_wizards[peer_id].inputs.receive(first_sequence, codes)
 
 
-## Checked in turn: a known wizard, Grimoire position 1 (the only spell for now), an aim
-## that is a real direction, the cooldown over, and the mana to pay. Anything else is
-## ignored without a word: a well-behaved client never sends it.
+## Checked in turn: a known wizard, a Grimoire position it has, an aim that is a real
+## direction, that position's cooldown over, and the mana to pay. Anything else is ignored
+## without a word: a well-behaved client never sends it.
 func _on_cast_requested(peer_id: int, grimoire_position: int, aim: Vector2) -> void:
-	if not _wizards.has(peer_id) or grimoire_position != 1:
+	if not _wizards.has(peer_id):
+		return
+	var wizard_state := _wizards[peer_id]
+	if grimoire_position < 1 or grimoire_position > _open_positions(wizard_state):
+		return
+	if grimoire_position > values.spells.size():
 		return
 	if not aim.is_finite() or aim.length() < 0.001:
 		return
-	var wizard_state := _wizards[peer_id]
-	if tick < wizard_state.ready_tick or wizard_state.mana < values.spell_mana_cost:
+	var spell := values.spells[grimoire_position - 1]
+	var slot := grimoire_position - 1
+	if tick < wizard_state.ready_ticks[slot] or wizard_state.mana < spell.mana_cost:
 		return
-	wizard_state.mana -= values.spell_mana_cost
-	wizard_state.ready_tick = tick + values.spell_cooldown_ticks
+	wizard_state.mana -= spell.mana_cost
+	wizard_state.ready_ticks[slot] = tick + spell.cooldown_ticks
 	var projectile := Projectile.new()
 	projectile.caster_peer_id = peer_id
+	projectile.grimoire_position = grimoire_position
 	projectile.room_id = wizard_state.room_id
 	projectile.position = wizard_state.position + Projectile.BODY_OFFSET
-	projectile.velocity = aim.normalized() * values.spell_projectile_speed
-	projectile.distance_left = values.spell_range_tiles * Simulation.TILE_SIZE
-	projectile.raw_damage = values.spell_raw_damage
+	projectile.velocity = aim.normalized() * spell.projectile_speed
+	projectile.distance_left = spell.range_tiles * Simulation.TILE_SIZE
+	projectile.raw_damage = spell.raw_damage
 	_projectiles.append(projectile)
 
 

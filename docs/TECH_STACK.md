@@ -7,6 +7,7 @@ Where a decision is deferred it carries ⬜ and says what would settle it.
 - [Tech stack — Wizards Towers](#tech-stack--wizards-towers)
   - [Engine and language](#engine-and-language)
   - [View and projection](#view-and-projection)
+  - [Controls](#controls)
   - [Client and server](#client-and-server)
   - [Authority model](#authority-model)
   - [Netcode](#netcode)
@@ -58,6 +59,46 @@ PvP is always on outside safe zones and spells are directional, so mouse-to-worl
 **The Monolith is vertical, and it is the centrepiece.**
 A pure overhead view renders the tower as a circle on the ground.
 The 3/4 angle gives it height, and gives village towers theirs.
+
+## Controls
+
+**A key is named by its position on a QWERTY UK keyboard, never by what is printed on it.**
+The game reads physical keys: the key named Q is the one left of W, whatever the player's layout prints there, so on a French AZERTY keyboard it is the key printed A.
+Every document and every line of code names keys this way.
+
+**Every action can be bound again.**
+The keys below are only the defaults.
+
+**The game shows each key as the player's own keyboard prints it.**
+It reads the keyboard layout from the system and turns every key position into the label printed on that key, so a French player is told to press A where this document says Q.
+
+**Walking and aiming leave the hand few free fingers.**
+The left hand walks with three fingers on W, A, S and D, two of them pressed at once on a diagonal, and the right hand aims with the mouse.
+Only the mouse buttons, the thumb on Space and the little finger on Shift stay free in every direction, so they carry the spells cast most often.
+Q and E take a walking finger away for a moment and carry slower spells.
+Shift is the one modifier: a second one held by the same little finger would make every cast a stretch.
+Side buttons of the mouse are not used by default, since not every player has them.
+
+| Grimoire position | Key position               | Meant for                                 |
+| ----------------- | -------------------------- | ----------------------------------------- |
+| 1                 | left mouse button          | the fastest spells, cast without stopping |
+| 2                 | right mouse button         | the fastest spells, cast without stopping |
+| 3                 | Space                      | the fastest spells, cast without stopping |
+| 4                 | Q                          | slow spells                               |
+| 5                 | E                          | slow spells                               |
+| 6                 | Shift + left mouse button  | fast spells                               |
+| 7                 | Shift + right mouse button | fast spells                               |
+| 8                 | Shift + Space              | fast spells                               |
+| 9                 | Shift + Q                  | the slowest spells                        |
+| 10                | Shift + E                  | the slowest spells                        |
+
+| Action             | Key position |
+| ------------------ | ------------ |
+| Walk               | W, A, S, D   |
+| Interact           | F            |
+| Open a card choice | C            |
+
+A player chooses which spell sits in which Grimoire position, so the table above says what each position suits, not what it holds.
 
 ## Client and server
 

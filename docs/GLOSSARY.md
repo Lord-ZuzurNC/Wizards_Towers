@@ -18,6 +18,7 @@ one concept, one word, one spelling, everywhere — in the design document, in t
   - [World map](#world-map)
   - [Offline and ownership](#offline-and-ownership)
   - [Netcode](#netcode)
+  - [Controls](#controls)
   - [Banned synonyms](#banned-synonyms)
 
 ## How to use it
@@ -143,7 +144,7 @@ The two Effect slots must hold **different** runes, and a spell may contain **at
 | **weight limit**      | The size of the weight bar, growing with `wizard_level`. A stat of its own, **not** the mana pool.                                                                                                                                                                                                                                                                                                                  | `weight_limit`                | ✅      |
 | **headroom**          | The unfilled remainder of the weight bar. What a tome grants more of.                                                                                                                                                                                                                                                                                                                                               | `headroom`                    | ✅      |
 | **Grimoire**          | The book holding every spell a wizard possesses. Kept untranslated in all languages. Capacity derives from the wizard's level — there is **no separate Grimoire level**.                                                                                                                                                                                                                                            | `Grimoire`                    | ✅      |
-| **Grimoire position** | One of the numbered places in a Grimoire, each holding at most one spell. Count is `min(10, 1 + floor((wizard_level - 1) / 3))`, one every three levels: **ten at most**, one per key from 1 to 0. **Unlocking one costs a mana-stone.**                                                                                                                                                                            | `grimoire_position`           | ✅      |
+| **Grimoire position** | One of the numbered places in a Grimoire, each holding at most one spell. Count is `min(10, 1 + floor((wizard_level - 1) / 3))`, one every three levels: **ten at most**, each with its own key. **Unlocking one costs a mana-stone.**                                                                                                                                                                              | `grimoire_position`           | ✅      |
 | **rarity**            | A grade shared by runes, weapons and cards: common, rare or legendary. **One scale, no separate ladders.** An Artifact has no rarity; its **band** takes that place. Rarity scales how strongly a thing acts; it never changes what it does.                                                                                                                                                                        | `Rarity` (enum)               | ✅      |
 | **weight**            | The cost pressure one rune contributes, and the primary input to the computed mana cost. Authored per rune in `RUNES.md`; multiplied by rarity (×1.0 / ×1.4 / ×2.0). **A weight is never a mana cost.** Range 0 to 6 at common.                                                                                                                                                                                     | `weight`                      | ✅      |
 | **Artifact**          | A rune bound to a **floor**, not a wizard: hold the floor, use the rune. **100 in the catalogue**; at generation a world deals one to every possible floor, **two** to floors 10, 20, 30 and 40, so a floor not yet unlocked holds its Artifact dormant. **At most one per spell.** Losing the floor empties the slot, refillable with no mana-stone. Banded by floor: 1-19 normal, 20-39 enhanced, 40-49 powerful. | `Artifact`, `artifact_id`     | ✅      |
@@ -243,6 +244,14 @@ How client and server stay in step lives in `TECH_STACK.md`, section *Netcode*.
 | **simulation tick**  | One fixed step of the world, thirty a second, on server and client. Not the economy's tick, which paces `income`. | `simulation_tick`  | ✅      |
 | **state update**     | What the server sends a client after a simulation tick: where everything stands and what changed.                 | `StateUpdate`      | ✅      |
 | **protocol version** | The number a client announces when it connects; the server refuses any client whose number differs from its own.  | `Protocol.VERSION` | ✅      |
+
+## Controls
+
+Which key does what lives in `TECH_STACK.md`, section *Controls*.
+
+| Term             | Definition                                                                                                                                                | Code               | Status |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ------ |
+| **key position** | A key named by where it sits on a QWERTY UK keyboard, whatever the player's layout prints on it: Q is the key left of W. See `TECH_STACK.md`, *Controls*. | `physical_keycode` | ✅      |
 
 ## Banned synonyms
 

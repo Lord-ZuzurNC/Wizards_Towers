@@ -1,7 +1,9 @@
 class_name Hud
 extends CanvasLayer
-## The player's numbers along the bottom of the screen, what the interact key would do, and
-## the level-up card choice.
+## The player's numbers along the bottom of the screen, what the interact key would do, the
+## spell bar along the top, and the level-up card choice.
+##
+## Every key is named as the player's keyboard prints it (see [KeyLabels]).
 ##
 ## A level-up never opens its choice by itself: the world does not pause, so a choice that
 ## covered the screen mid-fight would be a trap (CARDS.md, The level-up choice). A badge
@@ -11,7 +13,8 @@ extends CanvasLayer
 ## Text uses the project theme's font, Pixel Operator, at the 16 pixels it is drawn for:
 ## any other size breaks its pixel grid.
 
-const TEXT_COLOR := Color("ffffeb")
+## Every colour here is from BLK NX64 (ART_DIRECTION.md).
+const TEXT_COLOR := Color("ffffff")
 const BADGE_COLOR := Color("ffe091")
 const PANEL_COLOR := Color("12173dee")
 const BAND_COLOR := Color("12173d")
@@ -33,6 +36,7 @@ var _world: ClientWorld
 var _numbers := Label.new()
 var _panel := Control.new()
 var _row := HBoxContainer.new()
+var _spell_bar: SpellBar
 
 
 func _init(world: ClientWorld) -> void:
@@ -62,6 +66,8 @@ func _init(world: ClientWorld) -> void:
 		label.add_theme_color_override(&"font_color", BADGE_COLOR)
 	for label: Label in [connection, location, _numbers, badge, prompt]:
 		add_child(label)
+	_spell_bar = SpellBar.new(_world)
+	add_child(_spell_bar)
 	_build_panel()
 	_refresh_choices()
 
@@ -84,6 +90,7 @@ func toggle_choice() -> void:
 		_panel.hide()
 	elif _world.pending_choices > 0:
 		_panel.show()
+	_world.ui_has_mouse = _panel.visible
 
 
 func is_choice_open() -> bool:
@@ -137,7 +144,11 @@ func _prompt_text() -> String:
 	var status := _world.status
 	match _world.village_verdict(index):
 		VillagePurchase.Verdict.ALLOWED:
-			return "E: buy %s, %d gold" % [title, status.village_price]
+			return "%s: buy %s, %d gold" % [
+				KeyLabels.for_action(&"interact"),
+				title,
+				status.village_price,
+			]
 		VillagePurchase.Verdict.OWNED:
 			if _world.owns_village(index):
 				return "%s is yours" % title
@@ -151,7 +162,10 @@ func _prompt_text() -> String:
 
 func _refresh_choices() -> void:
 	var pending := _world.pending_choices
-	badge.text = "%d card choice%s: press C" % [pending, "" if pending == 1 else "s"]
+	badge.text = (
+		"%d card choice%s: press %s"
+		% [pending, "" if pending == 1 else "s", KeyLabels.for_action(&"open_card_choice")]
+	)
 	badge.visible = pending > 0
 	for child in _row.get_children():
 		child.queue_free()
@@ -159,6 +173,7 @@ func _refresh_choices() -> void:
 		_row.add_child(_card_button(_world.offered_cards[i], i))
 	if pending == 0:
 		_panel.hide()
+		_world.ui_has_mouse = false
 
 
 func _card_button(card: Card, index: int) -> Button:
@@ -186,3 +201,74 @@ func _card_button(card: Card, index: int) -> Button:
 func _on_card_pressed(index: int) -> void:
 	_world.take_card(index)
 	_panel.hide()
+	_world.ui_has_mouse = false
+
+
+## The ten Grimoire positions along the top of the screen, in two rows as the keys sit:
+## the plain keys, then the same keys with Shift. Each cell names its key and wears its
+## spell's colour, dimmed while it cools down, with the time left shrinking underneath.
+class SpellBar:
+	extends Control
+
+	const CELL := Vector2(56, 19)
+	const GAP := 4.0
+	const ORIGIN := Vector2(184, 2)
+	const LOCKED_COLOR := Color("1d1a59")
+	const COOLING_COLOR := Color("293268")
+	const COOLING_TEXT_COLOR := Color("909edd")
+	const KEY_COLOR := Color("12173d")
+
+	var _world: ClientWorld
+	var _labels: Array[Label] = []
+
+
+	func _init(world: ClientWorld) -> void:
+		_world = world
+		_world.status_changed.connect(queue_redraw)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var shift := Label.new()
+		shift.text = "Shift"
+		shift.position = ORIGIN + Vector2(-44, CELL.y + GAP)
+		shift.add_theme_color_override(&"font_color", TEXT_COLOR)
+		add_child(shift)
+		for i in Grimoire.MAX_POSITIONS:
+			var label := Label.new()
+			label.position = _cell(i).position
+			label.size = CELL
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.add_theme_color_override(&"font_color", KEY_COLOR)
+			label.text = KeyLabels.for_action(ClientWorld.cast_action(i + 1)).trim_prefix("Shift+")
+			add_child(label)
+			_labels.append(label)
+
+
+	func _draw() -> void:
+		var status := _world.status
+		var spells: Array[PlaceholderSpell] = []
+		if _world.values != null:
+			spells = _world.values.spells
+		for i in Grimoire.MAX_POSITIONS:
+			var cell := _cell(i)
+			var open := i < status.grimoire_positions and i < spells.size()
+			if not open:
+				draw_rect(cell, LOCKED_COLOR)
+				_labels[i].add_theme_color_override(&"font_color", COOLING_TEXT_COLOR)
+				continue
+			var spell: PlaceholderSpell = spells[i]
+			var left := status.cooldowns[i] if i < status.cooldowns.size() else 0
+			# Cooling: the palette's dark blue, the spell's colour only in the shrinking bar,
+			# so no shade outside BLK NX64 is ever made up.
+			draw_rect(cell, COOLING_COLOR if left > 0 else spell.color)
+			var text_color := COOLING_TEXT_COLOR if left > 0 else KEY_COLOR
+			_labels[i].add_theme_color_override(&"font_color", text_color)
+			if left > 0:
+				var share := clampf(float(left) / maxi(1, spell.cooldown_ticks), 0.0, 1.0)
+				var bar := Rect2(cell.position.x, cell.end.y - 4, roundf(cell.size.x * share), 4)
+				draw_rect(bar, spell.color)
+
+
+	## The cell of Grimoire position [param index] + 1.
+	func _cell(index: int) -> Rect2:
+		var column := index % 5
+		var row := floori(index / 5.0)
+		return Rect2(ORIGIN + Vector2(column * (CELL.x + GAP), row * (CELL.y + GAP)), CELL)

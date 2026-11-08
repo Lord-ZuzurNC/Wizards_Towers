@@ -12,8 +12,9 @@ var health := Levels.health(1)
 var mana := Levels.base_mana_pool(1)
 ## Fractions of a mana point regained but not yet whole.
 var mana_carry := 0.0
-## The first tick the placeholder spell may be cast again.
-var ready_tick := 0
+## For each Grimoire position, index 0 for position 1: the first tick its spell may be
+## cast again.
+var ready_ticks := PackedInt32Array()
 ## Card choices earned and not yet taken, oldest first: each is a list of card ids.
 var card_choices: Array[PackedStringArray] = []
 ## Every card taken this run, in order.
@@ -26,6 +27,10 @@ var village_purchases := 0
 ## stands where its player saw it when pressing the key.
 var pending_purchase := -1
 var purchase_after := 0
+
+
+func _init() -> void:
+	ready_ticks.resize(Grimoire.MAX_POSITIONS)
 
 
 func max_health() -> int:

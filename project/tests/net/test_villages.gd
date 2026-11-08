@@ -162,7 +162,7 @@ func test_the_hud_says_what_the_key_would_do() -> void:
 	var client := await _join()
 	var hud := Hud.new(client.world)
 	_add(hud)
-	assert_true(await wait_until(_prompt_reads.bind(hud, "E: buy Near, 20 gold")), hud.prompt.text)
+	assert_true(await wait_until(_prompt_reads.bind(hud, "F: buy Near, 20 gold")), hud.prompt.text)
 	client.world.buy_village(0)
 	assert_true(await wait_until(_prompt_reads.bind(hud, "Near is yours")), hud.prompt.text)
 	await _walk_to_far_village(client)

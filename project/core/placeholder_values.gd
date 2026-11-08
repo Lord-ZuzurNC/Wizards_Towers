@@ -13,14 +13,14 @@ const DEFAULT_PATH := "res://data/placeholder_values.tres"
 @export var xp_per_level := 10
 ## Mana regained each second. No rule written yet.
 @export var mana_per_second := 5
-@export_group("Placeholder spell")
-## The one spell, in Grimoire position 1, standing in until spells are composed from runes.
-@export var spell_raw_damage := 10
-@export var spell_mana_cost := 10
-## FORMULAS.md: cooldown ⬜.
-@export var spell_cooldown_ticks := 15
-@export var spell_projectile_speed := 8.0
-@export var spell_range_tiles := 12.0
+@export_group("Placeholder spells")
+## One spell per Grimoire position, 1 to 10, standing in until spells are composed from
+## runes. Their speeds follow what TECH_STACK.md, Controls, says each position suits:
+## the fastest on 1 to 3, slow on 4 and 5, fast on 6 to 8, the slowest on 9 and 10.
+@export var spells: Array[PlaceholderSpell] = []
+## Opens all ten Grimoire positions from level 1, to try every key. Off, a wizard has the
+## positions of its level (FORMULAS.md), without the mana-stone each one costs.
+@export var open_every_grimoire_position := true
 @export_group("Gold and villages")
 ## Gold a wizard enters the world with.
 @export var starting_gold := 0
@@ -35,6 +35,30 @@ const DEFAULT_PATH := "res://data/placeholder_values.tres"
 @export var dummy_xp := 10
 @export var dummy_gold := 10
 @export var dummy_respawn_ticks := 90
+
+
+func _init() -> void:
+	spells = default_spells()
+
+
+## The ten spells in use unless data/placeholder_values.tres says otherwise.
+static func default_spells() -> Array[PlaceholderSpell]:
+	return [
+		# 1 to 3: the fastest.
+		PlaceholderSpell.make(6, 4, 6, 10.0, 10.0, Color("ff695a")),
+		PlaceholderSpell.make(6, 4, 6, 10.0, 10.0, Color("50b9eb")),
+		PlaceholderSpell.make(6, 4, 6, 10.0, 10.0, Color("8cff9b")),
+		# 4 and 5: slow.
+		PlaceholderSpell.make(25, 20, 45, 6.0, 14.0, Color("b483ef")),
+		PlaceholderSpell.make(25, 20, 45, 6.0, 14.0, Color("ffe091")),
+		# 6 to 8: fast.
+		PlaceholderSpell.make(12, 8, 15, 8.0, 12.0, Color("ff6eaf")),
+		PlaceholderSpell.make(12, 8, 15, 8.0, 12.0, Color("27d3cb")),
+		PlaceholderSpell.make(12, 8, 15, 8.0, 12.0, Color("afd370")),
+		# 9 and 10: the slowest.
+		PlaceholderSpell.make(60, 40, 150, 5.0, 16.0, Color("ffffff")),
+		PlaceholderSpell.make(60, 40, 150, 5.0, 16.0, Color("e54286")),
+	]
 
 
 static func load_default() -> PlaceholderValues:

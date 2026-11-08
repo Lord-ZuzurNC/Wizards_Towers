@@ -17,7 +17,13 @@ func before_each() -> void:
 	_port = _next_port
 	_next_port += 1
 	_values = PlaceholderValues.new()
-	_values.spell_cooldown_ticks = 1
+	# Every position casts the same spell here, unless a test says otherwise.
+	for spell in _values.spells:
+		spell.raw_damage = 10
+		spell.mana_cost = 10
+		spell.cooldown_ticks = 1
+		spell.projectile_speed = 8.0
+		spell.range_tiles = 12.0
 	_values.dummy_respawn_ticks = 100_000
 
 
@@ -31,7 +37,7 @@ func after_each() -> void:
 func test_a_spell_cast_at_the_dummy_hurts_it_on_both_sides() -> void:
 	var server := _start_server()
 	var client := await _join()
-	client.world.cast(Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
 	assert_true(await wait_until(_client_sees_dummy_health.bind(client, 22)))
 	assert_eq(server.world.dummies_in(&"left")[0].health, 22)
 
@@ -40,7 +46,7 @@ func test_a_cast_costs_mana() -> void:
 	var server := _start_server()
 	var client := await _join()
 	var before := server.world.wizard(client.peer_id()).mana
-	client.world.cast(Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
 	assert_true(await wait_until(_dummy_health_is.bind(server, 22)))
 	# Mana comes back meanwhile, a little, so the cost shows as at least 9 of the 10.
 	assert_true(server.world.wizard(client.peer_id()).mana <= before - 9)
@@ -49,36 +55,105 @@ func test_a_cast_costs_mana() -> void:
 func test_a_spell_cast_away_from_the_dummy_misses_it() -> void:
 	var server := _start_server()
 	var client := await _join()
-	client.world.cast(Vector2.LEFT)
+	client.world.cast(1, Vector2.LEFT)
 	await _ticks(20)
 	assert_eq(server.world.dummies_in(&"left")[0].health, 30)
 
 
 func test_without_the_mana_nothing_is_cast() -> void:
-	_values.spell_mana_cost = 1_000
+	_values.spells[0].mana_cost = 1_000
 	var server := _start_server()
 	var client := await _join()
-	client.world.cast(Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
 	await _ticks(20)
 	assert_eq(server.world.dummies_in(&"left")[0].health, 30)
 
 
 func test_the_cooldown_refuses_a_second_cast_too_soon() -> void:
-	_values.spell_cooldown_ticks = 1_000
+	_values.spells[0].cooldown_ticks = 1_000
 	var server := _start_server()
 	var client := await _join()
-	client.world.cast(Vector2.RIGHT)
-	client.world.cast(Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
 	await _ticks(20)
 	assert_eq(server.world.dummies_in(&"left")[0].health, 22)
 
 
-func test_a_grimoire_position_without_a_spell_casts_nothing() -> void:
+func test_a_grimoire_position_out_of_range_casts_nothing() -> void:
 	var server := _start_server()
 	var client := await _join()
-	(client.get_node("Channel") as WorldChannel).send_cast(2, Vector2.RIGHT)
+	var channel := client.get_node("Channel") as WorldChannel
+	channel.send_cast(0, Vector2.RIGHT)
+	channel.send_cast(11, Vector2.RIGHT)
 	await _ticks(20)
 	assert_eq(server.world.dummies_in(&"left")[0].health, 30)
+
+
+func test_a_level_1_wizard_casts_from_its_one_position_only() -> void:
+	_values.open_every_grimoire_position = false
+	var server := _start_server()
+	var client := await _join()
+	client.world.cast(2, Vector2.RIGHT)
+	await _ticks(20)
+	assert_eq(server.world.dummies_in(&"left")[0].health, 30)
+	client.world.cast(1, Vector2.RIGHT)
+	assert_true(await wait_until(_dummy_health_is.bind(server, 22)))
+
+
+func test_each_position_casts_its_own_spell() -> void:
+	_values.spells[5].raw_damage = 20
+	var server := _start_server()
+	var client := await _join()
+	client.world.cast(6, Vector2.RIGHT)
+	# 20 through a magic_defence of 10: 20 × 60 / 70 = 17.
+	assert_true(await wait_until(_dummy_health_is.bind(server, 30 - 17)))
+
+
+func test_each_position_cools_down_on_its_own() -> void:
+	_values.spells[0].cooldown_ticks = 1_000
+	var server := _start_server()
+	var client := await _join()
+	client.world.cast(1, Vector2.RIGHT)
+	assert_true(await wait_until(_dummy_health_is.bind(server, 22)))
+	client.world.cast(1, Vector2.RIGHT)
+	client.world.cast(2, Vector2.RIGHT)
+	assert_true(await wait_until(_dummy_health_is.bind(server, 14)))
+	await _ticks(20)
+	assert_eq(server.world.dummies_in(&"left")[0].health, 14)
+	assert_true(await wait_until(_client_sees_cooling.bind(client, 0)))
+	assert_eq(client.world.status.cooldowns[1], 0)
+
+
+func test_a_shift_click_casts_from_position_6_only() -> void:
+	# Told apart by what each costs: position 6 takes 30 mana, position 1 would take 20 more.
+	_values.spells[5].mana_cost = 30
+	_values.spells[0].mana_cost = 20
+	var server := _start_server()
+	var client := await _join()
+	# The keyboard and mouse, not the test's override: idle, since nothing is held.
+	client.world.input_override = -1
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.shift_pressed = true
+	Input.parse_input_event(click)
+	Input.flush_buffered_events()
+	assert_true(await wait_until(_mana_at_most.bind(server, client, 75)))
+	await _ticks(10)
+	var mana := server.world.wizard(client.peer_id()).mana
+	# Mana comes back meanwhile, a point or two, never ten.
+	assert_true(mana > 100 - 30 - 10, "mana %d: position 1 was cast too" % mana)
+	var release := click.duplicate() as InputEventMouseButton
+	release.pressed = false
+	Input.parse_input_event(release)
+	Input.flush_buffered_events()
+
+
+func test_a_projectile_says_which_position_cast_it() -> void:
+	_start_server()
+	var client := await _join()
+	client.world.cast(7, Vector2.LEFT)
+	assert_true(await wait_until(_client_sees_projectile_from.bind(client, 7)))
 
 
 func test_destroying_the_dummy_levels_up_and_offers_the_three_cards() -> void:
@@ -102,7 +177,7 @@ func test_hitting_a_destroyed_dummy_gives_no_more_xp() -> void:
 	var client := await _join()
 	await _destroy_dummy(client)
 	for i in 3:
-		client.world.cast(Vector2.RIGHT)
+		client.world.cast(1, Vector2.RIGHT)
 		await _ticks(3)
 	await _ticks(15)
 	assert_eq(server.world.wizard(client.peer_id()).wizard_level, 2)
@@ -113,7 +188,7 @@ func test_a_spell_flies_through_a_destroyed_dummy() -> void:
 	_start_server()
 	var client := await _join()
 	await _destroy_dummy(client)
-	client.world.cast(Vector2.RIGHT)
+	client.world.cast(1, Vector2.RIGHT)
 	# The dummy stands at x = 104 and a hit reaches 10 pixels: beyond 114, it flew through.
 	assert_true(await wait_until(_client_sees_spell_beyond.bind(client, 114.0)))
 
@@ -149,9 +224,9 @@ func test_the_xp_goes_to_the_wizard_who_lands_the_last_hit() -> void:
 	var first := await _join()
 	var second := await _join()
 	for i in 3:
-		first.world.cast(Vector2.RIGHT)
+		first.world.cast(1, Vector2.RIGHT)
 		assert_true(await wait_until(_dummy_health_is.bind(server, 30 - 8 * (i + 1))))
-	second.world.cast(Vector2.RIGHT)
+	second.world.cast(1, Vector2.RIGHT)
 	assert_true(await wait_until(_dummy_health_is.bind(server, 0)))
 	assert_eq(server.world.wizard(first.peer_id()).xp, 0)
 	assert_eq(server.world.wizard(second.peer_id()).wizard_level, 2)
@@ -159,7 +234,7 @@ func test_the_xp_goes_to_the_wizard_who_lands_the_last_hit() -> void:
 
 func _destroy_dummy(client: GameClient) -> void:
 	for i in 4:
-		client.world.cast(Vector2.RIGHT)
+		client.world.cast(1, Vector2.RIGHT)
 		var left := maxi(0, 30 - 8 * (i + 1))
 		assert_true(await wait_until(_client_sees_dummy_health.bind(client, left)))
 
@@ -219,6 +294,19 @@ func _client_sees_spell_beyond(client: GameClient, x: float) -> bool:
 		if spot.x > x:
 			return true
 	return false
+
+
+func _client_sees_cooling(client: GameClient, index: int) -> bool:
+	var cooldowns := client.world.status.cooldowns
+	return cooldowns.size() > index and cooldowns[index] > 0
+
+
+func _client_sees_projectile_from(client: GameClient, grimoire_position: int) -> bool:
+	return client.world.projectile_spells().has(grimoire_position)
+
+
+func _mana_at_most(server: GameServer, client: GameClient, mana: int) -> bool:
+	return server.world.wizard(client.peer_id()).mana <= mana
 
 
 func _dummy_health_is(server: GameServer, health: int) -> bool:

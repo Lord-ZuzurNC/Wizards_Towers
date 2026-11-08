@@ -77,6 +77,24 @@ func test_no_choice_left_closes_the_panel_and_hides_the_badge() -> void:
 	assert_false(_badge().visible)
 
 
+func test_the_spell_bar_names_its_ten_keys_in_two_rows() -> void:
+	var texts: Array[String] = []
+	for node in _hud.find_children("*", "Label", true, false):
+		texts.append((node as Label).text)
+	for expected: String in ["LMB", "RMB", "Space", "Q", "E", "Shift"]:
+		assert_true(texts.has(expected), "%s missing from %s" % [expected, texts])
+	# Each key appears twice: once plain, once in the Shift row.
+	assert_eq(texts.count("LMB"), 2)
+
+
+func test_an_open_card_choice_keeps_clicks_from_casting() -> void:
+	_offer(1)
+	_hud.toggle_choice()
+	assert_true(_world.ui_has_mouse)
+	_hud.toggle_choice()
+	assert_false(_world.ui_has_mouse)
+
+
 func _offer(pending: int) -> void:
 	var ids := PackedStringArray(["test_common", "test_rare", "test_legendary"])
 	_channel.card_choices_received.emit(pending, ids)

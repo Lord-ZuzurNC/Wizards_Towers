@@ -82,6 +82,8 @@ var cards: Dictionary[StringName, Card] = { }
 var values: PlaceholderValues
 ## Stands in for the keyboard when set to a direction code from 0 to 8; tests use it.
 var input_override := -1
+## True while a panel takes the mouse, so a click on it casts nothing.
+var ui_has_mouse := false
 var room: RoomData
 ## The latest numbers the server sent about the player's own wizard.
 var status := StateUpdate.new()
@@ -141,8 +143,12 @@ func _physics_process(_delta: float) -> void:
 	)
 	_own_drawn_from = _own_marker.position
 	_own_marker.position = _predictor.position
-	if input_override < 0 and Input.is_action_just_pressed(&"cast_1"):
-		cast(get_global_mouse_position() - (_predictor.position + Projectile.BODY_OFFSET))
+	if input_override < 0 and not ui_has_mouse:
+		var aim := get_global_mouse_position() - (_predictor.position + Projectile.BODY_OFFSET)
+		for grimoire_position in range(1, Grimoire.MAX_POSITIONS + 1):
+			# Exact match: Shift with the left button casts from 6, never from 1 as well.
+			if Input.is_action_just_pressed(cast_action(grimoire_position), true):
+				cast(grimoire_position, aim)
 	if input_override < 0 and Input.is_action_just_pressed(&"interact"):
 		var village := village_in_reach()
 		if village >= 0:
@@ -189,11 +195,16 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 		values = PlaceholderValues.load_default()
 
 
-## Asks the server to cast the spell of Grimoire position 1 toward [param aim].
+## The input action casting from [param grimoire_position], 1 to 10.
+static func cast_action(grimoire_position: int) -> StringName:
+	return StringName("cast_%d" % grimoire_position)
+
+
+## Asks the server to cast the spell of [param grimoire_position] toward [param aim].
 ## Nothing appears until the server accepts it.
-func cast(aim: Vector2) -> void:
+func cast(grimoire_position: int, aim: Vector2) -> void:
 	if _channel != null:
-		_channel.send_cast(1, aim)
+		_channel.send_cast(grimoire_position, aim)
 
 
 ## Asks the server to buy village [param index] of the current room. Nothing changes until
@@ -286,6 +297,11 @@ func dummy_health() -> PackedInt32Array:
 	return _overlay.dummy_health
 
 
+## The Grimoire position each spell in flight was cast from, as last received.
+func projectile_spells() -> PackedInt32Array:
+	return _overlay.projectile_spells
+
+
 ## Where the spells in flight were, as last received.
 func projectile_positions() -> PackedVector2Array:
 	return _overlay.projectile_positions
@@ -313,7 +329,7 @@ func _on_state_update_received(update: StateUpdate) -> void:
 		if not update.wizard_ids.has(peer_id):
 			_others[peer_id].queue_free()
 			_others.erase(peer_id)
-	_overlay.show_update(update)
+	_overlay.show_update(update, values)
 	if update.village_owners != _village_owners:
 		_village_owners = update.village_owners
 		queue_redraw()
@@ -456,6 +472,8 @@ class Overlay:
 	var dummy_health: PackedInt32Array = []
 	var dummy_max_health: PackedInt32Array = []
 	var projectile_positions: PackedVector2Array = []
+	var projectile_colors: Array[Color] = []
+	var projectile_spells: PackedInt32Array = []
 
 
 	func _draw() -> void:
@@ -470,13 +488,19 @@ class Overlay:
 				Rect2(at + BAR.position, Vector2(BAR.size.x * share, BAR.size.y)),
 				HEALTH_COLOR,
 			)
-		for at in projectile_positions:
-			draw_rect(Rect2(at + SPELL.position, SPELL.size), SPELL_COLOR)
+		for i in projectile_positions.size():
+			var at := projectile_positions[i]
+			draw_rect(Rect2(at + SPELL.position, SPELL.size), projectile_colors[i])
 
 
-	func show_update(update: StateUpdate) -> void:
+	func show_update(update: StateUpdate, values: PlaceholderValues) -> void:
 		dummy_positions = update.dummy_positions
 		dummy_health = update.dummy_health
 		dummy_max_health = update.dummy_max_health
 		projectile_positions = update.projectile_positions
+		projectile_spells = update.projectile_spells
+		projectile_colors.clear()
+		for cast_from in update.projectile_spells:
+			var known := values != null and cast_from >= 1 and cast_from <= values.spells.size()
+			projectile_colors.append(values.spells[cast_from - 1].color if known else SPELL_COLOR)
 		queue_redraw()

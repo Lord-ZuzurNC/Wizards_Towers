@@ -113,7 +113,7 @@ grimoire_positions = min(10, 1 + floor((wizard_level - 1) / 3))
 
 Source: `GLOSSARY.md`, Grimoire position.
 One position every three levels, each beyond the first costing one mana-stone to unlock.
-Ten is the cap, one per number key from 1 to 0, reached at level 28.
+Ten is the cap, reached at level 28; the key casting each is in `TECH_STACK.md`, section *Controls*.
 
 | `wizard_level` | health | power | magic defence | Share of a hit blocked | luck | Base mana pool | Weight limit | Grimoire positions |
 | -------------: | -----: | ----: | ------------: | ---------------------: | ---: | -------------: | -----------: | -----------------: |

@@ -1,5 +1,5 @@
 extends TestCase
-## The movement keys, as the project maps them.
+## The default controls, as TECH_STACK.md, Controls, sets them.
 
 
 func after_each() -> void:
@@ -31,12 +31,43 @@ func test_each_action_answers_to_a_letter_and_an_arrow() -> void:
 			assert_true(keys.has(key), "%s lacks key %d" % [action, key])
 
 
-func test_casting_the_card_choice_and_interacting_have_their_keys() -> void:
-	var expected := { &"cast_1": KEY_1, &"open_card_choice": KEY_C, &"interact": KEY_E }
-	for action: StringName in expected:
+func test_the_grimoire_positions_follow_the_controls_of_tech_stack() -> void:
+	var expected := [
+		"LMB",
+		"RMB",
+		"Space",
+		"Q",
+		"E",
+		"Shift+LMB",
+		"Shift+RMB",
+		"Shift+Space",
+		"Shift+Q",
+		"Shift+E",
+	]
+	for i in expected.size():
+		var action := ClientWorld.cast_action(i + 1)
 		assert_true(InputMap.has_action(action), action)
-		var event := InputMap.action_get_events(action)[0] as InputEventKey
-		assert_eq(event.physical_keycode, expected[action])
+		assert_eq(KeyLabels.for_action(action), expected[i], action)
+
+
+func test_interacting_and_the_card_choice_have_their_keys() -> void:
+	assert_eq(KeyLabels.for_action(&"interact"), "F")
+	assert_eq(KeyLabels.for_action(&"open_card_choice"), "C")
+
+
+func test_shift_with_a_button_casts_from_the_shift_row_only() -> void:
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.shift_pressed = true
+	Input.parse_input_event(click)
+	Input.flush_buffered_events()
+	assert_true(Input.is_action_pressed(&"cast_6", true))
+	assert_false(Input.is_action_pressed(&"cast_1", true))
+	var release := click.duplicate() as InputEventMouseButton
+	release.pressed = false
+	Input.parse_input_event(release)
+	Input.flush_buffered_events()
 
 
 func test_a_physical_key_press_triggers_its_action() -> void:

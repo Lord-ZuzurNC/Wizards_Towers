@@ -14,6 +14,8 @@ var position := Vector2.ZERO
 var velocity := Vector2.ZERO
 var distance_left := 0.0
 var raw_damage := 0
+## The Grimoire position it was cast from, so a client can draw it in that spell's colour.
+var grimoire_position := 1
 
 
 ## Moves one tick. Returns false once the projectile is spent: out of range or in a wall.
