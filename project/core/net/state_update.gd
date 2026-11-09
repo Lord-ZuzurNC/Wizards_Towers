@@ -23,8 +23,11 @@ const _FIELD_TYPES: Array[int] = [
 	TYPE_PACKED_INT32_ARRAY, # cooldowns
 ]
 ## health, max_health, mana, mana_pool, wizard_level, xp, xp_to_next, gold, village_price,
-## villages_held, grimoire_positions.
-const _STATUS_SIZE := 11
+## villages_held, grimoire_positions, season, season_ticks_left, speed, effects.
+const _STATUS_SIZE := 15
+## Bits of [member effects].
+const BURNING := 1
+const SLOWED := 2
 
 var tick := 0
 var room_id: StringName
@@ -56,6 +59,13 @@ var village_price := 0
 var villages_held := 0
 ## How many Grimoire positions the wizard may cast from.
 var grimoire_positions := 0
+## The world's [enum Season.Kind], and the ticks before it changes or the run ends.
+var season := 0
+var season_ticks_left := 0
+## The wizard's speed this tick, slows included: the client predicts with it.
+var speed := Simulation.BASE_SPEED
+## What afflicts the wizard: [constant BURNING], [constant SLOWED].
+var effects := 0
 ## For each Grimoire position, index 0 for position 1: ticks before it may cast again.
 var cooldowns: PackedInt32Array = []
 
@@ -95,6 +105,10 @@ static func from_message(message: Array) -> StateUpdate:
 	update.village_price = status[8]
 	update.villages_held = status[9]
 	update.grimoire_positions = status[10]
+	update.season = status[11]
+	update.season_ticks_left = status[12]
+	update.speed = status[13]
+	update.effects = status[14]
 	var sizes_match := (
 		update.wizard_ids.size() == update.wizard_positions.size()
 		and update.dummy_positions.size() == update.dummy_health.size()
@@ -102,6 +116,7 @@ static func from_message(message: Array) -> StateUpdate:
 		and update.village_positions.size() == update.village_owners.size()
 		and update.projectile_positions.size() == update.projectile_spells.size()
 		and update.cooldowns.size() <= Grimoire.MAX_POSITIONS
+		and update.season >= 0 and update.season < Season.COUNT
 	)
 	return update if sizes_match else null
 
@@ -133,6 +148,10 @@ func to_message() -> Array:
 				village_price,
 				villages_held,
 				grimoire_positions,
+				season,
+				season_ticks_left,
+				speed,
+				effects,
 			],
 		),
 		cooldowns,

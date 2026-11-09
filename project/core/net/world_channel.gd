@@ -19,6 +19,8 @@ signal take_card_requested(peer_id: int, card_index: int)
 signal buy_village_requested(peer_id: int, village_index: int, after_sequence: int)
 ## Received on a client: the state after a simulation tick. Malformed ones never arrive.
 signal state_update_received(update: StateUpdate)
+## Received on a client: the run ended, and how.
+signal world_ending_received(ending: int)
 ## Received on a client: its card choices changed.
 signal card_choices_received(pending: int, card_ids: PackedStringArray)
 
@@ -50,6 +52,11 @@ func send_buy_village(village_index: int, after_sequence: int) -> void:
 ## Server side.
 func send_state_update(peer_id: int, update: StateUpdate) -> void:
 	state_update_sync.rpc_id(peer_id, update.to_message())
+
+
+## Server side: the run is over, ended as [param ending], a [enum WorldEnding.Kind].
+func send_world_ending(peer_id: int, ending: int) -> void:
+	world_ending_sync.rpc_id(peer_id, ending)
 
 
 ## Server side: the number of choices waiting, and the cards of the oldest one.
@@ -94,3 +101,10 @@ func state_update_sync(message: Array) -> void:
 @rpc("authority", "call_remote", "reliable")
 func card_choices_sync(pending: int, card_ids: PackedStringArray) -> void:
 	card_choices_received.emit(pending, card_ids)
+
+
+## Trusted: only the server may call it.
+@rpc("authority", "call_remote", "reliable")
+func world_ending_sync(ending: int) -> void:
+	if ending >= 0 and ending < WorldEnding.NAMES.size():
+		world_ending_received.emit(ending)

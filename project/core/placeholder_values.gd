@@ -21,6 +21,19 @@ const DEFAULT_PATH := "res://data/placeholder_values.tres"
 ## Opens all ten Grimoire positions from level 1, to try every key. Off, a wizard has the
 ## positions of its level (FORMULAS.md), without the mana-stone each one costs.
 @export var open_every_grimoire_position := true
+@export_group("Seasons and hazards")
+## A season's length. GLOSSARY.md says 48 hours; 2 minutes keeps a whole run to 8.
+@export var season_ticks := 2 * 60 * Simulation.TICK_RATE
+## FORMULAS.md, Hazards: hazard_raw_damage, provisional until the runes have base damage.
+@export var hazard_raw_damage := 1
+## Ember's burn: how long it lasts after the last hazard hit, and what each burn hit deals.
+## RUNES.md says only "a short burn"; it hits on the hazard's own beat, twice a second.
+@export var burn_ticks := 60
+@export var burn_raw_damage := 1
+## Rime's slow: how long it lasts after the last hazard hit, and the share of speed it takes.
+## RUNES.md says only "a brief slow".
+@export var slow_ticks := 30
+@export var slow_share := 0.3
 @export_group("Gold and villages")
 ## Gold a wizard enters the world with.
 @export var starting_gold := 0

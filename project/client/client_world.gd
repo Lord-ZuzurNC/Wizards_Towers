@@ -17,6 +17,8 @@ extends Node2D
 signal status_changed
 ## The pending card choices changed.
 signal card_choices_changed
+## The run ended, as a [enum WorldEnding.Kind]; the next one has begun.
+signal run_ended(ending: int)
 
 ## How far in the past other wizards are drawn: 3 ticks, 100 ms.
 const INTERPOLATION_TICKS := 3.0
@@ -65,6 +67,10 @@ const CRATER_COLOR := Color("ff695a")
 const RIFT_CORE_COLOR := Color("ff695a")
 const RIFT_BANK_COLOR := Color("723352")
 const LAKE_COLOR := Color("50b9eb")
+## The sea and the lake in winter.
+const FROZEN_WATER_COLOR := Color("8cdaff")
+## A rift bank in summer, while it burns.
+const BURNING_BANK_COLOR := Color("b23c40")
 ## The screen in art pixels, and the HUD band along its bottom that the map scrolls above.
 const SCREEN := Vector2i(640, 360)
 const HUD_HEIGHT := 40
@@ -102,6 +108,7 @@ var _camera := Camera2D.new()
 ## The wizard's position on the tick before, to place the camera between two ticks.
 var _own_drawn_from := Vector2.ZERO
 var _village_owners: PackedInt32Array = []
+var _season := -1
 var _latest_tick := 0
 var _render_tick := 0.0
 
@@ -187,6 +194,7 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 	_own_peer_id = own_peer_id
 	_channel.state_update_received.connect(_on_state_update_received)
 	_channel.card_choices_received.connect(_on_card_choices_received)
+	_channel.world_ending_received.connect(run_ended.emit)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
@@ -280,6 +288,11 @@ func current_biome() -> int:
 	return world_map.biome_at(world_map.tile_at(_predictor.position))
 
 
+## The speed the prediction walks the player's wizard at: the server's, slows included.
+func predicted_speed() -> int:
+	return _predictor.speed
+
+
 ## Where the player's own wizard stands, as predicted.
 func own_position() -> Vector2:
 	return _predictor.position
@@ -318,8 +331,12 @@ func _on_state_update_received(update: StateUpdate) -> void:
 	if update.tick <= _latest_tick or not rooms.has(update.room_id):
 		return
 	_latest_tick = update.tick
+	if update.season != _season:
+		_set_season(update.season)
 	if rooms[update.room_id] != room:
 		_enter_room(rooms[update.room_id])
+	# The server's speed, slows included, before replaying inputs with it.
+	_predictor.speed = update.speed
 	for i in update.wizard_ids.size():
 		if update.wizard_ids[i] == _own_peer_id:
 			_reconcile(update.acknowledged, update.wizard_positions[i])
@@ -356,13 +373,28 @@ static func terrain_color(world_map: WorldMapData, tile: Vector2i) -> Color:
 		Biome.Feature.RIFT_CORE:
 			return RIFT_CORE_COLOR
 		Biome.Feature.RIFT_BANK:
+			if world_map.season == Season.Kind.SUMMER:
+				return BURNING_BANK_COLOR
 			return RIFT_BANK_COLOR
 		Biome.Feature.WATER:
+			if world_map.season == Season.Kind.WINTER:
+				return FROZEN_WATER_COLOR
 			if world_map.biome_at(tile) == Biome.Kind.GLACIER:
 				return LAKE_COLOR
 	var biome := world_map.biome_at(tile)
 	# A fixed scatter of the second shade: about one tile in six.
 	return BIOME_SCATTER[biome] if hash(tile) % 6 == 0 else BIOME_GROUND[biome]
+
+
+## Every world map the client knows takes on the season: water freezes in winter, for the
+## prediction as for the drawing.
+func _set_season(kind: int) -> void:
+	_season = kind
+	for known: RoomData in rooms.values():
+		var world_map := known as WorldMapData
+		if world_map != null:
+			world_map.season = kind
+	queue_redraw()
 
 
 func _flag_color(index: int) -> Color:

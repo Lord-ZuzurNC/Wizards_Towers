@@ -33,6 +33,30 @@ static func small_world() -> WorldMapData:
 	return world
 
 
+## A 30 × 5 world map with a little of every seasonal ground: the sea along the edges, a
+## rift bank in columns 10 to 12 and glacier in columns 20 to 24, plains elsewhere. Its
+## spawn is tile (5, 2).
+static func seasonal_world() -> WorldMapData:
+	var rows := PackedStringArray()
+	for y in 5:
+		var row := ""
+		for x in 30:
+			if y == 0 or y == 4 or x < 2 or x > 27:
+				row += "~"
+			elif x >= 10 and x <= 12:
+				row += "r"
+			elif x >= 20 and x <= 24:
+				row += "g"
+			else:
+				row += "."
+		rows.append(row)
+	var world := WorldMapData.new()
+	world.id = &"world"
+	world.rows = rows
+	world.spawn_tile = Vector2i(5, 2)
+	return world
+
+
 ## Two 8 × 3 rooms joined by a door: [code]left[/code] opens on its right edge into
 ## [code]right[/code], which opens on its left edge back into [code]left[/code].
 static func two_joined_rooms() -> Dictionary[StringName, RoomData]:

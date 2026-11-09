@@ -26,11 +26,23 @@ var village_purchases := 0
 ## judged once the movement input [member purchase_after] has been applied, so the wizard
 ## stands where its player saw it when pressing the key.
 var pending_purchase := -1
+## The tick Ember's burn ends; it hurts on the hazard's beat until then.
+var burning_until := 0
+## The tick Rime's slow ends.
+var slowed_until := 0
 var purchase_after := 0
 
 
 func _init() -> void:
 	ready_ticks.resize(Grimoire.MAX_POSITIONS)
+
+
+func is_burning(tick: int) -> bool:
+	return tick < burning_until
+
+
+func is_slowed(tick: int) -> bool:
+	return tick < slowed_until
 
 
 func max_health() -> int:

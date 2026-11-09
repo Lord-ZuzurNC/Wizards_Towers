@@ -1,7 +1,8 @@
 class_name Hud
 extends CanvasLayer
 ## The player's numbers along the bottom of the screen, what the interact key would do, the
-## spell bar along the top, and the level-up card choice.
+## spell bar along the top, the season in the top-right corner, the end of a run, and the
+## level-up card choice.
 ##
 ## Every key is named as the player's keyboard prints it (see [KeyLabels]).
 ##
@@ -18,6 +19,8 @@ const TEXT_COLOR := Color("ffffff")
 const BADGE_COLOR := Color("ffe091")
 const PANEL_COLOR := Color("12173dee")
 const BAND_COLOR := Color("12173d")
+## How long the end of a run stays on screen.
+const ENDING_SECONDS := 4.0
 const CARD_COLOR := Color("293268")
 const CARD_SIZE := Vector2(120, 160)
 
@@ -31,6 +34,10 @@ var location := Label.new()
 var badge := Label.new()
 ## Says what the interact key would do here; empty when it would do nothing.
 var prompt := Label.new()
+## The season, and the time left in it.
+var season := Label.new()
+## Says how the last run ended, for a few seconds after it did.
+var ending := Label.new()
 
 var _world: ClientWorld
 var _numbers := Label.new()
@@ -43,6 +50,7 @@ func _init(world: ClientWorld) -> void:
 	_world = world
 	_world.status_changed.connect(_refresh_numbers)
 	_world.card_choices_changed.connect(_refresh_choices)
+	_world.run_ended.connect(_on_run_ended)
 	# An opaque band under the text: a world map scrolls on beneath it.
 	var band := ColorRect.new()
 	band.color = BAND_COLOR
@@ -68,6 +76,26 @@ func _init(world: ClientWorld) -> void:
 		add_child(label)
 	_spell_bar = SpellBar.new(_world)
 	add_child(_spell_bar)
+	var corner := ColorRect.new()
+	corner.color = BAND_COLOR
+	corner.position = Vector2(536, 0)
+	corner.size = Vector2(104, 20)
+	add_child(corner)
+	season.position = Vector2(536, 1)
+	season.size = Vector2(100, 18)
+	season.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	season.add_theme_color_override(&"font_color", TEXT_COLOR)
+	add_child(season)
+	ending.position = Vector2(0, 150)
+	ending.size = Vector2(640, 40)
+	ending.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ending.add_theme_color_override(&"font_color", BADGE_COLOR)
+	var ending_back := StyleBoxFlat.new()
+	ending_back.bg_color = BAND_COLOR
+	ending_back.anti_aliasing = false
+	ending.add_theme_stylebox_override(&"normal", ending_back)
+	ending.hide()
+	add_child(ending)
 	_build_panel()
 	_refresh_choices()
 
@@ -133,7 +161,25 @@ func _refresh_numbers() -> void:
 		]
 	)
 	prompt.text = _prompt_text()
-	location.text = _world.location_name()
+	location.text = _world.location_name() + _effects_text()
+	var seconds := ceili(float(status.season_ticks_left) / Simulation.TICK_RATE)
+	season.text = "%s %d:%02d" % [Season.label(status.season), seconds / 60, seconds % 60]
+
+
+func _effects_text() -> String:
+	var effects := _world.status.effects
+	var text := ""
+	if effects & StateUpdate.BURNING:
+		text += ", burning"
+	if effects & StateUpdate.SLOWED:
+		text += ", slowed"
+	return text
+
+
+func _on_run_ended(kind: int) -> void:
+	ending.text = "%s\nA new world begins" % WorldEnding.label(kind)
+	ending.show()
+	get_tree().create_timer(ENDING_SECONDS).timeout.connect(ending.hide)
 
 
 func _prompt_text() -> String:

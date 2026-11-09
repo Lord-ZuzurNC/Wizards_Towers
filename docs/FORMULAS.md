@@ -160,6 +160,7 @@ Source: `WORLD_MAP.md`, section *Hazards*.
 
 `hazard_raw_damage` is a placeholder for testing.
 ⬜ It becomes the base damage of the Ember or Rime rune once `raw_damage` exists.
+⬜ How long Ember's burn and Rime's slow last after the last hit, what each burn hit deals, and how much speed the slow takes. Placeholders for testing: a burn of 2 seconds hitting for 1 on the hazard's beat, a slow of 1 second taking 30 % of speed.
 
 ## Magic
 

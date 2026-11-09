@@ -22,7 +22,8 @@ enum Answer {
 ## 2: movement inputs and room state updates.
 ## 3: casting, cards, gold and villages; the state update carries them all.
 ## 4: ten Grimoire positions, their cooldowns, and which one each projectile came from.
-const VERSION := 4
+## 5: seasons, hazards and their effects, and the end of a run.
+const VERSION := 5
 const DEFAULT_PORT := 7777
 ## Sized for fifty wizards a world, see TECH_STACK.md.
 const MAX_CONNECTIONS := 50

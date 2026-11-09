@@ -2,10 +2,14 @@ class_name ServerWorld
 extends Node
 ## The authoritative world, advanced one simulation tick at a time.
 ##
-## Each tick, in this order: every wizard applies at most one movement input and walks
+## Each tick, in this order: the season moves on, and the run ends when winter runs out;
+## every wizard takes what its ground deals, applies at most one movement input and walks
 ## through any exit; spells in flight move and hit; destroyed training dummies stand up
 ## again; mana comes back. Then every client gets a [StateUpdate] of its room, with the
 ## sequence number of the last input applied so it can reconcile its prediction.
+##
+## When a run ends, every wizard starts a new one in the start room, as a newcomer: a
+## wizard lives one run at most (GLOSSARY.md, run).
 ##
 ## A cast, a card taken and a village bought arrive as requests: each is checked here before
 ## anything changes.
@@ -19,6 +23,10 @@ var values: PlaceholderValues
 ## The room every new wizard starts in.
 var start_room := &"first_room"
 var tick := 0
+## The tick the current run began.
+var run_start_tick := 0
+## The current [enum Season.Kind].
+var season := Season.Kind.SPRING as int
 
 var _channel: WorldChannel
 var _wizards: Dictionary[int, WizardState] = { }
@@ -36,9 +44,15 @@ func _init() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	# Nothing runs before setup(): no channel, no values, no rooms.
+	if _channel == null:
+		return
 	tick += 1
+	if not _advance_season():
+		_end_run(WorldEnding.Kind.WORLD_COLLAPSE)
 	for peer_id: int in _wizards:
 		var wizard_state := _wizards[peer_id]
+		_suffer_ground(wizard_state)
 		_walk(wizard_state)
 		_regain_mana(wizard_state)
 		if wizard_state.pending_purchase >= 0:
@@ -72,15 +86,93 @@ func setup(channel: WorldChannel) -> bool:
 	for room_id: StringName in rooms:
 		_dummies[room_id] = _place_dummies(rooms[room_id])
 		_villages[room_id] = _place_villages(rooms[room_id])
+	run_start_tick = tick
+	_set_season(Season.Kind.SPRING)
 	return true
 
 
 func add_wizard(peer_id: int) -> void:
+	_wizards[peer_id] = _newcomer()
+
+
+## Ticks left before the season changes, or the run ends after winter.
+func season_ticks_left() -> int:
+	return Season.ticks_left(tick - run_start_tick, values.season_ticks)
+
+
+## A wizard as it enters a run: in the start room, at level 1.
+func _newcomer() -> WizardState:
 	var wizard := WizardState.new()
 	wizard.room_id = start_room
 	wizard.position = rooms[start_room].tile_center(rooms[start_room].spawn_tile)
 	wizard.gold = values.starting_gold
-	_wizards[peer_id] = wizard
+	return wizard
+
+
+## Moves the season on when its time has come. Returns false once winter has run out.
+func _advance_season() -> bool:
+	var now := Season.at(tick - run_start_tick, values.season_ticks)
+	if now < 0:
+		return false
+	if now != season:
+		_set_season(now)
+	return true
+
+
+func _set_season(kind: int) -> void:
+	season = kind
+	for room: RoomData in rooms.values():
+		var world_map := room as WorldMapData
+		if world_map != null:
+			world_map.season = kind
+
+
+## Ends the run for everybody, then starts the next one at once. Every wizard is told how
+## the run ended, then becomes a newcomer in the start room; villages, dummies and spells in
+## flight start over too.
+func _end_run(ending: WorldEnding.Kind) -> void:
+	for peer_id: int in _wizards.keys():
+		_channel.send_world_ending(peer_id, ending)
+		var newcomer := _newcomer()
+		# The same input stream goes on: the client keeps numbering its inputs from where it was.
+		newcomer.inputs = _wizards[peer_id].inputs
+		_wizards[peer_id] = newcomer
+		_send_card_choices(peer_id)
+	for room_id: StringName in rooms:
+		_dummies[room_id] = _place_dummies(rooms[room_id])
+		_villages[room_id] = _place_villages(rooms[room_id])
+	_projectiles.clear()
+	run_start_tick = tick
+	_set_season(Season.Kind.SPRING)
+
+
+## The hazard under a wizard's feet hits on its beat, twice a second: its damage, and its
+## side effect renewed. Ember's burn then keeps hurting on the same beat after the wizard
+## steps off; Rime's slow keeps slowing.
+func _suffer_ground(wizard_state: WizardState) -> void:
+	if tick % Hazard.INTERVAL_TICKS == 0:
+		var world_map := rooms[wizard_state.room_id] as WorldMapData
+		var hazard := Hazard.Kind.NONE
+		if world_map != null:
+			hazard = world_map.hazard_at(world_map.tile_at(wizard_state.position))
+		if hazard != Hazard.Kind.NONE:
+			_hurt(wizard_state, values.hazard_raw_damage)
+		if hazard == Hazard.Kind.EMBER:
+			wizard_state.burning_until = tick + values.burn_ticks
+		elif hazard == Hazard.Kind.RIME:
+			wizard_state.slowed_until = tick + values.slow_ticks
+		elif wizard_state.is_burning(tick):
+			_hurt(wizard_state, values.burn_raw_damage)
+	wizard_state.speed = Simulation.BASE_SPEED
+	if wizard_state.is_slowed(tick):
+		wizard_state.speed = roundi(Simulation.BASE_SPEED * (1.0 - values.slow_share))
+
+
+## A hit through the wizard's magic_defence (FORMULAS.md, Combat). Wizards cannot die yet:
+## health stops at 1 until wizard endings exist.
+func _hurt(wizard_state: WizardState, raw_damage: int) -> void:
+	var dealt := Damage.dealt(raw_damage, Levels.magic_defence(wizard_state.wizard_level))
+	wizard_state.health = maxi(1, wizard_state.health - dealt)
 
 
 func remove_wizard(peer_id: int) -> void:
@@ -255,6 +347,12 @@ func _send_state_updates() -> void:
 			for ready in wizard_state.ready_ticks:
 				cooldowns.append(maxi(0, ready - tick))
 			shared.cooldowns = cooldowns
+			shared.speed = wizard_state.speed
+			shared.effects = 0
+			if wizard_state.is_burning(tick):
+				shared.effects |= StateUpdate.BURNING
+			if wizard_state.is_slowed(tick):
+				shared.effects |= StateUpdate.SLOWED
 			_channel.send_state_update(peer_id, shared)
 
 
@@ -263,6 +361,8 @@ func _room_state(room_id: StringName, peer_ids: PackedInt32Array) -> StateUpdate
 	var update := StateUpdate.new()
 	update.tick = tick
 	update.room_id = room_id
+	update.season = season
+	update.season_ticks_left = season_ticks_left()
 	update.wizard_ids = peer_ids
 	for peer_id in peer_ids:
 		update.wizard_positions.append(_wizards[peer_id].position)
