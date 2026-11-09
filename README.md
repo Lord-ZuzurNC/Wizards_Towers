@@ -93,6 +93,7 @@ Discovering combinations is the game.
 
 ## Documentation
 
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — the milestones to an alpha, and the decisions each one waits on.
 - [`docs/GUIDELINES.md`](docs/GUIDELINES.md) — code, documentation and asset style guide, targeting Godot 4.7.
 - [`docs/GLOSSARY.md`](docs/GLOSSARY.md) — the project's vocabulary, and the contract between the design documents and the identifiers in the code.
 - [`docs/FORMULAS.md`](docs/FORMULAS.md) — every number the game computes rather than authors, written once.
