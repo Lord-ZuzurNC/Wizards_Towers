@@ -8,6 +8,7 @@ The look every sprite, tile and screen aims for, so art from several hands still
   - [View and scale](#view-and-scale)
   - [Palettes](#palettes)
   - [Rooms and camera](#rooms-and-camera)
+  - [Spell bar](#spell-bar)
   - [Look](#look)
 
 ## How to read this document
@@ -66,6 +67,29 @@ Darkness and light sources are computed, then every pixel on screen is snapped b
 
 Inside a dungeon or a maze the HUD is simplified, to leave the room as much of the screen as possible: health, mana, the spell bar, and a row of icons opening the menus, kept clear of the room.
 A maze puzzle needing more room spreads over several rooms.
+
+## Spell bar
+
+**Two bars of five squares, one per row of keys** (`TECH_STACK.md`, *Controls*): the plain bar for Grimoire positions 1 to 5, the Shift bar for 6 to 10.
+The squares follow the positions in order: left button, right button, Space, Q, E.
+
+**The Shift bar sits behind the plain bar, a quarter of a square up and to the right.**
+Three quarters of each of its squares are hidden, so it shows as an upturned L along the top and right of the plain bar.
+
+**Holding Shift brings the Shift bar to the front; releasing it sends it back.**
+Neither bar moves: only which one is drawn in front changes, so the eye never chases a moving bar mid-fight.
+The bar in front is the active one, the one the keys cast from.
+
+**Each bar shows its cooldowns on its own side: the plain bar's below its squares, the Shift bar's above.**
+Both strips stay in view whichever bar is in front, so a slow spell in the Shift bar can be watched without holding Shift.
+A cast square goes to a resting colour, its strip empties as the cooldown runs, and the square takes its colour back when the spell is ready.
+BLK NX64 has no neutral grey: the resting colour is one of its dark blues.
+
+**Above both bars, the five keys, named as the player's own keyboard prints them.**
+Mouse buttons and Space are drawn as small icons, letters as letters.
+They are blue while the plain bar is active and orange while Shift is held, both from the palette.
+
+⬜ The size of a square and where the bar stands on screen, settled with the rest of the HUD.
 
 ## Look
 

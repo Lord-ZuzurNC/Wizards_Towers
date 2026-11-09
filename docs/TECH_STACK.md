@@ -99,6 +99,9 @@ Side buttons of the mouse are not used by default, since not every player has th
 | Open a card choice | C            |
 
 A player chooses which spell sits in which Grimoire position, so the table above says what each position suits, not what it holds.
+How the two rows are shown on screen is in `ART_DIRECTION.md`, section *Spell bar*.
+
+**Binding the keys again happens in the settings**, designed with the menus.
 
 ## Client and server
 
