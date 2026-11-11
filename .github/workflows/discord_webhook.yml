@@ -14,5 +14,5 @@ jobs:
           repo_format: '📂 {repo}'
           title_format: '⚡ {count} new {commits} on {branch}'
           commit_format: '🔧 {sha} {subject} — {author}'
-          footer_format: '🪾 {branch} · {pusher}'
+          footer_format: '🌳 {branch} · {pusher}'
           more_format: '➕ {count} more {commits}'
