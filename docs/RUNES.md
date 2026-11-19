@@ -113,22 +113,24 @@ It is also the slot that now determines Reach, since Range no longer exists.
 Element gives the spell its nature.
 It decides what the damage *is*, and therefore what resists it.
 
-| Rune         | What it does                                                                       | Weight | Notes                                                                                       |
-| ------------ | ---------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------- |
-| **Ember**    | Fire damage, and a short burn afterwards.                                          | 2      | The reliable one. Burns through village crops.                                              |
-| **Rime**     | Cold damage, and a brief slow.                                                     | 2      | The best element for escaping a stronger wizard.                                            |
-| **Spark**    | Lightning damage, instant, with a chance to strike twice.                          | 2      | The only element with built-in randomness, scaled by luck.                                  |
-| **Gale**     | Wind damage, light, pushing what it hits.                                          | 2      | Low damage, high control. Can shove an enemy off a floor.                                   |
-| **Stone**    | Blunt damage, slow to land, ignoring a portion of magic defence.                   | 3      | The answer to a high-defence echo.                                                          |
-| **Verdure**  | Living damage that spreads to what stands nearby.                                  | 3      | Spreads through crops and through packed enemies.                                           |
-| **Brine**    | Corrosive damage that reduces the target's magic defence while it lasts.           | 3      | Opens a target for a second, heavier spell.                                                 |
-| **Gloom**    | Shadow damage that is stronger against a target that cannot see the caster.        | 3      | Rewards ambush. Weak in the open.                                                           |
-| **Toxin**    | Poison damage over time that also lowers the target's `power` while it lasts.      | 3      | Low immediate damage, almost pure debuff. The only element that weakens what it hits.       |
-| **Radiance** | Light damage, stronger against the undead and against echoes.                      | 4      | The anti-echo element. A floor raider's choice.                                             |
-| **Ichor**    | Blood damage that costs the caster health and returns it on a hit.                 | 4      | The only element that can kill its own caster.                                              |
-| **Null**     | Pure force with no elemental nature, which nothing resists and nothing is weak to. | 5      | Expensive, predictable, and never the wrong answer.                                         |
-| **Unmaking** | Void damage that also removes a buff or a lingering effect from the target.        | 5      | The only element that interacts with other wizards' spells.                                 |
-| **Rust**     | Metal damage that ignores magic defence entirely.                                  | 5      | The longest cooldown of any element. Where Stone ignores a portion, this ignores all of it. |
+| Rune         | What it does                                                                       | Weight | Magnitude | Notes                                                                                       |
+| ------------ | ---------------------------------------------------------------------------------- | ------ | --------: | ------------------------------------------------------------------------------------------- |
+| **Ember**    | Fire damage, and a short burn afterwards.                                          | 2      |        12 | The reliable one. Burns through village crops.                                              |
+| **Rime**     | Cold damage, and a brief slow.                                                     | 2      |        12 | The best element for escaping a stronger wizard.                                            |
+| **Spark**    | Lightning damage, instant, with a chance to strike twice.                          | 2      |        12 | The only element with built-in randomness, scaled by luck.                                  |
+| **Gale**     | Wind damage, light, pushing what it hits.                                          | 2      |        12 | Low damage, high control. Can shove an enemy off a floor.                                   |
+| **Stone**    | Blunt damage, slow to land, ignoring a portion of magic defence.                   | 3      |        16 | The answer to a high-defence echo.                                                          |
+| **Verdure**  | Living damage that spreads to what stands nearby.                                  | 3      |        16 | Spreads through crops and through packed enemies.                                           |
+| **Brine**    | Corrosive damage that reduces the target's magic defence while it lasts.           | 3      |        16 | Opens a target for a second, heavier spell.                                                 |
+| **Gloom**    | Shadow damage that is stronger against a target that cannot see the caster.        | 3      |        16 | Rewards ambush. Weak in the open.                                                           |
+| **Toxin**    | Poison damage over time that also lowers the target's `power` while it lasts.      | 3      |        16 | Low immediate damage, almost pure debuff. The only element that weakens what it hits.       |
+| **Radiance** | Light damage, stronger against the undead and against echoes.                      | 4      |        20 | The anti-echo element. A floor raider's choice.                                             |
+| **Ichor**    | Blood damage that costs the caster health and returns it on a hit.                 | 4      |        20 | The only element that can kill its own caster.                                              |
+| **Null**     | Pure force with no elemental nature, which nothing resists and nothing is weak to. | 5      |        24 | Expensive, predictable, and never the wrong answer.                                         |
+| **Unmaking** | Void damage that also removes a buff or a lingering effect from the target.        | 5      |        24 | The only element that interacts with other wizards' spells.                                 |
+| **Rust**     | Metal damage that ignores magic defence entirely.                                  | 5      |        24 | The longest cooldown of any element. Where Stone ignores a portion, this ignores all of it. |
+
+**Magnitude is what `FORMULAS.md` calls `base_magnitude(element)`**, the common-rarity input to `raw_damage`. It scales by rarity the same way weight does — see the table above this section — so a legendary Ember swings 2.5× harder than a common one, at 2× the weight.
 
 ## Duration
 
@@ -234,3 +236,10 @@ Expect to retune them once the weight bar is implemented and a single fight can 
 **`Pool` and `Rain` need watching.**
 Both are placed area shapes, and `Pool` at weight 3 is cheaper than `Rain` at 4.
 They are separated by `Rain` striking from above in bursts while `Pool` holds the ground continuously, which is a real difference only if `Lingering` and `Instant` feel distinct in play.
+
+## Alpha scope
+
+**The alpha ships the full catalogue, uncut.**
+Runes are data, not art or level content: nothing above needs a sprite, a voice line or a hand-placed encounter before Milestone 1 can build the spell system against it.
+Cutting the list would only shrink a tester's strategy space for no saved work, so all **77** runes ship with the first playable spell builder.
+Decided in `ROADMAP.md`, Milestone 1.

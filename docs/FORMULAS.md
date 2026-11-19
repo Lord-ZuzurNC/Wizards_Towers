@@ -128,7 +128,16 @@ Ten is the cap, reached at level 28; the key casting each is in `TECH_STACK.md`,
 
 A wizard at level 10 roughly matches a veteran enemy, and at the level-30 target blocks about what a champion blocks, before any card.
 
-⬜ The XP needed for each `wizard_level`.
+**XP curve.**
+
+```text
+xp_to_level_up(L) = 100 × L      XP needed to go from wizard_level L to L + 1, for L in 1..29
+xp_cumulative(L)  = 100 × L × (L - 1) / 2
+```
+
+Source: `GLOSSARY.md`, wizard level; `CARDS.md`.
+Linear per level, so the climb never jumps: level 1 → 2 costs 100 XP, level 29 → 30 costs 2 900 XP, and the level-30 target costs 43 500 XP across the whole run.
+Against `xp(kill) = health / 10`, that is about 544 common kills, spread across combat, quests and mazes — the mixed diet that gives the **30** card choices their 'about one per hour of play' pace over the roughly 30 hours of active play an 8-day run expects from a tester.
 
 ## Combat
 
@@ -144,7 +153,16 @@ Rounding down alone would break that promise for small hits, so a hit that lands
 `K` is the defence that halves a hit: at 60, a champion's 40 `magic_defence` blocks 40 % of a hit.
 Penetration is how Stone ignores a portion of defence and Rust ignores all of it.
 
-⬜ `raw_damage`, from the spell's magnitude and the caster's `power`.
+**Raw damage.**
+
+```text
+raw_damage        = element_magnitude × power / 10
+element_magnitude = base_magnitude(element) × magnitude_multiplier(rarity)      see RUNES.md, Element
+```
+
+Source: `RUNES.md`, Element.
+Magnitude lives on the Element rune alone: Element already decides what the damage *is*, so it also decides how much of it there is, before Shape, Duration and Effect reshape its delivery.
+Dividing by 10 anchors the scale to the level-1 baseline: at `power` 10, `raw_damage` equals `element_magnitude` exactly, and it grows with `power` from there — about ×2 by level 11, ×3.9 at the level-30 target.
 
 **Hazards.**
 
@@ -158,9 +176,25 @@ Dealt at each hazard hit to every combatant standing on the ground, with the run
 Ember on a rift bank in summer, Rime on the glacier in winter.
 Source: `WORLD_MAP.md`, section *Hazards*.
 
-`hazard_raw_damage` is a placeholder for testing.
-⬜ It becomes the base damage of the Ember or Rime rune once `raw_damage` exists.
-⬜ How long Ember's burn and Rime's slow last after the last hit, what each burn hit deals, and how much speed the slow takes. Placeholders for testing: a burn of 2 seconds hitting for 1 on the hazard's beat, a slow of 1 second taking 30 % of speed.
+`hazard_raw_damage` was a placeholder for testing; it becomes `element_magnitude` of Ember or Rime at common rarity (12, see `RUNES.md`) now that `raw_damage` exists. A hazard never scales with `power`, since nobody casts it.
+
+**Ember's burn.**
+
+```text
+burn_duration = 3 simulation seconds after the last hit
+burn_tick     = every 0.5 s (the hazard's own beat)
+burn_damage   = round(0.3 × raw_damage) per tick, through the same defence formula as the hit that applied it
+```
+
+**Rime's slow.**
+
+```text
+slow_duration = 2 simulation seconds after the last hit
+slow_amount   = 30 % of speed
+```
+
+Source: `WORLD_MAP.md`, Hazards; `RUNES.md`, Ember and Rime.
+Both figures replace the 2-second / 1-second testing placeholders now that a real `raw_damage` exists to scale the burn against; the slow amount was already right.
 
 ## Magic
 
@@ -191,8 +225,43 @@ headroom       = weight_bar_max - spell_weight
 Source: `GLOSSARY.md`, weight bar.
 The bar runs from 1 to the wizard's weight limit, not their mana pool, and no figure is ever shown to the player.
 
-⬜ The mana cost of a spell, computed from `spell_weight`.
-⬜ The cooldown of a spell, computed from its Duration and Element.
+**Mana cost.**
+
+```text
+mana_cost = max(1, round(0.6 × spell_weight ^ 1.3))
+```
+
+Source: `RUNES.md`.
+A convex curve: weight is cheap to add in small amounts and expensive in large ones, so a cheap two-rune spell stays cheap and the heaviest five-rune builds cost real mana even on a full pool.
+The lightest legal spell, `Bolt` + an Element + `Instant` at weight 4, costs about 4 mana; the heaviest possible spell, weight 52, costs about 102 — a third of a level-30 wizard's 300-mana pool.
+
+**Cooldown.**
+
+```text
+cooldown = base_cooldown(duration) × cooldown_multiplier(element)      seconds
+```
+
+| Duration      | `base_cooldown` |
+| ------------- | --------------: |
+| **Instant**   |            1.0s |
+| **Brief**     |            1.5s |
+| **Delayed**   |            1.5s |
+| **Sustained** |            1.0s |
+| **Lingering** |            2.5s |
+| **Echoing**   |            3.0s |
+| **Eternal**   |            5.0s |
+
+| Element weight | `cooldown_multiplier` | Elements                            |
+| -------------: | --------------------: | ----------------------------------- |
+|              2 |                  ×1.0 | Ember, Rime, Spark, Gale            |
+|              3 |                 ×1.15 | Stone, Verdure, Brine, Gloom, Toxin |
+|              4 |                  ×1.3 | Radiance, Ichor                     |
+|              5 |                  ×1.5 | Null, Unmaking                      |
+|              5 |                  ×1.8 | Rust                                |
+
+Source: `RUNES.md`, Duration and Element.
+Rust is split out of the weight-5 row on its own: it already ignores magic defence entirely, and `RUNES.md` already names it the longest cooldown of any element.
+`Sustained` keeps a short base cooldown because its own cost is paid per tick while held, not at the cast; see `GLOSSARY.md`, spell slot.
 
 ## Enemies
 
@@ -455,15 +524,10 @@ Source: `GLOSSARY.md`, sudden death.
 
 Gathered here so they can be answered in one pass, roughly in the order the game needs them.
 
-| Formula                                         | Needed by                     | Blocks                               |
-| ----------------------------------------------- | ----------------------------- | ------------------------------------ |
-| `raw_damage`                                    | every fight                   | any balancing at all                 |
-| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates             |
-| Mana cost, from `spell_weight`                  | `RUNES.md`                    | the spell builder                    |
-| Cooldown, from Duration and Element             | `RUNES.md`                    | the spell builder                    |
-| XP per `wizard_level`                           | `GLOSSARY.md`, `MAZES.md`     | maze rewards, Grimoire pace          |
-| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy                    |
-| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression                     |
-| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace                        |
-| `base_lock_price` and `lock_multiplier`         | `CARDS.md`                    | the card choice                      |
-| Element rune base damage                        | `WORLD_MAP.md`, `RUNES.md`    | hazard damage beyond the placeholder |
+| Formula                                         | Needed by                     | Blocks                   |
+| ----------------------------------------------- | ----------------------------- | ------------------------ |
+| Crit and favourable rolls, from `luck`          | every fight, drops            | Spark, crits, drop rates |
+| `base_price` and `multiplier` per purchase type | `UPGRADES_*.md`, `WEAPONS.md` | the whole economy        |
+| Score weights and RP conversion                 | `GLOSSARY.md`                 | meta-progression         |
+| Stone drop chances                              | `DUNGEONS.md`                 | Grimoire pace            |
+| `base_lock_price` and `lock_multiplier`         | `CARDS.md`                    | the card choice          |

@@ -180,12 +180,14 @@ An addon providing them would be an engine plugin, see [What is deliberately abs
 
 During development the server runs as a headless process and the client connects to it on `localhost`, both on the same machine.
 
-⬜ **Lag compensation**, the server judging a hit as the caster saw it, is deferred.
-Settled by playing over a real network.
-On `localhost` the latency is zero and hides the question.
-
 ⬜ **Interest management**, each client receiving only what stands near it, is deferred.
 Required before fifty wizards share a 2 560-tile map, not before.
+
+**Lag compensation is confirmed deferred, for Milestone 1 and the alpha.**
+The server keeps judging every hit at the position it already holds, with no rewind to what the caster saw.
+Milestone 1 is tested headless and on `localhost`, where latency is zero and the question cannot even be measured; building it now would mean tuning against a number that does not exist yet.
+Revisited once Milestone 7 puts testers on a real network.
+Decided in `ROADMAP.md`, Milestone 1.
 
 ## Persistence
 

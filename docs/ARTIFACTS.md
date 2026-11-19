@@ -34,6 +34,11 @@ A Monolith has `current wizards - 1` floors, so a floor exists only once enough 
 Its Artifact is dealt at generation all the same, and wakes when a joining wizard unlocks the floor.
 A world that never fills never reaches its enhanced or powerful floors, and that is intended.
 
+**Out of scope before Milestone 6.**
+An Artifact lives on a floor, and no floor exists until the Monolith does.
+The alpha's own subset of this catalogue — smaller than the full 100, since pairing effect and corruption by hand is real production work — is picked when Milestone 6 starts, once floors exist to test the pairing against.
+Decided in `ROADMAP.md`, Milestone 1.
+
 **Effect and corruption are paired at world generation, never authored together.**
 One table per attribute lists Artifacts with their **effect only**, and one shared **Corruptions** table lists the costs they can be paired with.
 Because a corruption can land on any Artifact, no corruption references a specific Artifact's effect.

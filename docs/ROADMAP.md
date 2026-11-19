@@ -70,14 +70,14 @@ Each of these is a stand-in that a milestone below replaces.
 The heart of the game; everything else plugs into it.
 
 **Decisions**
-- [ ] `raw_damage`, from the spell's magnitude and the caster's `power` (`FORMULAS.md`).
-- [ ] The mana cost of a spell from `spell_weight`, and its cooldown from Duration and Element (`FORMULAS.md`).
-- [ ] The XP needed for each `wizard_level` (`FORMULAS.md`).
-- [ ] How long Ember's burn and Rime's slow last, and what they deal (`FORMULAS.md`).
-- [ ] **What happens when a wizard dies**: `GLOSSARY.md` says a wizard lives one run at most; what does the player do next, watch or leave? (`GLOSSARY.md`, wizard ending)
-- [ ] **The inventory**: where carried runes and weapons live, and how many. **Undocumented.**
-- [ ] Lag compensation: kept deferred for the alpha, or built now (`TECH_STACK.md`).
-- [ ] The runes and Artifacts in the alpha subset (`RUNES.md`, `ARTIFACTS.md`).
+- [x] `raw_damage`, from the spell's magnitude and the caster's `power` (`FORMULAS.md`).
+- [x] The mana cost of a spell from `spell_weight`, and its cooldown from Duration and Element (`FORMULAS.md`).
+- [x] The XP needed for each `wizard_level` (`FORMULAS.md`).
+- [x] How long Ember's burn and Rime's slow last, and what they deal (`FORMULAS.md`).
+- [x] **What happens when a wizard dies**: `GLOSSARY.md` says a wizard lives one run at most; what does the player do next, watch or leave? (`GLOSSARY.md`, wizard ending)
+- [x] **The inventory**: where carried runes and weapons live, and how many. (`GLOSSARY.md`)
+- [x] Lag compensation: kept deferred for the alpha, or built now (`TECH_STACK.md`).
+- [x] The runes and Artifacts in the alpha subset (`RUNES.md`, `ARTIFACTS.md`).
 
 **Build**
 - [ ] Spells assembled from runes: Shape, Element, Duration, Effect.
