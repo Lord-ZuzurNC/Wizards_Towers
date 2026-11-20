@@ -177,3 +177,26 @@ func _world(rows: PackedStringArray) -> WorldMapData:
 	world.id = &"w"
 	world.rows = rows
 	return world
+
+
+func test_the_monolith_footprint_is_always_blocked() -> void:
+	var world := WorldMapData.new()
+	world.rows = PackedStringArray(["." + "M".repeat(3) + "."])
+	for season: int in Season.COUNT:
+		world.season = season
+		for x: int in [1, 2, 3]:
+			assert_true(world.is_solid(Vector2i(x, 0)), Season.label(season))
+
+
+func test_random_walkable_tile_never_lands_on_blocked_ground() -> void:
+	var world := WorldMapData.new()
+	world.rows = PackedStringArray(["~.M.~", "~...~"])
+	for i in 50:
+		var tile := world.random_walkable_tile()
+		assert_false(world.is_solid(tile), str(tile))
+
+
+func test_random_walkable_tile_is_the_origin_when_nothing_is_walkable() -> void:
+	var world := WorldMapData.new()
+	world.rows = PackedStringArray(["~~~", "~~~"])
+	assert_eq(world.random_walkable_tile(), Vector2i.ZERO)

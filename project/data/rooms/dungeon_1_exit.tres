@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RoomData" format=3]
+
+[ext_resource type="Script" path="res://core/world/room_exit.gd" id="1_rexit"]
+[ext_resource type="Script" path="res://core/world/room_data.gd" id="2_rdata"]
+
+[sub_resource type="Resource" id="Resource_exit"]
+script = ExtResource("1_rexit")
+area = Rect2i(9, 2, 1, 1)
+target_room = &"world_map"
+target_tile = Vector2i(75, 52)
+
+[resource]
+script = ExtResource("2_rdata")
+id = &"dungeon_1_exit"
+title = "Dungeon 1 — exit"
+rows = PackedStringArray("##########", "#........#", "#.........", "#........#", "#........#", "##########")
+exits = Array[ExtResource("1_rexit")]([SubResource("Resource_exit")])
+spawn_tile = Vector2i(1, 2)

@@ -71,6 +71,8 @@ const LAKE_COLOR := Color("50b9eb")
 const FROZEN_WATER_COLOR := Color("8cdaff")
 ## A rift bank in summer, while it burns.
 const BURNING_BANK_COLOR := Color("b23c40")
+## The Monolith's footprint: reserved and blocked, not yet a real structure.
+const MONOLITH_COLOR := Color("000000")
 ## The screen in art pixels, and the HUD band along its bottom that the map scrolls above.
 const SCREEN := Vector2i(640, 360)
 ## Pulled back on the world map only (ART_DIRECTION.md, Rooms and camera): shows about
@@ -379,6 +381,8 @@ static func terrain_color(world_map: WorldMapData, tile: Vector2i) -> Color:
 			if world_map.season == Season.Kind.SUMMER:
 				return BURNING_BANK_COLOR
 			return RIFT_BANK_COLOR
+		Biome.Feature.MONOLITH:
+			return MONOLITH_COLOR
 		Biome.Feature.WATER:
 			if world_map.season == Season.Kind.WINTER:
 				return FROZEN_WATER_COLOR

@@ -8,7 +8,7 @@ extends RoomData
 ## .  plains        f  forest       m  marsh        g  glacier
 ## d  desert        h  mountain     v  volcanic     ~  sea (coast)
 ## ^  spine         o  crater       x  rift core    r  rift bank
-## =  the glacier's lake
+## =  the glacier's lake    M  the Monolith's footprint
 ## [/codeblock]
 ## Blocked: the sea, the lake, a spine, a crater and a rift core; in winter the sea and the
 ## lake freeze and can be walked on. The world sets [member season] as the run goes on.
@@ -30,12 +30,17 @@ const LEGEND: Dictionary[String, Vector2i] = {
 	"x": Vector2i(Biome.Kind.VOLCANIC, Biome.Feature.RIFT_CORE),
 	"r": Vector2i(Biome.Kind.VOLCANIC, Biome.Feature.RIFT_BANK),
 	"=": Vector2i(Biome.Kind.GLACIER, Biome.Feature.WATER),
+	"M": Vector2i(Biome.Kind.MOUNTAIN, Biome.Feature.MONOLITH),
 }
 ## WORLD_MAP.md, Scale: 2 560 tiles a side.
 const MAP_MAX_SIZE := Vector2i(2560, 2560)
 
 ## The season the map is in, a [enum Season.Kind]. Set by the world, never saved.
 var season := Season.Kind.SPRING as int
+## Whether a newcomer appears on a random walkable tile rather than at [member spawn_tile].
+## Off by default: most world maps used in tests want the one deterministic spawn they
+## authored. The real world map turns this on — it has no single "right" place to start.
+@export var random_spawn := false
 
 
 func is_solid(tile: Vector2i) -> bool:
@@ -47,6 +52,21 @@ func is_solid(tile: Vector2i) -> bool:
 	if entry.y == Biome.Feature.WATER and season == Season.Kind.WINTER:
 		return false
 	return not Biome.is_walkable(entry.y)
+
+
+## A tile of [param feature] drawn at random from every walkable tile of the map; none if
+## the map has no walkable tile at all. Used to place a newcomer on the world map, since it
+## has no single fixed [member spawn_tile] worth favouring over another.
+func random_walkable_tile() -> Vector2i:
+	var candidates: Array[Vector2i] = []
+	for y in rows.size():
+		for x in rows[y].length():
+			var tile := Vector2i(x, y)
+			if not is_solid(tile):
+				candidates.append(tile)
+	if candidates.is_empty():
+		return Vector2i.ZERO
+	return candidates[randi() % candidates.size()]
 
 
 ## Whether [param tile] is frozen water: the sea or the lake, in winter.

@@ -23,6 +23,10 @@ enum Feature {
 	RIFT_CORE,
 	RIFT_BANK,
 	WATER,
+	## The Monolith's footprint (GLOSSARY.md, The Monolith). Always impassable; not yet a
+	## real structure to enter — a reserved, blocked patch at the centre of the world map
+	## until Milestone 6 builds the real thing.
+	MONOLITH,
 }
 
 const NAMES: Array[String] = [

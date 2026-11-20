@@ -135,3 +135,30 @@ func _wizard_beyond(client: GameClient, x: float) -> bool:
 func _add(node: Node) -> void:
 	(Engine.get_main_loop() as SceneTree).root.add_child(node)
 	_nodes.append(node)
+
+
+func test_a_newcomer_spawns_on_a_random_walkable_tile_not_always_the_same_one() -> void:
+	var seen: Array[Vector2] = []
+	for i in 5:
+		var port := _next_port
+		_next_port += 1
+		var server := GameServer.new()
+		var world := RoomFixtures.small_world()
+		world.random_spawn = true
+		server.world.rooms = { &"world": world }
+		server.world.start_room = &"world"
+		_add(server)
+		assert_eq(server.start(port), OK)
+		var client := GameClient.new()
+		client.world.rooms = { &"world": RoomFixtures.small_world() }
+		client.world.input_override = Movement.IDLE
+		_add(client)
+		assert_eq(client.join("127.0.0.1", port), OK)
+		assert_true(await wait_until(_client_in_room.bind(client)))
+		var position := server.world.wizard_position(client.peer_id())
+		assert_false(world.is_solid(world.tile_at(position)), str(position))
+		seen.append(position)
+	var distinct := { }
+	for p: Vector2 in seen:
+		distinct[p] = true
+	assert_true(distinct.size() > 1, "every spawn landed on the same tile: %s" % [seen])

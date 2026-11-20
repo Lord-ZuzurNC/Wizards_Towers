@@ -20,8 +20,10 @@ var rooms: Dictionary[StringName, RoomData] = { }
 var cards: Dictionary[StringName, Card] = { }
 ## Every number the design has not settled; see [PlaceholderValues].
 var values: PlaceholderValues
-## The room every new wizard starts in.
-var start_room := &"first_room"
+## The room every new wizard starts in. `first_room` is still a quick two-room sanity
+## test (`server/run-server.sh`, then setting this back by hand) — it is just no longer
+## the default now that a populated world map exists to spawn into.
+var start_room := &"world_map"
 var tick := 0
 ## The tick the current run began.
 var run_start_tick := 0
@@ -101,11 +103,17 @@ func season_ticks_left() -> int:
 	return Season.ticks_left(tick - run_start_tick, values.season_ticks)
 
 
-## A wizard as it enters a run: in the start room, at level 1.
+## A wizard as it enters a run: in the start room, at level 1. On a world map, it appears
+## on a random walkable tile rather than always the same spot — a world map has no one
+## "right" place to start, unlike a room with a doorway.
 func _newcomer() -> WizardState:
 	var wizard := WizardState.new()
 	wizard.room_id = start_room
-	wizard.position = rooms[start_room].tile_center(rooms[start_room].spawn_tile)
+	var start := rooms[start_room]
+	var world_map := start as WorldMapData
+	var random := world_map != null and world_map.random_spawn
+	var tile := world_map.random_walkable_tile() if random else start.spawn_tile
+	wizard.position = start.tile_center(tile)
 	wizard.gold = values.starting_gold
 	return wizard
 
