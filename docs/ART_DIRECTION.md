@@ -37,7 +37,7 @@ A CC-BY-SA piece that is modified must stay under CC-BY-SA, not under the projec
 | Native resolution  | 640 × 360 for the whole screen, scaled by whole numbers: ×2 to 720p, ×3 to 1080p, ×4 to 1440p, ×6 to 4K |
 | Drawing            | At screen resolution: an art pixel keeps its size, but things move by finer steps, so motion is smooth  |
 | On screen          | 40 × 22.5 tiles; crossing the screen at speed 100 takes 10 seconds                                      |
-| Characters         | 24 to 32 pixels tall                                                                                    |
+| Characters         | 32 × 32 canvas, the wizard itself 24 to 32 pixels tall inside it (room for a hat, a robe's flare, a raised arm) |
 | Large world bosses | 48 to 64 pixels tall                                                                                    |
 | Frame rate         | Follows the screen's refresh rate, never capped; the simulation itself stays at 30 ticks a second       |
 | Animation          | About 10 frames a second, independent of the game's frame rate                                          |
@@ -58,6 +58,8 @@ BLK NX64 alone runs short of dark tones there: in the test of `pre-POCs/dungeon_
 Darkness and light sources are computed, then every pixel on screen is snapped back to the nearest colour of the palette in use, light falling in visible steps blended by an ordered dither.
 
 ## Rooms and camera
+
+**The world map's camera is pulled back**, `WORLD_MAP_ZOOM` in `client_world.gd`: it shows about 1.5× what a dungeon or maze room shows, at the same 1:1 pixel density everywhere else — the wizard's own sprite is not rescaled for it.
 
 | Place                                   | Size                                                                                      | Camera             |
 | --------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------ |

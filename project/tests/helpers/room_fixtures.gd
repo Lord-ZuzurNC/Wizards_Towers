@@ -18,7 +18,7 @@ static func small_world() -> WorldMapData:
 	var rows := PackedStringArray()
 	for y in 30:
 		var row := ""
-		for x in 50:
+		for x in 70:
 			if y == 0 or y == 29 or x < 2:
 				row += "~"
 			elif x >= 30:

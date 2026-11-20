@@ -1,8 +1,11 @@
 extends TestCase
 ## Walking on a world map, end to end: biomes, the sea, and the camera.
 ##
-## Real server, real client, real ticks, on [method RoomFixtures.small_world]: 50 × 30
-## tiles, sea on the left edge, plains, then forest from column 30 on.
+## Real server, real client, real ticks, on [method RoomFixtures.small_world]: 70 × 30
+## tiles, sea on the left edge, plains, then forest from column 30 on. 70 tiles (1120 px)
+## is wide enough that [constant ClientWorld.WORLD_MAP_ZOOM] still leaves real room for the
+## camera to move before it hits either edge — narrower, and the zoomed-out view would span
+## the whole room and the camera would just sit centred, never following at all.
 
 const LEFT := 3
 const RIGHT := 5
@@ -57,12 +60,17 @@ func test_the_sea_stops_the_wizard_on_both_sides() -> void:
 func test_the_camera_follows_the_wizard_but_never_shows_past_the_map() -> void:
 	_start_server()
 	var client := await _join()
+	# Half of what the zoomed-out camera shows, in world pixels either side of its centre.
+	var half_extent := (ClientWorld.SCREEN.x / 2.0) / ClientWorld.WORLD_MAP_ZOOM.x
 	await _ticks(2)
 	# At tile 10 the wizard is too near the west edge: the camera rests against it.
-	assert_eq(client.world.camera_center().x, 320.0)
+	assert_true(
+		absf(client.world.camera_center().x - half_extent) < 1.0,
+		str(client.world.camera_center()),
+	)
 	client.world.input_override = RIGHT
-	# Past 320 the camera can follow; past 480 it would rest against the east edge.
-	assert_true(await wait_until(_wizard_beyond.bind(client, 400.0), 6.0))
+	# Once the wizard is past half_extent the camera can follow it freely.
+	assert_true(await wait_until(_wizard_beyond.bind(client, half_extent + 80.0), 8.0))
 	client.world.input_override = Movement.IDLE
 	await _ticks(2)
 	var gap := absf(client.world.camera_center().x - client.world.own_position().x)

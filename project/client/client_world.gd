@@ -73,6 +73,9 @@ const FROZEN_WATER_COLOR := Color("8cdaff")
 const BURNING_BANK_COLOR := Color("b23c40")
 ## The screen in art pixels, and the HUD band along its bottom that the map scrolls above.
 const SCREEN := Vector2i(640, 360)
+## Pulled back on the world map only (ART_DIRECTION.md, Rooms and camera): shows about
+## 60% more tiles on each side. Tune by eye; this is the first value tried.
+const WORLD_MAP_ZOOM := Vector2(0.65, 0.65)
 const HUD_HEIGHT := 40
 ## A correction larger than this, in pixels, is a jump rather than a nudge: the wizard is
 ## placed there at once instead of gliding.
@@ -411,6 +414,9 @@ func _enter_room(new_room: RoomData) -> void:
 	_camera.limit_right = maxi(size.x, SCREEN.x)
 	# The HUD band hides the screen's bottom lines: the map may scroll on above it.
 	_camera.limit_bottom = maxi(size.y + HUD_HEIGHT, SCREEN.y)
+	# The world map is far bigger than a screen, so it reads better pulled back; dungeons
+	# and mazes stay at 1:1 — the wizard's own sprite is not rescaled either way.
+	_camera.zoom = WORLD_MAP_ZOOM if room is WorldMapData else Vector2.ONE
 	for marker: WizardMarker in _others.values():
 		marker.queue_free()
 	_others.clear()
