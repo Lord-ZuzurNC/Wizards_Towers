@@ -64,6 +64,11 @@ Each of these is a stand-in that a milestone below replaces.
 - [ ] Nothing is saved. → milestone 3
 - [ ] The spell bar is two plain rows, not the design in `ART_DIRECTION.md`, *Spell bar*. → milestone 7
 - [ ] A season lasts 2 minutes instead of 48 hours. → milestone 7
+- [ ] Every wizard starts knowing every rune at common rarity: there is no loot, no NPC shop
+      and no quest reward yet to grant one for real (`KnownRunes.starter()`). → milestone 4
+- [ ] Only Bolt's Shape has real behaviour: a straight projectile. The other 20 Shapes'
+      spells compute real numbers (RUNES.md, FORMULAS.md) but cannot be cast yet, and no
+      Effect rune does anything yet. → milestone 1, still open
 
 ## Milestone 1 — Real combat
 

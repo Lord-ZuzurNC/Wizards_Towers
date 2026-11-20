@@ -15,6 +15,11 @@ var mana_carry := 0.0
 ## For each Grimoire position, index 0 for position 1: the first tick its spell may be
 ## cast again.
 var ready_ticks := PackedInt32Array()
+## The runes this wizard may use in a spell (GLOSSARY.md, known rune).
+var known_runes := KnownRunes.starter()
+## One [Spell] per Grimoire position, index 0 for position 1. Empty (not castable) until
+## edited, except position 0's default.
+var grimoire: Array[Spell] = []
 ## Card choices earned and not yet taken, oldest first: each is a list of card ids.
 var card_choices: Array[PackedStringArray] = []
 ## Every card taken this run, in order.
@@ -35,6 +40,19 @@ var purchase_after := 0
 
 func _init() -> void:
 	ready_ticks.resize(Grimoire.MAX_POSITIONS)
+	grimoire = default_grimoire()
+
+
+## RUNES.md, Shape: Bolt is "the default of every new wizard"; Ember is "the reliable
+## one". The other Grimoire positions start empty.
+static func default_grimoire() -> Array[Spell]:
+	var spells: Array[Spell] = []
+	for i in Grimoire.MAX_POSITIONS:
+		spells.append(Spell.new())
+	spells[0].set_rune(Spell.Slot.SHAPE, &"bolt")
+	spells[0].set_rune(Spell.Slot.ELEMENT, &"ember")
+	spells[0].set_rune(Spell.Slot.DURATION, &"instant")
+	return spells
 
 
 func is_burning(tick: int) -> bool:

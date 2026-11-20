@@ -74,6 +74,7 @@ func setup(channel: WorldChannel) -> bool:
 	_channel.cast_requested.connect(_on_cast_requested)
 	_channel.take_card_requested.connect(_on_take_card_requested)
 	_channel.buy_village_requested.connect(_on_buy_village_requested)
+	_channel.edit_spell_requested.connect(_on_edit_spell_requested)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
@@ -385,9 +386,15 @@ func _on_move_requested(peer_id: int, first_sequence: int, codes: PackedByteArra
 		_wizards[peer_id].inputs.receive(first_sequence, codes)
 
 
-## Checked in turn: a known wizard, a Grimoire position it has, an aim that is a real
-## direction, that position's cooldown over, and the mana to pay. Anything else is ignored
-## without a word: a well-behaved client never sends it.
+## Checked in turn: a known wizard, a Grimoire position it has, a castable spell in it, a
+## Bolt Shape (the only one whose behaviour is built so far — RUNES.md lists 20 more), an
+## aim that is a real direction, that position's cooldown over, and the mana to pay.
+## Anything else is ignored without a word: a well-behaved client never sends it.
+##
+## Damage, mana cost and cooldown come from [member WizardState.grimoire]'s real [Spell]
+## (FORMULAS.md, Magic). A Bolt's flight has no formula yet (RUNES.md only says "fast"),
+## so its speed and range still come from [member PlaceholderValues.spells], kept only for
+## that and for the spell bar's colour.
 func _on_cast_requested(peer_id: int, grimoire_position: int, aim: Vector2) -> void:
 	if not _wizards.has(peer_id):
 		return
@@ -398,20 +405,24 @@ func _on_cast_requested(peer_id: int, grimoire_position: int, aim: Vector2) -> v
 		return
 	if not aim.is_finite() or aim.length() < 0.001:
 		return
-	var spell := values.spells[grimoire_position - 1]
 	var slot := grimoire_position - 1
-	if tick < wizard_state.ready_ticks[slot] or wizard_state.mana < spell.mana_cost:
+	var spell := wizard_state.grimoire[slot]
+	if not spell.is_castable() or RuneCatalog.find(spell.rune_id(Spell.Slot.SHAPE)).id != &"bolt":
 		return
-	wizard_state.mana -= spell.mana_cost
-	wizard_state.ready_ticks[slot] = tick + spell.cooldown_ticks
+	var mana_cost := spell.mana_cost()
+	if tick < wizard_state.ready_ticks[slot] or wizard_state.mana < mana_cost:
+		return
+	wizard_state.mana -= mana_cost
+	wizard_state.ready_ticks[slot] = tick + roundi(spell.cooldown() * Simulation.TICK_RATE)
+	var kinetics := values.spells[slot]
 	var projectile := Projectile.new()
 	projectile.caster_peer_id = peer_id
 	projectile.grimoire_position = grimoire_position
 	projectile.room_id = wizard_state.room_id
 	projectile.position = wizard_state.position + Projectile.BODY_OFFSET
-	projectile.velocity = aim.normalized() * spell.projectile_speed
-	projectile.distance_left = spell.range_tiles * Simulation.TILE_SIZE
-	projectile.raw_damage = spell.raw_damage
+	projectile.velocity = aim.normalized() * kinetics.projectile_speed
+	projectile.distance_left = kinetics.range_tiles * Simulation.TILE_SIZE
+	projectile.raw_damage = spell.raw_damage(wizard_state.power())
 	_projectiles.append(projectile)
 
 
@@ -435,6 +446,31 @@ func _on_buy_village_requested(peer_id: int, village_index: int, after_sequence:
 		return
 	_wizards[peer_id].pending_purchase = village_index
 	_wizards[peer_id].purchase_after = after_sequence
+
+
+## Checked in turn: a known wizard, a Grimoire position it has, a valid [enum Spell.Slot],
+## a rune of that slot's attribute, a grade the wizard knows that rune at. Where the editing
+## wizard stands is not checked yet: "from the wizard's own tower" (GLOSSARY.md, spell
+## editing) waits on territory, Milestone 4.
+func _on_edit_spell_requested(
+	peer_id: int,
+	grimoire_position: int,
+	slot: int,
+	rune_id: StringName,
+	grade: int,
+) -> void:
+	if not _wizards.has(peer_id):
+		return
+	var wizard_state := _wizards[peer_id]
+	if grimoire_position < 1 or grimoire_position > _open_positions(wizard_state):
+		return
+	if slot < 0 or slot >= Spell.Slot.values().size():
+		return
+	if not wizard_state.known_runes.knows(rune_id, grade):
+		return
+	if not wizard_state.grimoire[grimoire_position - 1].set_rune(slot, rune_id, grade):
+		return
+	_channel.send_spell_edited(peer_id, grimoire_position, slot, rune_id, grade)
 
 
 ## A village of the wizard's own room, by its place in the room's list, checked by the same
