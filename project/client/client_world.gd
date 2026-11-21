@@ -124,6 +124,8 @@ var _village_owners: PackedInt32Array = []
 var _season := -1
 var _latest_tick := 0
 var _render_tick := 0.0
+## The seed of the world map grown last; -1 before the server has named one.
+var _world_map_seed := -1
 
 
 func _init() -> void:
@@ -212,6 +214,7 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 	_channel.wizard_died_received.connect(wizard_died.emit)
 	_channel.world_ending_received.connect(_reset_grimoire.unbind(1))
 	_channel.spell_edited_received.connect(_on_spell_edited_received)
+	_channel.world_map_regrown_received.connect(_on_world_map_regrown_received)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
@@ -277,8 +280,10 @@ func owns_village(index: int) -> bool:
 	return village_owner(index) == _own_peer_id
 
 
-## Asks the server to start again as a newcomer in the same world, once the player's own
-## wizard is dead. The next state update shows the fresh wizard; nothing else answers.
+## Asks the server to start again as a newcomer in a new world, once the player's own
+## wizard is dead. Today that new world is everybody's: see
+## [method ServerWorld._on_respawn_requested]. The new map's seed and the next state
+## update show the fresh wizard.
 func respawn() -> void:
 	if _channel != null:
 		_channel.send_respawn()
@@ -410,6 +415,29 @@ func _on_spell_edited_received(
 		return
 	if grimoire[grimoire_position - 1].set_rune(slot, rune_id, grade):
 		grimoire_changed.emit()
+
+
+## The server grew a new world map: the client grows the very same one from the same seed,
+## so it draws and collides against what the server walks on, and shows it at once if the
+## player stands on it. A new world means a newcomer, so the Grimoire goes back to the
+## default too. A seed already applied changes nothing.
+func _on_world_map_regrown_received(map_seed: int) -> void:
+	if map_seed == _world_map_seed:
+		return
+	_world_map_seed = map_seed
+	WorldMapGenerator.regrow(
+		rooms,
+		map_seed,
+		WorldMapGenerator.DUNGEON_ENTRANCES,
+		WorldMapGenerator.DUNGEON_EXITS,
+	)
+	if _season >= 0:
+		_set_season(_season)
+	if room != null and room.id == &"world_map":
+		_enter_room(rooms[&"world_map"])
+		if _predictor.room != null:
+			_predictor.room = room
+	_reset_grimoire()
 
 
 func _reset_grimoire() -> void:

@@ -1,9 +1,11 @@
 extends TestCase
-## A dead wizard's player starting again, as a newcomer in the same world.
+## A dead wizard's player starting again, as a newcomer in a new world: today the one world
+## every connected wizard shares, so all of them start again with it.
 ##
 ## Real server, real clients, real ticks, set up as in `test_wizard_death.gd`: the run starts
 ## in the [code]left[/code] room of [RoomFixtures], and a test lets the rift bank of
-## [method RoomFixtures.seasonal_world] finish the wizard off in summer.
+## [method RoomFixtures.seasonal_world] finish the wizard off in summer. The test of the map
+## itself runs on the real rooms instead, the only ones a world map regrows on.
 
 const SEASON := 10_000
 const RIFT_BANK := Vector2i(11, 2)
@@ -65,36 +67,48 @@ func test_a_dead_wizard_starts_again_at_level_1_on_the_spawn_with_full_health() 
 	assert_true(await wait_until(_client_alive.bind(client)))
 
 
-func test_starting_again_leaves_the_world_and_the_other_wizards_alone() -> void:
-	var server := _start_server()
-	var client := await _join()
-	var other := await _join()
+func test_starting_again_regrows_the_map_and_resets_every_other_wizard_too() -> void:
+	var server := GameServer.new()
+	server.world.values = _values
+	_add(server)
+	assert_eq(server.start(_port), OK)
+	var client := await _join_real()
+	var other := await _join_real()
 	var other_wizard := server.world.wizard(other.peer_id())
+	other_wizard.gain_xp(3 * _values.xp_per_level, _values.xp_per_level)
+	assert_true(await wait_until(_client_sees_level.bind(other, 4)))
 	var watcher := EndingWatcher.new()
 	client.world.run_ended.connect(watcher.on_run_ended)
 	other.world.run_ended.connect(watcher.on_run_ended)
-	await _die(server, client)
-	var run_start := server.world.run_start_tick
-	var map := server.world.rooms[&"world"]
+	var original_rows := (server.world.rooms[&"world_map"] as WorldMapData).rows
+	# How it died does not matter here, only that it is dead.
+	server.world.wizard(client.peer_id()).is_dead = true
 	client.world.respawn()
 	assert_true(await wait_until(_alive.bind(server, client)))
-	assert_true(server.world.wizard(other.peer_id()) == other_wizard)
-	assert_false(other_wizard.is_dead)
-	assert_eq(server.world.run_start_tick, run_start)
-	assert_true(server.world.rooms[&"world"] == map)
+	var new_rows := (server.world.rooms[&"world_map"] as WorldMapData).rows
+	assert_ne(new_rows, original_rows)
+	var fresh_other := server.world.wizard(other.peer_id())
+	assert_true(fresh_other != other_wizard)
+	assert_eq(fresh_other.wizard_level, 1)
+	assert_true(fresh_other.peace_shield_active)
+	assert_true(fresh_other.inputs == other_wizard.inputs)
+	# Both clients grow the same new map from the server's seed.
+	assert_true(await wait_until(_client_sees_rows.bind(client, new_rows)))
+	assert_true(await wait_until(_client_sees_rows.bind(other, new_rows)))
+	assert_true(await wait_until(_client_sees_level.bind(other, 1)))
 	await _ticks(5)
+	# A player trying again is no world ending: nobody is told one happened.
 	assert_true(watcher.endings.is_empty(), str(watcher.endings))
 
 
 func test_the_dead_wizard_s_villages_go_back_to_no_one() -> void:
 	var server := _start_server()
 	var client := await _join()
-	var village: VillageState = server.world.villages_in(&"left")[0]
-	village.owner_peer_id = client.peer_id()
+	server.world.villages_in(&"left")[0].owner_peer_id = client.peer_id()
 	await _die(server, client)
 	client.world.respawn()
 	assert_true(await wait_until(_alive.bind(server, client)))
-	assert_eq(village.owner_peer_id, 0)
+	assert_eq(server.world.villages_in(&"left")[0].owner_peer_id, 0)
 	assert_eq(server.world.villages_held(client.peer_id()), 0)
 
 
@@ -129,6 +143,17 @@ func _join() -> GameClient:
 	return client
 
 
+## A client on the real rooms, loaded from disk like the server's.
+func _join_real() -> GameClient:
+	var client := GameClient.new()
+	client.world.values = _values
+	client.world.input_override = Movement.IDLE
+	_add(client)
+	assert_eq(client.join("127.0.0.1", _port), OK)
+	assert_true(await wait_until(_client_in_room.bind(client, &"world_map")))
+	return client
+
+
 func _rooms() -> Dictionary[StringName, RoomData]:
 	var rooms := RoomFixtures.two_joined_rooms()
 	var near := VillageSite.new()
@@ -154,6 +179,15 @@ func _client_dead(client: GameClient) -> bool:
 
 func _client_alive(client: GameClient) -> bool:
 	return not client.world.status.is_dead and client.world.status.wizard_level == 1
+
+
+func _client_sees_rows(client: GameClient, rows: PackedStringArray) -> bool:
+	var map := client.world.room as WorldMapData
+	return map != null and map.rows == rows
+
+
+func _client_sees_level(client: GameClient, level: int) -> bool:
+	return client.world.status.wizard_level == level
 
 
 func _client_in_room(client: GameClient, room_id: StringName) -> bool:

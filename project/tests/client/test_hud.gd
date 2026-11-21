@@ -1,7 +1,8 @@
 extends TestCase
 ## The HUD's card choice: a badge while choices wait, a panel only when asked for.
 ## The banner of a run's end, or of the player's own wizard's death, and Escape to start
-## again after one. The peace shield's label, and the Grimoire editor.
+## again after one. The peace shield's label, the spell bar's cooldown, and the Grimoire
+## editor.
 ##
 ## No server: the test emits the channel's signals itself, and a [RecordingChannel] keeps
 ## what the client asks for instead of sending it.
@@ -90,6 +91,19 @@ func test_the_spell_bar_names_its_ten_keys_in_two_rows() -> void:
 		assert_true(texts.has(expected), "%s missing from %s" % [expected, texts])
 	# Each key appears twice: once plain, once in the Shift row.
 	assert_eq(texts.count("LMB"), 2)
+
+
+## Position 1 holds the default Bolt of Ember, Instant: 1.0 s, 30 ticks, where its
+## placeholder still says 6. Six ticks left is a fifth of the real cooldown, not all of it.
+func test_the_spell_bar_empties_over_the_real_spell_s_cooldown() -> void:
+	assert_eq(roundi(_world.grimoire[0].cooldown() * Simulation.TICK_RATE), 30)
+	assert_eq(_world.values.spells[0].cooldown_ticks, 6)
+	_update(1, true, false, 1, PackedInt32Array([15]))
+	assert_eq(Hud.SpellBar.cooldown_share(_world, 0), 0.5)
+	_update(2, true, false, 1, PackedInt32Array([6]))
+	assert_eq(Hud.SpellBar.cooldown_share(_world, 0), 0.2)
+	_update(3, true, false, 1, PackedInt32Array([0]))
+	assert_eq(Hud.SpellBar.cooldown_share(_world, 0), 0.0)
 
 
 func test_an_open_card_choice_keeps_clicks_from_casting() -> void:
@@ -218,7 +232,13 @@ func _offer(pending: int) -> void:
 
 
 ## Sends a state update of the player's wizard alone in the left room.
-func _update(tick: int, shield: bool, dead := false, positions := 1) -> void:
+func _update(
+	tick: int,
+	shield: bool,
+	dead := false,
+	positions := 1,
+	cooldowns := PackedInt32Array(),
+) -> void:
 	var update := StateUpdate.new()
 	update.tick = tick
 	update.room_id = &"left"
@@ -229,6 +249,7 @@ func _update(tick: int, shield: bool, dead := false, positions := 1) -> void:
 	update.peace_shield_active = shield
 	update.is_dead = dead
 	update.grimoire_positions = positions
+	update.cooldowns = cooldowns
 	_channel.state_update_received.emit(update)
 
 

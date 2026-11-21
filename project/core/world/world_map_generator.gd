@@ -1,7 +1,9 @@
 class_name WorldMapGenerator
 extends RefCounted
 ## Builds a fresh world map from scratch — a new layout each time a run collapses
-## (GLOSSARY.md, World endings), not the same one forever.
+## (GLOSSARY.md, World endings), not the same one forever. Everything it builds follows
+## from the [RandomNumberGenerator] alone, so one seed always grows one map:
+## [method regrow] relies on that.
 ##
 ## The shape is deliberate, not organic noise everywhere: the mountain spine and the
 ## volcanic rift are built as unbroken walls across a band of rows, because the game relies
@@ -20,6 +22,10 @@ const BORDER := 3
 const ATTEMPTS := 50
 
 const PLAINS := "."
+## The real world map's dungeons, in pairs: door i of the map leads into entrance i, and
+## exit i leads back out beside that same door. See [method regrow].
+const DUNGEON_ENTRANCES: Array[StringName] = [&"dungeon_1_entrance", &"dungeon_2_entrance"]
+const DUNGEON_EXITS: Array[StringName] = [&"dungeon_1_exit", &"dungeon_2_exit"]
 
 ## A row of a grid still being built: one character per tile, mutable in place.
 const NEIGHBOURS_4: Array[Vector2i] = [
@@ -38,6 +44,36 @@ const NEIGHBOURS_8: Array[Vector2i] = [
 	Vector2i(1, -1),
 	Vector2i(-1, 1),
 ]
+
+
+## Replaces [code]rooms[&"world_map"][/code] with a whole new world map grown from
+## [param map_seed]: terrain, dummies, villages, and one door per entry of
+## [param dungeon_entrances]. Each room of [param dungeon_exits] gets its own exit pointed
+## back beside the door of the same index (see [method nearby_open_tile]).
+##
+## The same seed always grows the same map, doors and landing tiles, so the server and its
+## clients each call this with the one seed the server picked and stand in the same world,
+## without the map itself crossing the network. Changes nothing when [param rooms] lacks
+## the world map or any of those dungeon rooms (test fixtures never use these ids).
+static func regrow(
+	rooms: Dictionary[StringName, RoomData],
+	map_seed: int,
+	dungeon_entrances: Array[StringName],
+	dungeon_exits: Array[StringName],
+) -> void:
+	if not rooms.has(&"world_map"):
+		return
+	for room_id in dungeon_exits + dungeon_entrances:
+		if not rooms.has(room_id):
+			return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = map_seed
+	var fresh := generate_terrain(rng)
+	var doors := place_points_of_interest(fresh, rng, dungeon_entrances)
+	for i in dungeon_exits.size():
+		var landing := nearby_open_tile(fresh, doors[i])
+		(rooms[dungeon_exits[i]] as RoomData).exits[0].target_tile = landing
+	rooms[&"world_map"] = fresh
 
 
 ## A sound, freshly laid out world map: just the terrain and the Monolith, nothing walking

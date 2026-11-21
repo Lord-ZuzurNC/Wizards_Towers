@@ -369,17 +369,29 @@ class SpellBar:
 				draw_rect(cell, LOCKED_COLOR)
 				_labels[i].add_theme_color_override(&"font_color", COOLING_TEXT_COLOR)
 				continue
-			var spell: PlaceholderSpell = spells[i]
-			var left := status.cooldowns[i] if i < status.cooldowns.size() else 0
+			# The placeholder spell gives only the colour; the cooldown is the real spell's.
+			var color := spells[i].color
+			var share := cooldown_share(_world, i)
 			# Cooling: the palette's dark blue, the spell's colour only in the shrinking bar,
 			# so no shade outside BLK NX64 is ever made up.
-			draw_rect(cell, COOLING_COLOR if left > 0 else spell.color)
-			var text_color := COOLING_TEXT_COLOR if left > 0 else KEY_COLOR
+			draw_rect(cell, COOLING_COLOR if share > 0.0 else color)
+			var text_color := COOLING_TEXT_COLOR if share > 0.0 else KEY_COLOR
 			_labels[i].add_theme_color_override(&"font_color", text_color)
-			if left > 0:
-				var share := clampf(float(left) / maxi(1, spell.cooldown_ticks), 0.0, 1.0)
+			if share > 0.0:
 				var bar := Rect2(cell.position.x, cell.end.y - 4, roundf(cell.size.x * share), 4)
-				draw_rect(bar, spell.color)
+				draw_rect(bar, color)
+
+
+	## The share of Grimoire position [param index] + 1's cooldown still to run, 0.0 to 1.0:
+	## the ticks the server says are left, over the full cooldown of the real [Spell] in
+	## that position of [member ClientWorld.grimoire].
+	static func cooldown_share(world: ClientWorld, index: int) -> float:
+		var cooldowns := world.status.cooldowns
+		var left := cooldowns[index] if index < cooldowns.size() else 0
+		if left <= 0:
+			return 0.0
+		var full := roundi(world.grimoire[index].cooldown() * Simulation.TICK_RATE)
+		return clampf(float(left) / maxi(1, full), 0.0, 1.0)
 
 
 	## The cell of Grimoire position [param index] + 1.

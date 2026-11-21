@@ -203,3 +203,52 @@ func test_a_fresh_boot_already_has_a_generated_world_map() -> void:
 	var booted_map := server.world.rooms[&"world_map"] as WorldMapData
 	assert_ne(booted_map.rows, static_rows)
 	assert_true(booted_map.random_spawn)
+
+
+## The client grows the server's map from the server's seed, so the dungeon door it draws is
+## the one the server walks the wizard through: one step onto it, on the client's own
+## prediction, takes the wizard into the dungeon on the server.
+func test_the_client_and_the_server_agree_on_where_a_dungeon_door_is() -> void:
+	var server := GameServer.new()
+	_add(server)
+	assert_eq(server.start(_port), OK)
+	var client := GameClient.new()
+	client.world.input_override = Movement.IDLE
+	_add(client)
+	assert_eq(client.join("127.0.0.1", _port), OK)
+	assert_true(await wait_until(_client_on_the_server_s_map.bind(server, client)))
+	var server_map := server.world.rooms[&"world_map"] as WorldMapData
+	var client_map := client.world.rooms[&"world_map"] as WorldMapData
+	assert_true(client.world.room == client_map)
+	var door := server_map.exits[0].area.position
+	var client_door := client_map.exit_at(client_map.tile_center(door))
+	assert_true(client_door != null, "the client draws no door on %s" % door)
+	if client_door != null:
+		assert_eq(client_door.target_room, &"dungeon_1_entrance")
+	var beside := _open_neighbour(server_map, door)
+	var start := server_map.tile_center(beside)
+	server.world.wizard(client.peer_id()).position = start
+	assert_true(await wait_until(_client_sees_itself_at.bind(client, start)))
+	client.world.input_override = Movement.encode(door - beside)
+	assert_true(
+		await wait_until(_server_has_wizard_in.bind(server, client, &"dungeon_1_entrance"), 4.0),
+	)
+
+
+func _client_on_the_server_s_map(server: GameServer, client: GameClient) -> bool:
+	var map := client.world.room as WorldMapData
+	return map != null and map.rows == (server.world.rooms[&"world_map"] as WorldMapData).rows
+
+
+func _server_has_wizard_in(server: GameServer, client: GameClient, room_id: StringName) -> bool:
+	return server.world.wizard_room(client.peer_id()) == room_id
+
+
+## A walkable tile right next to [param tile]: a generated map is fully connected, so a
+## door always has one.
+func _open_neighbour(map: WorldMapData, tile: Vector2i) -> Vector2i:
+	for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		if not map.is_solid(tile + offset) and map.exit_at(map.tile_center(tile + offset)) == null:
+			return tile + offset
+	fail("no open tile next to %s" % tile)
+	return tile

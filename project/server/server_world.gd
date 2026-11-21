@@ -3,13 +3,15 @@ extends Node
 ## The authoritative world, advanced one simulation tick at a time.
 ##
 ## Each tick, in this order: the season moves on, and the run ends when winter runs out;
-## every living wizard takes what its ground deals, applies at most one movement input,
+## every living wizard takes what its ground and any training dummy next to it deal,
+## applies at most one movement input,
 ## walks through any exit and gets mana back; spells in flight move and hit; destroyed
 ## training dummies stand up again. Then every client gets a [StateUpdate] of its room, with the
 ## sequence number of the last input applied so it can reconcile its prediction.
 ##
 ## When a run ends, every wizard starts a new one in the start room, as a newcomer: a
-## wizard lives one run at most (GLOSSARY.md, run).
+## wizard lives one run at most (GLOSSARY.md, run). A dead wizard's player starting again
+## does the same, without a world ending: see [method _on_respawn_requested].
 ##
 ## A cast, a card taken and a village bought arrive as requests: each is checked here before
 ## anything changes.
@@ -29,6 +31,9 @@ var tick := 0
 var run_start_tick := 0
 ## The current [enum Season.Kind].
 var season := Season.Kind.SPRING as int
+## The seed the world map was last grown from: every client is told it, and grows the same
+## map from it (see [method WorldMapGenerator.regrow]).
+var world_map_seed := 0
 
 var _channel: WorldChannel
 var _wizards: Dictionary[int, WizardState] = { }
@@ -59,6 +64,7 @@ func _physics_process(_delta: float) -> void:
 		if wizard_state.is_dead:
 			continue
 		_suffer_ground(peer_id, wizard_state)
+		_suffer_dummies(peer_id, wizard_state)
 		_walk(wizard_state)
 		_regain_mana(wizard_state)
 		if wizard_state.pending_purchase >= 0:
@@ -84,10 +90,10 @@ func setup(channel: WorldChannel) -> bool:
 	_channel.edit_spell_requested.connect(_on_edit_spell_requested)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
-		# A fresh boot gets a generated map too, the same as a World Collapse does — the
-		# hand-made one otherwise never leaves until the first run ends. A no-op when the
-		# dungeon rooms are missing, so a test fixture that sets `rooms` itself is unaffected.
-		_regrow_world_map()
+	# A fresh boot gets a generated map too, the same as a World Collapse does — the
+	# hand-made one otherwise never leaves until the first run ends. A no-op when the
+	# dungeon rooms are missing, so a test fixture that sets `rooms` itself is unaffected.
+	_regrow_world_map()
 	if cards.is_empty():
 		cards = CardCatalog.load_folder()
 	if values == null:
@@ -103,8 +109,11 @@ func setup(channel: WorldChannel) -> bool:
 	return true
 
 
+## Admits a newly connected client's wizard, and tells that client which world map it
+## stands on.
 func add_wizard(peer_id: int) -> void:
 	_wizards[peer_id] = _newcomer()
+	_channel.send_world_map_regrown(peer_id, world_map_seed)
 
 
 ## Ticks left before the season changes, or the run ends after winter.
@@ -145,14 +154,20 @@ func _set_season(kind: int) -> void:
 			world_map.season = kind
 
 
-## Ends the run for everybody, then starts the next one at once. Every wizard is told how
-## the run ended, then becomes a newcomer in the start room; villages, dummies and spells in
-## flight start over too. On the real world map, the map itself is torn down and regrown —
-## a fresh world for the fresh run, not the same one forever.
+## Ends the run for everybody: every wizard is told how it ended, then the next one starts
+## at once, in a new world (see [method _start_new_world]).
 func _end_run(ending: WorldEnding.Kind) -> void:
+	for peer_id: int in _wizards:
+		_channel.send_world_ending(peer_id, ending)
+	_start_new_world()
+
+
+## Starts a new world for every connected wizard: the world map regrown, every wizard a
+## newcomer in the start room, villages, dummies and spells in flight started over, the
+## season back to spring.
+func _start_new_world() -> void:
 	_regrow_world_map()
 	for peer_id: int in _wizards.keys():
-		_channel.send_world_ending(peer_id, ending)
 		var newcomer := _newcomer()
 		# The same input stream goes on: the client keeps numbering its inputs from where it was.
 		newcomer.inputs = _wizards[peer_id].inputs
@@ -166,23 +181,19 @@ func _end_run(ending: WorldEnding.Kind) -> void:
 	_set_season(Season.Kind.SPRING)
 
 
-## Replaces the real world map with a freshly generated one, and points its dungeon doors
-## back at the right spot — a no-op everywhere else (test fixtures never use these ids).
+## Regrows the real world map from a fresh seed and tells every connected client that seed,
+## so each grows the very same map; a no-op on the map wherever the real rooms are missing
+## (see [method WorldMapGenerator.regrow]).
 func _regrow_world_map() -> void:
-	var dungeon_exits: Array[StringName] = [&"dungeon_1_exit", &"dungeon_2_exit"]
-	var dungeon_entrances: Array[StringName] = [&"dungeon_1_entrance", &"dungeon_2_entrance"]
-	if not rooms.has(&"world_map"):
-		return
-	for room_id in dungeon_exits + dungeon_entrances:
-		if not rooms.has(room_id):
-			return
-	var rng := RandomNumberGenerator.new()
-	var fresh := WorldMapGenerator.generate_terrain(rng)
-	var doors := WorldMapGenerator.place_points_of_interest(fresh, rng, dungeon_entrances)
-	for i in dungeon_exits.size():
-		var landing := WorldMapGenerator.nearby_open_tile(fresh, doors[i])
-		(rooms[dungeon_exits[i]] as RoomData).exits[0].target_tile = landing
-	rooms[&"world_map"] = fresh
+	world_map_seed = randi()
+	WorldMapGenerator.regrow(
+		rooms,
+		world_map_seed,
+		WorldMapGenerator.DUNGEON_ENTRANCES,
+		WorldMapGenerator.DUNGEON_EXITS,
+	)
+	for peer_id: int in _wizards:
+		_channel.send_world_map_regrown(peer_id, world_map_seed)
 
 
 ## The hazard under a wizard's feet hits on its beat, twice a second: its damage, and its
@@ -207,6 +218,20 @@ func _suffer_ground(peer_id: int, wizard_state: WizardState) -> void:
 		wizard_state.speed = roundi(Simulation.BASE_SPEED * (1.0 - values.slow_share))
 
 
+## A testing aid, not a design decision: every standing training dummy within
+## [member PlaceholderValues.dummy_strike_range_tiles] of the wizard strikes it, on the same
+## beat as the hazards, so the peace shield can be seen working before wizards can fight.
+## While the shield is up nothing happens at all. A strike stands in for a real attacker:
+## it is not the wizard's own attack, so it never breaks the shield either.
+func _suffer_dummies(peer_id: int, wizard_state: WizardState) -> void:
+	if tick % Hazard.INTERVAL_TICKS != 0 or wizard_state.peace_shield_active:
+		return
+	var reach := values.dummy_strike_range_tiles * Simulation.TILE_SIZE
+	for dummy: TrainingDummy in _dummies.get(wizard_state.room_id, []):
+		if not dummy.is_destroyed() and dummy.position.distance_to(wizard_state.position) <= reach:
+			_hurt(peer_id, wizard_state, values.dummy_strike_raw_damage)
+
+
 ## A hit through the wizard's magic_defence (FORMULAS.md, Combat). At 0 health the wizard
 ## dies, and its client is told its wizard ending once. A dead wizard takes no more hits.
 func _hurt(peer_id: int, wizard_state: WizardState, raw_damage: int) -> void:
@@ -217,10 +242,10 @@ func _hurt(peer_id: int, wizard_state: WizardState, raw_damage: int) -> void:
 	if wizard_state.health > 0:
 		return
 	wizard_state.is_dead = true
-	# Hazard damage (a burning rift bank, a freezing glacier) is the only lethal damage so
-	# far, and no enemy exists yet to blame for MURDERED, CLAIMED_BY or the others. Death in
-	# the open world is the closest of the seven until the bestiary (Milestone 2) gives
-	# hazard death a more specific cause, or a real one.
+	# Hazard damage (a burning rift bank, a freezing glacier) and the training dummy's
+	# provisional strike are the only lethal damage so far, and no enemy exists yet to blame
+	# for MURDERED, CLAIMED_BY or the others. Death in the open world is the closest of the
+	# seven until the bestiary (Milestone 2) gives these deaths a more specific cause.
 	wizard_state.ending = WizardEnding.Kind.DEVOURED_WILDS
 	_channel.send_wizard_died(peer_id, wizard_state.ending)
 
@@ -493,22 +518,19 @@ func _on_take_card_requested(peer_id: int, card_index: int) -> void:
 	_send_card_choices(peer_id)
 
 
-## A dead wizard's player starts again at once, in the same world, as a newcomer: level 1,
-## a fresh spot, a fresh Grimoire, and none of the dead wizard's villages, which go back to
-## no one. The run, the map and every other wizard carry on untouched. Ignored without a
-## word while the wizard is alive.
+## A dead wizard's player starts again at once, in a new world: the map regrown from a
+## fresh seed and every wizard a newcomer in it, as at the end of a run (see
+## [method _start_new_world]). No world ending is sent, since none happened: a player
+## asking to try again is none of the three GLOSSARY.md defines.
+##
+## This resets [b]every[/b] wizard connected, not only this one: a server process holds one
+## shared [ServerWorld], and there is no way yet to give one player a world of their own
+## (TECH_STACK.md, Multiple worlds). That is the project owner's deliberate call for now.
+## Ignored without a word while the wizard is alive.
 func _on_respawn_requested(peer_id: int) -> void:
 	if not _wizards.has(peer_id) or not _wizards[peer_id].is_dead:
 		return
-	var newcomer := _newcomer()
-	# The same input stream goes on, as in _end_run().
-	newcomer.inputs = _wizards[peer_id].inputs
-	_wizards[peer_id] = newcomer
-	for room_villages: Array in _villages.values():
-		for village: VillageState in room_villages:
-			if village.owner_peer_id == peer_id:
-				village.owner_peer_id = 0
-	_send_card_choices(peer_id)
+	_start_new_world()
 
 
 ## Kept until the inputs sent before it have been applied; a newer request replaces it.

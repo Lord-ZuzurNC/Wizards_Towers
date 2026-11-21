@@ -1,7 +1,12 @@
 class_name TrainingDummy
 extends RefCounted
-## A stationary combatant to practise on: it never attacks, pays XP to whoever destroys it,
-## and stands up again after a while.
+## A stationary combatant to practise on: it pays XP to whoever destroys it, and stands up
+## again after a while.
+##
+## While standing, it also strikes a wizard right next to it (see
+## [member PlaceholderValues.dummy_strike_raw_damage]). That is a provisional testing aid
+## standing in for a real attacker, so the peace shield's effect can be seen; it is not a
+## claim that dummies are hostile in the finished game.
 
 var position := Vector2.ZERO
 var health := 0

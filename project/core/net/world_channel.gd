@@ -32,6 +32,9 @@ signal edit_spell_requested(
 signal state_update_received(update: StateUpdate)
 ## Received on a client: the run ended, and how.
 signal world_ending_received(ending: int)
+## Received on a client: a new world began on a world map grown from [param map_seed];
+## the client grows the same one with [method WorldMapGenerator.regrow].
+signal world_map_regrown_received(map_seed: int)
 ## Received on a client: its own wizard died, and how.
 signal wizard_died_received(ending: int)
 ## Received on a client: its card choices changed.
@@ -78,6 +81,11 @@ func send_state_update(peer_id: int, update: StateUpdate) -> void:
 ## Server side: the run is over, ended as [param ending], a [enum WorldEnding.Kind].
 func send_world_ending(peer_id: int, ending: int) -> void:
 	world_ending_sync.rpc_id(peer_id, ending)
+
+
+## Server side: the world map was grown from [param map_seed].
+func send_world_map_regrown(peer_id: int, map_seed: int) -> void:
+	world_map_regrown_sync.rpc_id(peer_id, map_seed)
 
 
 ## Server side: [param peer_id]'s wizard died, as [param ending], a [enum WizardEnding.Kind].
@@ -164,6 +172,12 @@ func card_choices_sync(pending: int, card_ids: PackedStringArray) -> void:
 func world_ending_sync(ending: int) -> void:
 	if ending >= 0 and ending < WorldEnding.NAMES.size():
 		world_ending_received.emit(ending)
+
+
+## Trusted: only the server may call it.
+@rpc("authority", "call_remote", "reliable")
+func world_map_regrown_sync(map_seed: int) -> void:
+	world_map_regrown_received.emit(map_seed)
 
 
 ## Trusted: only the server may call it.

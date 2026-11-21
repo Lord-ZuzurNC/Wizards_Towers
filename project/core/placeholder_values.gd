@@ -48,6 +48,13 @@ const DEFAULT_PATH := "res://data/placeholder_values.tres"
 @export var dummy_xp := 10
 @export var dummy_gold := 10
 @export var dummy_respawn_ticks := 90
+## A testing aid, not a design decision: a standing dummy strikes a wizard whose feet are
+## within [member dummy_strike_range_tiles] of its own, on the hazards' beat, so the peace
+## shield can be seen blocking something before wizards can fight. Dummies are not meant
+## to be hostile in the finished game.
+@export var dummy_strike_raw_damage := 2
+## "Standing next to it": a tile and a half, feet to feet.
+@export var dummy_strike_range_tiles := 1.5
 
 
 func _init() -> void:

@@ -25,7 +25,8 @@ enum Answer {
 ## 5: seasons, hazards and their effects, and the end of a run.
 ## 6: Grimoire positions hold a real Spell assembled from runes; spells can be edited.
 ## 7: the state update carries the peace shield and death; a dead wizard can start again.
-const VERSION := 7
+## 8: the server tells each client the seed its world map was grown from.
+const VERSION := 8
 const DEFAULT_PORT := 7777
 ## Sized for fifty wizards a world, see TECH_STACK.md.
 const MAX_CONNECTIONS := 50
