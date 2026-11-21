@@ -14,6 +14,8 @@ signal move_requested(peer_id: int, first_sequence: int, codes: PackedByteArray)
 signal cast_requested(peer_id: int, grimoire_position: int, aim: Vector2)
 ## Received on the server: a client took a card from its oldest card choice.
 signal take_card_requested(peer_id: int, card_index: int)
+## Received on the server: a client whose wizard is dead asked to start again as a newcomer.
+signal respawn_requested(peer_id: int)
 ## Received on the server: a client asked to buy a village of the room it stands in, once
 ## its movement input [param after_sequence] has been applied.
 signal buy_village_requested(peer_id: int, village_index: int, after_sequence: int)
@@ -56,6 +58,11 @@ func send_cast(grimoire_position: int, aim: Vector2) -> void:
 ## Client side.
 func send_take_card(card_index: int) -> void:
 	request_take_card.rpc_id(1, card_index)
+
+
+## Client side.
+func send_respawn() -> void:
+	request_respawn.rpc_id(1)
 
 
 ## Client side.
@@ -116,6 +123,12 @@ func request_cast(grimoire_position: int, aim: Vector2) -> void:
 func request_take_card(card_index: int) -> void:
 	if multiplayer.is_server():
 		take_card_requested.emit(multiplayer.get_remote_sender_id(), card_index)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func request_respawn() -> void:
+	if multiplayer.is_server():
+		respawn_requested.emit(multiplayer.get_remote_sender_id())
 
 
 @rpc("any_peer", "call_remote", "reliable")

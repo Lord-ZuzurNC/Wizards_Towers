@@ -19,8 +19,11 @@ signal status_changed
 signal card_choices_changed
 ## The run ended, as a [enum WorldEnding.Kind]; the next one has begun.
 signal run_ended(ending: int)
-## The player's own wizard died, as a [enum WizardEnding.Kind]; it watches until the run ends.
+## The player's own wizard died, as a [enum WizardEnding.Kind]; it watches until the run ends
+## or the player starts again.
 signal wizard_died(ending: int)
+## [member grimoire] changed: an edit was accepted, or a fresh wizard starts with the default.
+signal grimoire_changed
 
 ## How far in the past other wizards are drawn: 3 ticks, 100 ms.
 const INTERPOLATION_TICKS := 3.0
@@ -104,6 +107,9 @@ var status := StateUpdate.new()
 var pending_choices := 0
 ## The cards of the oldest waiting choice, the one opened next.
 var offered_cards: Array[Card] = []
+## The player's own Grimoire, index 0 for position 1, as the server accepted it: the default
+## every wizard starts with, then each accepted edit. Nothing here is predicted.
+var grimoire: Array[Spell] = WizardState.default_grimoire()
 
 var _channel: WorldChannel
 var _own_peer_id := 0
@@ -165,6 +171,9 @@ func _physics_process(_delta: float) -> void:
 		var village := village_in_reach()
 		if village >= 0:
 			buy_village(village)
+	# Escape has no other use yet: there is no pause menu.
+	if input_override < 0 and status.is_dead and Input.is_action_just_pressed(&"ui_cancel"):
+		respawn()
 
 
 func _draw() -> void:
@@ -201,6 +210,8 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 	_channel.card_choices_received.connect(_on_card_choices_received)
 	_channel.world_ending_received.connect(run_ended.emit)
 	_channel.wizard_died_received.connect(wizard_died.emit)
+	_channel.world_ending_received.connect(_reset_grimoire.unbind(1))
+	_channel.spell_edited_received.connect(_on_spell_edited_received)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():
@@ -264,6 +275,21 @@ func village_owner(index: int) -> int:
 ## Whether village [param index] of the room is the player's.
 func owns_village(index: int) -> bool:
 	return village_owner(index) == _own_peer_id
+
+
+## Asks the server to start again as a newcomer in the same world, once the player's own
+## wizard is dead. The next state update shows the fresh wizard; nothing else answers.
+func respawn() -> void:
+	if _channel != null:
+		_channel.send_respawn()
+
+
+## Asks the server to put rune [param rune_id] at [Rarity] [param grade] in [param slot], a
+## [enum Spell.Slot], of [param grimoire_position]. [member grimoire] changes only once the
+## server accepts it.
+func edit_spell(grimoire_position: int, slot: int, rune_id: StringName, grade: int) -> void:
+	if _channel != null:
+		_channel.send_edit_spell(grimoire_position, slot, rune_id, grade)
 
 
 ## Takes card [param index] of the oldest waiting choice.
@@ -356,6 +382,9 @@ func _on_state_update_received(update: StateUpdate) -> void:
 	if update.village_owners != _village_owners:
 		_village_owners = update.village_owners
 		queue_redraw()
+	if status.is_dead and not update.is_dead:
+		# A fresh wizard: the player started again (a run's end resets it on its own message).
+		_reset_grimoire()
 	status = update
 	status_changed.emit()
 
@@ -367,6 +396,25 @@ func _on_card_choices_received(pending: int, card_ids: PackedStringArray) -> voi
 		if cards.has(id):
 			offered_cards.append(cards[id])
 	card_choices_changed.emit()
+
+
+func _on_spell_edited_received(
+	grimoire_position: int,
+	slot: int,
+	rune_id: StringName,
+	grade: int,
+) -> void:
+	if grimoire_position < 1 or grimoire_position > grimoire.size():
+		return
+	if slot < 0 or slot >= Spell.Slot.size():
+		return
+	if grimoire[grimoire_position - 1].set_rune(slot, rune_id, grade):
+		grimoire_changed.emit()
+
+
+func _reset_grimoire() -> void:
+	grimoire = WizardState.default_grimoire()
+	grimoire_changed.emit()
 
 
 ## The colour [param tile] of [param world_map] is drawn in.

@@ -16,6 +16,8 @@ func test_a_message_round_trips() -> void:
 	assert_eq(read.grimoire_positions, 10)
 	assert_eq(read.cooldowns[1], 3)
 	assert_eq(read.projectile_spells, PackedInt32Array([6]))
+	assert_true(read.peace_shield_active)
+	assert_true(read.is_dead)
 
 
 func test_a_message_of_the_wrong_length_is_refused() -> void:
@@ -54,6 +56,12 @@ func test_more_than_ten_cooldowns_are_refused() -> void:
 	assert_true(StateUpdate.from_message(update.to_message()) == null)
 
 
+func test_a_peace_shield_that_is_not_a_bool_is_refused() -> void:
+	var message := _sample().to_message()
+	message[14] = 1
+	assert_true(StateUpdate.from_message(message) == null)
+
+
 func test_a_short_status_is_refused() -> void:
 	var message := _sample().to_message()
 	message[12] = PackedInt32Array([1, 2, 3])
@@ -86,4 +94,6 @@ func _sample() -> StateUpdate:
 	update.villages_held = 1
 	update.grimoire_positions = 10
 	update.cooldowns = PackedInt32Array([0, 3, 0, 0, 0, 0, 0, 0, 0, 0])
+	update.peace_shield_active = true
+	update.is_dead = true
 	return update

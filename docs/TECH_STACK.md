@@ -92,11 +92,13 @@ Side buttons of the mouse are not used by default, since not every player has th
 | 9                 | Shift + Q                  | the slowest spells                        |
 | 10                | Shift + E                  | the slowest spells                        |
 
-| Action             | Key position |
-| ------------------ | ------------ |
-| Walk               | W, A, S, D   |
-| Interact           | F            |
-| Open a card choice | C            |
+| Action                   | Key position |
+| ------------------------ | ------------ |
+| Walk                     | W, A, S, D   |
+| Interact                 | F            |
+| Open a card choice       | C            |
+| Open the Grimoire editor | G            |
+| Respawn, while dead only | Escape       |
 
 A player chooses which spell sits in which Grimoire position, so the table above says what each position suits, not what it holds.
 How the two rows are shown on screen is in `ART_DIRECTION.md`, section *Spell bar*.

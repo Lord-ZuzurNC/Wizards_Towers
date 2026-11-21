@@ -79,9 +79,12 @@ func test_walking_into_a_dungeon_breaks_the_peace_shield() -> void:
 	var client := _join()
 	assert_true(await wait_until(_client_in_room.bind(client, &"left")))
 	assert_true(server.world.wizard(client.peer_id()).peace_shield_active)
+	# The client is told too, every tick: the HUD shows it.
+	assert_true(await wait_until(_client_shield_is.bind(client, true)))
 	client.world.input_override = RIGHT
 	assert_true(await wait_until(_client_in_room.bind(client, &"right")))
 	assert_false(server.world.wizard(client.peer_id()).peace_shield_active)
+	assert_true(await wait_until(_client_shield_is.bind(client, false)))
 
 
 func test_walking_into_an_ordinary_room_keeps_the_peace_shield() -> void:
@@ -113,6 +116,10 @@ func _join() -> GameClient:
 
 func _client_in_room(client: GameClient, room_id: StringName) -> bool:
 	return client.world.room != null and client.world.room.id == room_id
+
+
+func _client_shield_is(client: GameClient, up: bool) -> bool:
+	return client.world.status.peace_shield_active == up
 
 
 func _server_has_wizard_at(server: GameServer, client: GameClient, spot: Vector2) -> bool:

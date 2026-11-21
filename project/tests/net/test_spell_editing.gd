@@ -80,6 +80,26 @@ func test_an_accepted_edit_lets_the_edited_spell_be_cast() -> void:
 	assert_true(await wait_until(_dummy_health_is.bind(server, 20)))
 
 
+func test_the_client_s_edits_fill_a_position_on_the_server_until_it_can_be_cast() -> void:
+	var server := _start_server()
+	var client := await _join()
+	var spell := server.world.wizard(client.peer_id()).grimoire[2]
+	client.world.edit_spell(3, Spell.Slot.SHAPE, &"bolt", Rarity.COMMON)
+	assert_true(
+		await wait_until(_server_rune_is.bind(server, client, 3, Spell.Slot.SHAPE, &"bolt"))
+	)
+	assert_false(spell.is_castable())
+	client.world.edit_spell(3, Spell.Slot.ELEMENT, &"spark", Rarity.COMMON)
+	client.world.edit_spell(3, Spell.Slot.DURATION, &"brief", Rarity.COMMON)
+	assert_true(await wait_until(spell.is_castable))
+	assert_eq(spell.rune_id(Spell.Slot.ELEMENT), &"spark")
+	assert_eq(spell.rune_id(Spell.Slot.DURATION), &"brief")
+	# The client learns of each accepted edit, and its own copy agrees.
+	assert_true(await wait_until(client.world.grimoire[2].is_castable))
+	client.world.cast(3, Vector2.RIGHT)
+	assert_true(await wait_until(_dummy_health_is.bind(server, 20)))
+
+
 func rooms_with_dummy(server: GameServer) -> void:
 	for room: RoomData in server.world.rooms.values():
 		room.dummy_tiles = [Vector2i(6, 1)]

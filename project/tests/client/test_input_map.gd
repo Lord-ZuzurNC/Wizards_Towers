@@ -55,6 +55,10 @@ func test_interacting_and_the_card_choice_have_their_keys() -> void:
 	assert_eq(KeyLabels.for_action(&"open_card_choice"), "C")
 
 
+func test_the_grimoire_editor_opens_on_the_key_position_g() -> void:
+	assert_eq(KeyLabels.for_action(&"open_grimoire"), "G")
+
+
 func test_shift_with_a_button_casts_from_the_shift_row_only() -> void:
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT

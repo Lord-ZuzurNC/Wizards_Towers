@@ -24,7 +24,8 @@ enum Answer {
 ## 4: ten Grimoire positions, their cooldowns, and which one each projectile came from.
 ## 5: seasons, hazards and their effects, and the end of a run.
 ## 6: Grimoire positions hold a real Spell assembled from runes; spells can be edited.
-const VERSION := 6
+## 7: the state update carries the peace shield and death; a dead wizard can start again.
+const VERSION := 7
 const DEFAULT_PORT := 7777
 ## Sized for fifty wizards a world, see TECH_STACK.md.
 const MAX_CONNECTIONS := 50

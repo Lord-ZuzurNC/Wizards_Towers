@@ -21,6 +21,8 @@ const _FIELD_TYPES: Array[int] = [
 	TYPE_PACKED_INT32_ARRAY, # village_owners
 	TYPE_PACKED_INT32_ARRAY, # the player's own numbers, in the order of _STATUS_SIZE's comment
 	TYPE_PACKED_INT32_ARRAY, # cooldowns
+	TYPE_BOOL, # peace_shield_active
+	TYPE_BOOL, # is_dead
 ]
 ## health, max_health, mana, mana_pool, wizard_level, xp, xp_to_next, gold, village_price,
 ## villages_held, grimoire_positions, season, season_ticks_left, speed, effects.
@@ -68,6 +70,10 @@ var speed := Simulation.BASE_SPEED
 var effects := 0
 ## For each Grimoire position, index 0 for position 1: ticks before it may cast again.
 var cooldowns: PackedInt32Array = []
+## Whether the wizard's peace shield is still up (GLOSSARY.md, peace shield).
+var peace_shield_active := false
+## Whether the wizard is dead and waits to start again.
+var is_dead := false
 
 
 ## Reads a message; null when it is malformed.
@@ -94,6 +100,8 @@ static func from_message(message: Array) -> StateUpdate:
 	update.village_positions = message[10]
 	update.village_owners = message[11]
 	update.cooldowns = message[13]
+	update.peace_shield_active = message[14]
+	update.is_dead = message[15]
 	update.health = status[0]
 	update.max_health = status[1]
 	update.mana = status[2]
@@ -155,4 +163,6 @@ func to_message() -> Array:
 			],
 		),
 		cooldowns,
+		peace_shield_active,
+		is_dead,
 	]

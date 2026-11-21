@@ -1,15 +1,16 @@
 class_name Hud
 extends CanvasLayer
 ## The player's numbers along the bottom of the screen, what the interact key would do, the
-## spell bar along the top, the season in the top-right corner, the end of a run, and the
-## level-up card choice.
+## spell bar along the top, the season in the top-right corner, the peace shield in the
+## top-left one, the end of a run, the level-up card choice and the Grimoire editor.
 ##
 ## Every key is named as the player's keyboard prints it (see [KeyLabels]).
 ##
 ## A level-up never opens its choice by itself: the world does not pause, so a choice that
 ## covered the screen mid-fight would be a trap (CARDS.md, The level-up choice). A badge
 ## says a choice waits; [kbd]C[/kbd] opens it, a click takes a card, [kbd]C[/kbd] again
-## closes it untouched.
+## closes it untouched. [kbd]G[/kbd] opens and closes the [GrimoireEditor] the same way; only
+## one of the two panels is open at a time.
 ##
 ## Text uses the project theme's font, Pixel Operator, at the 16 pixels it is drawn for:
 ## any other size breaks its pixel grid.
@@ -37,8 +38,12 @@ var prompt := Label.new()
 ## The season, and the time left in it.
 var season := Label.new()
 ## Says how the last run ended, for a few seconds after it did; or how the player's own
-## wizard died, until the run ends.
+## wizard died, until the run ends or the player starts again.
 var ending := Label.new()
+## Shown while the player's peace shield is up (GLOSSARY.md, peace shield).
+var peace_shield := Label.new()
+## Opened and closed by the [code]open_grimoire[/code] action.
+var grimoire_editor: GrimoireEditor
 
 var _world: ClientWorld
 var _numbers := Label.new()
@@ -47,6 +52,10 @@ var _row := HBoxContainer.new()
 var _spell_bar: SpellBar
 ## Counts what [member ending] has shown, so a run's timer never hides a later death.
 var _endings_shown := 0
+## The count of [member _endings_shown] when the last death showed.
+var _death_shown := -1
+## Whether the last state update had the player's wizard dead.
+var _was_dead := false
 
 
 func _init(world: ClientWorld) -> void:
@@ -90,6 +99,13 @@ func _init(world: ClientWorld) -> void:
 	season.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	season.add_theme_color_override(&"font_color", TEXT_COLOR)
 	add_child(season)
+	peace_shield.text = "Peace shield"
+	peace_shield.position = Vector2(0, 0)
+	peace_shield.size = Vector2(104, 20)
+	peace_shield.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	peace_shield.add_theme_color_override(&"font_color", BADGE_COLOR)
+	peace_shield.hide()
+	add_child(peace_shield)
 	ending.position = Vector2(0, 150)
 	ending.size = Vector2(640, 40)
 	ending.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -98,15 +114,22 @@ func _init(world: ClientWorld) -> void:
 	ending_back.bg_color = BAND_COLOR
 	ending_back.anti_aliasing = false
 	ending.add_theme_stylebox_override(&"normal", ending_back)
+	# The same band behind the peace shield as behind the season, opposite it.
+	peace_shield.add_theme_stylebox_override(&"normal", ending_back)
 	ending.hide()
 	add_child(ending)
 	_build_panel()
+	grimoire_editor = GrimoireEditor.new(_world)
+	add_child(grimoire_editor)
 	_refresh_choices()
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"open_card_choice"):
 		toggle_choice()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"open_grimoire"):
+		toggle_grimoire()
 		get_viewport().set_input_as_handled()
 
 
@@ -121,12 +144,27 @@ func toggle_choice() -> void:
 	if _panel.visible:
 		_panel.hide()
 	elif _world.pending_choices > 0:
+		grimoire_editor.hide()
 		_panel.show()
-	_world.ui_has_mouse = _panel.visible
+	_refresh_mouse()
 
 
 func is_choice_open() -> bool:
 	return _panel.visible
+
+
+## Opens the Grimoire editor, closing the card choice if it is open, or closes the editor.
+func toggle_grimoire() -> void:
+	if grimoire_editor.visible:
+		grimoire_editor.hide()
+	else:
+		_panel.hide()
+		grimoire_editor.show()
+	_refresh_mouse()
+
+
+func is_grimoire_open() -> bool:
+	return grimoire_editor.visible
 
 
 func _build_panel() -> void:
@@ -166,6 +204,11 @@ func _refresh_numbers() -> void:
 	)
 	prompt.text = _prompt_text()
 	location.text = _world.location_name() + _effects_text()
+	peace_shield.visible = status.peace_shield_active
+	if _was_dead and not status.is_dead:
+		# A fresh wizard: the death banner goes, unless a run's end has replaced it since.
+		_hide_ending(_death_shown)
+	_was_dead = status.is_dead
 	var seconds := ceili(float(status.season_ticks_left) / Simulation.TICK_RATE)
 	season.text = "%s %d:%02d" % [Season.label(status.season), seconds / 60, seconds % 60]
 
@@ -187,11 +230,14 @@ func _on_run_ended(kind: int) -> void:
 	get_tree().create_timer(ENDING_SECONDS).timeout.connect(_hide_ending.bind(_endings_shown))
 
 
-## Stays up: a dead wizard has nothing else to do until the run ends.
+## Stays up until the run ends or the player starts again, as a dead wizard has nothing
+## else to do.
 func _on_wizard_died(kind: int) -> void:
-	ending.text = "%s\nWatching until the world ends" % WizardEnding.label(kind)
+	# Escape is the built-in ui_cancel, printed the same on every layout.
+	ending.text = "%s\nEscape: start again as a new wizard" % WizardEnding.label(kind)
 	ending.show()
 	_endings_shown += 1
+	_death_shown = _endings_shown
 
 
 ## Hides [member ending] unless something else has shown since [param shown].
@@ -237,7 +283,7 @@ func _refresh_choices() -> void:
 		_row.add_child(_card_button(_world.offered_cards[i], i))
 	if pending == 0:
 		_panel.hide()
-		_world.ui_has_mouse = false
+		_refresh_mouse()
 
 
 func _card_button(card: Card, index: int) -> Button:
@@ -265,7 +311,12 @@ func _card_button(card: Card, index: int) -> Button:
 func _on_card_pressed(index: int) -> void:
 	_world.take_card(index)
 	_panel.hide()
-	_world.ui_has_mouse = false
+	_refresh_mouse()
+
+
+## A click on an open panel casts nothing.
+func _refresh_mouse() -> void:
+	_world.ui_has_mouse = _panel.visible or grimoire_editor.visible
 
 
 ## The ten Grimoire positions along the top of the screen, in two rows as the keys sit:

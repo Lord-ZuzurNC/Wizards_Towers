@@ -54,7 +54,8 @@ func _physics_process(_delta: float) -> void:
 		_end_run(WorldEnding.Kind.WORLD_COLLAPSE)
 	for peer_id: int in _wizards:
 		var wizard_state := _wizards[peer_id]
-		# A dead wizard only stays where it fell, seen by its room, until the run ends.
+		# A dead wizard only stays where it fell, seen by its room, until the run ends or its
+		# player starts again.
 		if wizard_state.is_dead:
 			continue
 		_suffer_ground(peer_id, wizard_state)
@@ -78,10 +79,15 @@ func setup(channel: WorldChannel) -> bool:
 	_channel.move_requested.connect(_on_move_requested)
 	_channel.cast_requested.connect(_on_cast_requested)
 	_channel.take_card_requested.connect(_on_take_card_requested)
+	_channel.respawn_requested.connect(_on_respawn_requested)
 	_channel.buy_village_requested.connect(_on_buy_village_requested)
 	_channel.edit_spell_requested.connect(_on_edit_spell_requested)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
+		# A fresh boot gets a generated map too, the same as a World Collapse does — the
+		# hand-made one otherwise never leaves until the first run ends. A no-op when the
+		# dungeon rooms are missing, so a test fixture that sets `rooms` itself is unaffected.
+		_regrow_world_map()
 	if cards.is_empty():
 		cards = CardCatalog.load_folder()
 	if values == null:
@@ -394,6 +400,8 @@ func _send_state_updates() -> void:
 				cooldowns.append(maxi(0, ready - tick))
 			shared.cooldowns = cooldowns
 			shared.speed = wizard_state.speed
+			shared.peace_shield_active = wizard_state.peace_shield_active
+			shared.is_dead = wizard_state.is_dead
 			shared.effects = 0
 			if wizard_state.is_burning(tick):
 				shared.effects |= StateUpdate.BURNING
@@ -482,6 +490,24 @@ func _on_take_card_requested(peer_id: int, card_index: int) -> void:
 		return
 	wizard_state.cards_taken.append(offered[card_index])
 	wizard_state.card_choices.pop_front()
+	_send_card_choices(peer_id)
+
+
+## A dead wizard's player starts again at once, in the same world, as a newcomer: level 1,
+## a fresh spot, a fresh Grimoire, and none of the dead wizard's villages, which go back to
+## no one. The run, the map and every other wizard carry on untouched. Ignored without a
+## word while the wizard is alive.
+func _on_respawn_requested(peer_id: int) -> void:
+	if not _wizards.has(peer_id) or not _wizards[peer_id].is_dead:
+		return
+	var newcomer := _newcomer()
+	# The same input stream goes on, as in _end_run().
+	newcomer.inputs = _wizards[peer_id].inputs
+	_wizards[peer_id] = newcomer
+	for room_villages: Array in _villages.values():
+		for village: VillageState in room_villages:
+			if village.owner_peer_id == peer_id:
+				village.owner_peer_id = 0
 	_send_card_choices(peer_id)
 
 

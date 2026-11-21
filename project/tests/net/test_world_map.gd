@@ -189,3 +189,17 @@ func test_a_world_collapse_regrows_the_real_world_map() -> void:
 	var new_map := server.world.rooms[&"world_map"] as WorldMapData
 	assert_false(new_map.is_solid(new_target))
 	assert_true(new_map.random_spawn)
+
+
+## A fresh server process starts with a generated map too, not the hand-made one: that one
+## otherwise never leaves until the first run ends, which is what a tester restarting the
+## server kept running into.
+func test_a_fresh_boot_already_has_a_generated_world_map() -> void:
+	var static_rows := (RoomCatalog.load_folder()[&"world_map"] as WorldMapData).rows
+	var server := GameServer.new()
+	_add(server)
+	assert_eq(server.start(_port), OK)
+	await _ticks(1)
+	var booted_map := server.world.rooms[&"world_map"] as WorldMapData
+	assert_ne(booted_map.rows, static_rows)
+	assert_true(booted_map.random_spawn)
