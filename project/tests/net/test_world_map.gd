@@ -162,3 +162,30 @@ func test_a_newcomer_spawns_on_a_random_walkable_tile_not_always_the_same_one() 
 	for p: Vector2 in seen:
 		distinct[p] = true
 	assert_true(distinct.size() > 1, "every spawn landed on the same tile: %s" % [seen])
+
+
+func test_a_world_collapse_regrows_the_real_world_map() -> void:
+	var values := PlaceholderValues.new()
+	values.season_ticks = 10
+	var server := GameServer.new()
+	server.world.rooms = RoomCatalog.load_folder()
+	server.world.start_room = &"world_map"
+	server.world.values = values
+	_add(server)
+	assert_eq(server.start(_port), OK)
+	await _ticks(1)
+	var original_rows := (server.world.rooms[&"world_map"] as WorldMapData).rows
+	var original_target := (server.world.rooms[&"dungeon_1_exit"] as RoomData).exits[0].target_tile
+	# Five ticks before the end of winter (Season.COUNT seasons of `season_ticks` each).
+	server.world.run_start_tick = server.world.tick - Season.COUNT * 10 + 5
+	assert_true(
+		await wait_until(
+			func() -> bool:
+				return (server.world.rooms[&"world_map"] as WorldMapData).rows != original_rows,
+		)
+	)
+	var new_target := (server.world.rooms[&"dungeon_1_exit"] as RoomData).exits[0].target_tile
+	assert_ne(new_target, original_target)
+	var new_map := server.world.rooms[&"world_map"] as WorldMapData
+	assert_false(new_map.is_solid(new_target))
+	assert_true(new_map.random_spawn)

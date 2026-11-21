@@ -12,8 +12,9 @@ extends RoomData
 ## [/codeblock]
 ## Blocked: the sea, the lake, a spine, a crater and a rift core; in winter the sea and the
 ## lake freeze and can be walked on. The world sets [member season] as the run goes on.
-## The real map, 2 560 tiles a side, will be generated from a mask; this one is written by
-## hand to try walking across biomes.
+## The real map, 2 560 tiles a side, will be generated from a mask (WORLD_MAP.md). The real
+## world map is generated at this smaller placeholder size instead, by [WorldMapGenerator];
+## test fixtures still write their own small ones by hand.
 
 ## The biome and the feature of each character.
 const LEGEND: Dictionary[String, Vector2i] = {

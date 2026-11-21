@@ -125,8 +125,6 @@ func _init() -> void:
 	add_child(_overlay)
 	# Placed every frame on the wizard as drawn, so it needs no smoothing of its own.
 	_camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	_camera.limit_left = 0
-	_camera.limit_top = 0
 	add_child(_camera)
 
 
@@ -414,13 +412,23 @@ func _flag_color(index: int) -> Color:
 func _enter_room(new_room: RoomData) -> void:
 	var first_room := room == null
 	room = new_room
-	var size := room.size() * Simulation.TILE_SIZE
-	_camera.limit_right = maxi(size.x, SCREEN.x)
-	# The HUD band hides the screen's bottom lines: the map may scroll on above it.
-	_camera.limit_bottom = maxi(size.y + HUD_HEIGHT, SCREEN.y)
+	var size := Vector2(room.size() * Simulation.TILE_SIZE)
 	# The world map is far bigger than a screen, so it reads better pulled back; dungeons
 	# and mazes stay at 1:1 — the wizard's own sprite is not rescaled either way.
 	_camera.zoom = WORLD_MAP_ZOOM if room is WorldMapData else Vector2.ONE
+	# A room at least as large as what the camera shows scrolls normally, edge to edge.
+	# A smaller room (most dungeon rooms) must be centred instead: left to the same clamp,
+	# it pins to a corner picked by the screen's own size, not the room's.
+	var view := Vector2(SCREEN) / _camera.zoom
+	# The HUD band hides the screen's bottom lines, so only the rest counts as "the view"
+	# for centring a short room — then the bottom limit still gets pushed down by the band
+	# itself, same as a tall room, so its bottom edge lands right above the HUD.
+	var gameplay_view_y := view.y - HUD_HEIGHT / _camera.zoom.y
+	_camera.limit_left = int(0.0 if size.x >= view.x else (size.x - view.x) / 2.0)
+	_camera.limit_right = int(size.x if size.x >= view.x else (size.x + view.x) / 2.0)
+	_camera.limit_top = int(0.0 if size.y >= gameplay_view_y else (size.y - gameplay_view_y) / 2.0)
+	var bottom := size.y if size.y >= gameplay_view_y else (size.y + gameplay_view_y) / 2.0
+	_camera.limit_bottom = int(bottom + HUD_HEIGHT / _camera.zoom.y)
 	for marker: WizardMarker in _others.values():
 		marker.queue_free()
 	_others.clear()

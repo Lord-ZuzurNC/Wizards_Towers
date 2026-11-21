@@ -138,8 +138,10 @@ func _set_season(kind: int) -> void:
 
 ## Ends the run for everybody, then starts the next one at once. Every wizard is told how
 ## the run ended, then becomes a newcomer in the start room; villages, dummies and spells in
-## flight start over too.
+## flight start over too. On the real world map, the map itself is torn down and regrown —
+## a fresh world for the fresh run, not the same one forever.
 func _end_run(ending: WorldEnding.Kind) -> void:
+	_regrow_world_map()
 	for peer_id: int in _wizards.keys():
 		_channel.send_world_ending(peer_id, ending)
 		var newcomer := _newcomer()
@@ -153,6 +155,25 @@ func _end_run(ending: WorldEnding.Kind) -> void:
 	_projectiles.clear()
 	run_start_tick = tick
 	_set_season(Season.Kind.SPRING)
+
+
+## Replaces the real world map with a freshly generated one, and points its dungeon doors
+## back at the right spot — a no-op everywhere else (test fixtures never use these ids).
+func _regrow_world_map() -> void:
+	var dungeon_exits: Array[StringName] = [&"dungeon_1_exit", &"dungeon_2_exit"]
+	var dungeon_entrances: Array[StringName] = [&"dungeon_1_entrance", &"dungeon_2_entrance"]
+	if not rooms.has(&"world_map"):
+		return
+	for room_id in dungeon_exits + dungeon_entrances:
+		if not rooms.has(room_id):
+			return
+	var rng := RandomNumberGenerator.new()
+	var fresh := WorldMapGenerator.generate_terrain(rng)
+	var doors := WorldMapGenerator.place_points_of_interest(fresh, rng, dungeon_entrances)
+	for i in dungeon_exits.size():
+		var landing := WorldMapGenerator.nearby_open_tile(fresh, doors[i])
+		(rooms[dungeon_exits[i]] as RoomData).exits[0].target_tile = landing
+	rooms[&"world_map"] = fresh
 
 
 ## The hazard under a wizard's feet hits on its beat, twice a second: its damage, and its

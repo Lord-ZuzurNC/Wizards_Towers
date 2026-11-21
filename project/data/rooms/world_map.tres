@@ -8,13 +8,13 @@
 script = ExtResource("1_rexit")
 area = Rect2i(74, 52, 1, 1)
 target_room = &"dungeon_1_entrance"
-target_tile = Vector2i(1, 2)
+target_tile = Vector2i(1, 10)
 
 [sub_resource type="Resource" id="Resource_dgexit2"]
 script = ExtResource("1_rexit")
 area = Rect2i(113, 46, 1, 1)
 target_room = &"dungeon_2_entrance"
-target_tile = Vector2i(1, 2)
+target_tile = Vector2i(1, 10)
 
 [sub_resource type="Resource" id="Resource_village1"]
 script = ExtResource("3_vsite")
