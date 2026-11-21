@@ -3,9 +3,9 @@ extends Node
 ## The authoritative world, advanced one simulation tick at a time.
 ##
 ## Each tick, in this order: the season moves on, and the run ends when winter runs out;
-## every wizard takes what its ground deals, applies at most one movement input and walks
-## through any exit; spells in flight move and hit; destroyed training dummies stand up
-## again; mana comes back. Then every client gets a [StateUpdate] of its room, with the
+## every living wizard takes what its ground deals, applies at most one movement input,
+## walks through any exit and gets mana back; spells in flight move and hit; destroyed
+## training dummies stand up again. Then every client gets a [StateUpdate] of its room, with the
 ## sequence number of the last input applied so it can reconcile its prediction.
 ##
 ## When a run ends, every wizard starts a new one in the start room, as a newcomer: a
@@ -54,7 +54,10 @@ func _physics_process(_delta: float) -> void:
 		_end_run(WorldEnding.Kind.WORLD_COLLAPSE)
 	for peer_id: int in _wizards:
 		var wizard_state := _wizards[peer_id]
-		_suffer_ground(wizard_state)
+		# A dead wizard only stays where it fell, seen by its room, until the run ends.
+		if wizard_state.is_dead:
+			continue
+		_suffer_ground(peer_id, wizard_state)
 		_walk(wizard_state)
 		_regain_mana(wizard_state)
 		if wizard_state.pending_purchase >= 0:
@@ -179,30 +182,41 @@ func _regrow_world_map() -> void:
 ## The hazard under a wizard's feet hits on its beat, twice a second: its damage, and its
 ## side effect renewed. Ember's burn then keeps hurting on the same beat after the wizard
 ## steps off; Rime's slow keeps slowing.
-func _suffer_ground(wizard_state: WizardState) -> void:
+func _suffer_ground(peer_id: int, wizard_state: WizardState) -> void:
 	if tick % Hazard.INTERVAL_TICKS == 0:
 		var world_map := rooms[wizard_state.room_id] as WorldMapData
 		var hazard := Hazard.Kind.NONE
 		if world_map != null:
 			hazard = world_map.hazard_at(world_map.tile_at(wizard_state.position))
 		if hazard != Hazard.Kind.NONE:
-			_hurt(wizard_state, values.hazard_raw_damage)
+			_hurt(peer_id, wizard_state, values.hazard_raw_damage)
 		if hazard == Hazard.Kind.EMBER:
 			wizard_state.burning_until = tick + values.burn_ticks
 		elif hazard == Hazard.Kind.RIME:
 			wizard_state.slowed_until = tick + values.slow_ticks
 		elif wizard_state.is_burning(tick):
-			_hurt(wizard_state, values.burn_raw_damage)
+			_hurt(peer_id, wizard_state, values.burn_raw_damage)
 	wizard_state.speed = Simulation.BASE_SPEED
 	if wizard_state.is_slowed(tick):
 		wizard_state.speed = roundi(Simulation.BASE_SPEED * (1.0 - values.slow_share))
 
 
-## A hit through the wizard's magic_defence (FORMULAS.md, Combat). Wizards cannot die yet:
-## health stops at 1 until wizard endings exist.
-func _hurt(wizard_state: WizardState, raw_damage: int) -> void:
+## A hit through the wizard's magic_defence (FORMULAS.md, Combat). At 0 health the wizard
+## dies, and its client is told its wizard ending once. A dead wizard takes no more hits.
+func _hurt(peer_id: int, wizard_state: WizardState, raw_damage: int) -> void:
+	if wizard_state.is_dead:
+		return
 	var dealt := Damage.dealt(raw_damage, Levels.magic_defence(wizard_state.wizard_level))
-	wizard_state.health = maxi(1, wizard_state.health - dealt)
+	wizard_state.health = maxi(0, wizard_state.health - dealt)
+	if wizard_state.health > 0:
+		return
+	wizard_state.is_dead = true
+	# Hazard damage (a burning rift bank, a freezing glacier) is the only lethal damage so
+	# far, and no enemy exists yet to blame for MURDERED, CLAIMED_BY or the others. Death in
+	# the open world is the closest of the seven until the bestiary (Milestone 2) gives
+	# hazard death a more specific cause, or a real one.
+	wizard_state.ending = WizardEnding.Kind.DEVOURED_WILDS
+	_channel.send_wizard_died(peer_id, wizard_state.ending)
 
 
 func remove_wizard(peer_id: int) -> void:
@@ -291,6 +305,8 @@ func _walk(wizard_state: WizardState) -> void:
 	if room_exit != null:
 		wizard_state.room_id = room_exit.target_room
 		wizard_state.position = rooms[wizard_state.room_id].tile_center(room_exit.target_tile)
+		if rooms[wizard_state.room_id].is_dungeon:
+			wizard_state.break_peace_shield()
 
 
 func _regain_mana(wizard_state: WizardState) -> void:
@@ -411,11 +427,11 @@ func _room_state(room_id: StringName, peer_ids: PackedInt32Array) -> StateUpdate
 
 
 func _on_move_requested(peer_id: int, first_sequence: int, codes: PackedByteArray) -> void:
-	if _wizards.has(peer_id):
+	if _wizards.has(peer_id) and not _wizards[peer_id].is_dead:
 		_wizards[peer_id].inputs.receive(first_sequence, codes)
 
 
-## Checked in turn: a known wizard, a Grimoire position it has, a castable spell in it, a
+## Checked in turn: a known living wizard, a Grimoire position it has, a castable spell in it, a
 ## Bolt Shape (the only one whose behaviour is built so far — RUNES.md lists 20 more), an
 ## aim that is a real direction, that position's cooldown over, and the mana to pay.
 ## Anything else is ignored without a word: a well-behaved client never sends it.
@@ -425,7 +441,7 @@ func _on_move_requested(peer_id: int, first_sequence: int, codes: PackedByteArra
 ## so its speed and range still come from [member PlaceholderValues.spells], kept only for
 ## that and for the spell bar's colour.
 func _on_cast_requested(peer_id: int, grimoire_position: int, aim: Vector2) -> void:
-	if not _wizards.has(peer_id):
+	if not _wizards.has(peer_id) or _wizards[peer_id].is_dead:
 		return
 	var wizard_state := _wizards[peer_id]
 	if grimoire_position < 1 or grimoire_position > _open_positions(wizard_state):
@@ -471,13 +487,13 @@ func _on_take_card_requested(peer_id: int, card_index: int) -> void:
 
 ## Kept until the inputs sent before it have been applied; a newer request replaces it.
 func _on_buy_village_requested(peer_id: int, village_index: int, after_sequence: int) -> void:
-	if not _wizards.has(peer_id) or village_index < 0:
+	if not _wizards.has(peer_id) or _wizards[peer_id].is_dead or village_index < 0:
 		return
 	_wizards[peer_id].pending_purchase = village_index
 	_wizards[peer_id].purchase_after = after_sequence
 
 
-## Checked in turn: a known wizard, a Grimoire position it has, a valid [enum Spell.Slot],
+## Checked in turn: a known living wizard, a Grimoire position it has, a valid [enum Spell.Slot],
 ## a rune of that slot's attribute, a grade the wizard knows that rune at. Where the editing
 ## wizard stands is not checked yet: "from the wizard's own tower" (GLOSSARY.md, spell
 ## editing) waits on territory, Milestone 4.
@@ -488,7 +504,7 @@ func _on_edit_spell_requested(
 	rune_id: StringName,
 	grade: int,
 ) -> void:
-	if not _wizards.has(peer_id):
+	if not _wizards.has(peer_id) or _wizards[peer_id].is_dead:
 		return
 	var wizard_state := _wizards[peer_id]
 	if grimoire_position < 1 or grimoire_position > _open_positions(wizard_state):

@@ -30,6 +30,8 @@ signal edit_spell_requested(
 signal state_update_received(update: StateUpdate)
 ## Received on a client: the run ended, and how.
 signal world_ending_received(ending: int)
+## Received on a client: its own wizard died, and how.
+signal wizard_died_received(ending: int)
 ## Received on a client: its card choices changed.
 signal card_choices_received(pending: int, card_ids: PackedStringArray)
 ## Received on a client: an edit of its own Grimoire was accepted. A rejected edit gets no
@@ -69,6 +71,11 @@ func send_state_update(peer_id: int, update: StateUpdate) -> void:
 ## Server side: the run is over, ended as [param ending], a [enum WorldEnding.Kind].
 func send_world_ending(peer_id: int, ending: int) -> void:
 	world_ending_sync.rpc_id(peer_id, ending)
+
+
+## Server side: [param peer_id]'s wizard died, as [param ending], a [enum WizardEnding.Kind].
+func send_wizard_died(peer_id: int, ending: int) -> void:
+	wizard_died_sync.rpc_id(peer_id, ending)
 
 
 ## Server side: the number of choices waiting, and the cards of the oldest one.
@@ -144,6 +151,13 @@ func card_choices_sync(pending: int, card_ids: PackedStringArray) -> void:
 func world_ending_sync(ending: int) -> void:
 	if ending >= 0 and ending < WorldEnding.NAMES.size():
 		world_ending_received.emit(ending)
+
+
+## Trusted: only the server may call it.
+@rpc("authority", "call_remote", "reliable")
+func wizard_died_sync(ending: int) -> void:
+	if ending >= 0 and ending < WizardEnding.NAMES.size():
+		wizard_died_received.emit(ending)
 
 
 ## Trusted: only the server may call it.

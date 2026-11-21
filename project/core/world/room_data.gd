@@ -27,6 +27,8 @@ const MAX_SIZE := Vector2i(40, 20)
 @export var dummy_tiles: Array[Vector2i] = []
 ## The villages standing in the room. A village is known by its place in this list.
 @export var villages: Array[VillageSite] = []
+## Whether the room is part of a dungeon: walking in breaks the peace shield.
+@export var is_dungeon := false
 
 
 ## The room's size in tiles.

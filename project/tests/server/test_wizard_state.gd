@@ -1,5 +1,5 @@
 extends TestCase
-## XP and level-ups.
+## XP, level-ups and the peace shield.
 
 
 func test_xp_short_of_a_level_changes_nothing_else() -> void:
@@ -29,3 +29,28 @@ func test_a_level_up_adds_what_the_level_adds_without_healing_fully() -> void:
 	wizard.gain_xp(10, 10)
 	assert_eq(wizard.max_health(), 110)
 	assert_eq(wizard.health, 50)
+
+
+func test_a_new_wizard_carries_the_peace_shield() -> void:
+	assert_true(WizardState.new().peace_shield_active)
+
+
+func test_reaching_level_2_breaks_the_peace_shield() -> void:
+	var wizard := WizardState.new()
+	wizard.gain_xp(10, 10)
+	assert_false(wizard.peace_shield_active)
+
+
+func test_xp_that_stays_at_level_1_keeps_the_peace_shield() -> void:
+	var wizard := WizardState.new()
+	wizard.gain_xp(9, 10)
+	assert_true(wizard.peace_shield_active)
+
+
+func test_a_broken_peace_shield_never_comes_back() -> void:
+	var wizard := WizardState.new()
+	wizard.break_peace_shield()
+	wizard.break_peace_shield()
+	assert_false(wizard.peace_shield_active)
+	wizard.gain_xp(25, 10)
+	assert_false(wizard.peace_shield_active)

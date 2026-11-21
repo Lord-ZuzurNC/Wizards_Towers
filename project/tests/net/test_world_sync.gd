@@ -73,6 +73,26 @@ func test_a_wizard_leaving_the_room_vanishes_for_the_others() -> void:
 	assert_true(await wait_until(_client_does_not_see.bind(watcher, walker)))
 
 
+func test_walking_into_a_dungeon_breaks_the_peace_shield() -> void:
+	var server := _start_server()
+	server.world.rooms[&"right"].is_dungeon = true
+	var client := _join()
+	assert_true(await wait_until(_client_in_room.bind(client, &"left")))
+	assert_true(server.world.wizard(client.peer_id()).peace_shield_active)
+	client.world.input_override = RIGHT
+	assert_true(await wait_until(_client_in_room.bind(client, &"right")))
+	assert_false(server.world.wizard(client.peer_id()).peace_shield_active)
+
+
+func test_walking_into_an_ordinary_room_keeps_the_peace_shield() -> void:
+	var server := _start_server()
+	var client := _join()
+	assert_true(await wait_until(_client_in_room.bind(client, &"left")))
+	client.world.input_override = RIGHT
+	assert_true(await wait_until(_client_in_room.bind(client, &"right")))
+	assert_true(server.world.wizard(client.peer_id()).peace_shield_active)
+
+
 func _start_server() -> GameServer:
 	var server := GameServer.new()
 	server.world.rooms = RoomFixtures.two_joined_rooms()

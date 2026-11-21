@@ -50,6 +50,7 @@ Content is cut, not systems:
 - [x] **Economy, first pass**: gold from dummies; buying a village at an escalating price; the level-2 rule for a second village; a purchase judged where the wizard stood when the key was pressed.
 - [x] **Rendering**: drawn at screen resolution with no frame cap; Pixel Operator font; every colour from BLK NX64, checked by test.
 - [x] **World map, first pass**: 8 biomes, impassable sea, spines, craters and rift cores; a camera that follows; the biome underfoot named.
+- [x] **World map, second pass**: generated procedurally at each World Collapse instead of staying hand-made; the Monolith's footprint reserved at the centre; a newcomer lands on a random open tile instead of one fixed spot; two placeholder dungeons (an entrance room and an exit room each) reachable from the world map and back.
 - [x] **Controls**: a spell grid of ten positions, five keys and the same five with Shift; key names as the player's own keyboard prints them.
 - [x] **Seasons**: four seasons; water freezes in winter; rift banks burn in summer; the glacier slows in winter; World Collapse when winter runs out, everyone back in the start room.
 
@@ -59,7 +60,9 @@ Each of these is a stand-in that a milestone below replaces.
 
 - [ ] Every number is provisional (`data/placeholder_values.tres`).
 - [ ] Nobody dies: health stops at 1. → milestone 1
-- [ ] The world map is hand-made and drawn in one piece. → milestone 2
+- [ ] The world map is generated procedurally as a placeholder, not from a mask yet, and is still handed over whole, not streamed. → milestone 2
+- [ ] The Monolith is a reserved, blocked patch at the world's exact centre: not a structure, nothing happens there yet. → milestone 6
+- [ ] Two placeholder dungeons exist only to test doors in and out of the world map: empty rooms, no instancing, no content. → milestone 5
 - [ ] No lag compensation. → milestone 1
 - [ ] Nothing is saved. → milestone 3
 - [ ] The spell bar is two plain rows, not the design in `ART_DIRECTION.md`, *Spell bar*. → milestone 7
@@ -69,6 +72,12 @@ Each of these is a stand-in that a milestone below replaces.
 - [ ] Only Bolt's Shape has real behaviour: a straight projectile. The other 20 Shapes'
       spells compute real numbers (RUNES.md, FORMULAS.md) but cannot be cast yet, and no
       Effect rune does anything yet. → milestone 1, still open
+- [ ] The peace shield breaks on reaching level 2 or entering a dungeon; breaking on a
+      wizard's first attack waits on wizard-vs-wizard combat, and what the shield actually
+      blocks is not wired yet either. → milestone 1, still open
+- [ ] Only `Devoured by the Wilds` is reachable: the other six wizard endings wait on PvP,
+      the final battle, dungeons, mazes and world bosses. A dead wizard keeps its last room
+      and position rather than freely spectating the whole world. → milestone 1, still open
 
 ## Milestone 1 — Real combat
 
@@ -85,13 +94,13 @@ The heart of the game; everything else plugs into it.
 - [x] The runes and Artifacts in the alpha subset (`RUNES.md`, `ARTIFACTS.md`).
 
 **Build**
-- [ ] Spells assembled from runes: Shape, Element, Duration, Effect.
-- [ ] The Grimoire and spell editing.
+- [x] Spells assembled from runes: Shape, Element, Duration, Effect.
+- [x] The Grimoire and spell editing.
 - [ ] Weapons and wizard types.
 - [ ] Wizard against wizard.
 - [ ] Status effects.
-- [ ] The death of a wizard.
-- [ ] The peace shield.
+- [x] The death of a wizard.
+- [x] The peace shield.
 
 ## Milestone 2 — A living world
 

@@ -36,6 +36,13 @@ var burning_until := 0
 ## The tick Rime's slow ends.
 var slowed_until := 0
 var purchase_after := 0
+## GLOSSARY.md, peace shield. Only its state is kept: nothing reads it yet, since no wizard
+## can hit another (see [method break_peace_shield]).
+var peace_shield_active := true
+## Set once health reaches 0. A dead wizard stays where it fell until the run ends.
+var is_dead := false
+## A [enum WizardEnding.Kind], or -1 while alive.
+var ending := -1
 
 
 func _init() -> void:
@@ -96,4 +103,15 @@ func gain_xp(amount: int, xp_per_level: int) -> int:
 		health += max_health() - old_health
 		mana += mana_pool() - old_mana
 		gained += 1
+	if wizard_level >= 2:
+		break_peace_shield()
 	return gained
+
+
+## Turns the peace shield off for good; harmless when it already is. Called on reaching
+## level 2 and on entering a dungeon. Not yet called on the wizard's first attack: that
+## waits on wizard-vs-wizard combat, and a hit on a training dummy must not count, or every
+## newcomer would lose it while learning to cast. Nor does the shield block anything yet:
+## there is no damage from another wizard for it to block.
+func break_peace_shield() -> void:
+	peace_shield_active = false

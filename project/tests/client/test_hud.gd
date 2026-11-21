@@ -1,5 +1,6 @@
 extends TestCase
 ## The HUD's card choice: a badge while choices wait, a panel only when asked for.
+## And the banner of a run's end, or of the player's own wizard's death.
 
 var _world: ClientWorld
 var _channel: WorldChannel
@@ -93,6 +94,36 @@ func test_an_open_card_choice_keeps_clicks_from_casting() -> void:
 	assert_true(_world.ui_has_mouse)
 	_hud.toggle_choice()
 	assert_false(_world.ui_has_mouse)
+
+
+func test_a_death_shows_its_ending_and_stays_up() -> void:
+	_channel.wizard_died_received.emit(WizardEnding.Kind.DEVOURED_WILDS)
+	assert_true(_hud.ending.visible)
+	assert_true(_hud.ending.text.begins_with("Devoured by the Wilds"), _hud.ending.text)
+	await _outlast_a_world_ending()
+	assert_true(_hud.ending.visible)
+
+
+func test_a_world_ending_after_a_death_shows_the_world_ending() -> void:
+	_channel.wizard_died_received.emit(WizardEnding.Kind.DEVOURED_WILDS)
+	_channel.world_ending_received.emit(WorldEnding.Kind.WORLD_COLLAPSE)
+	assert_true(_hud.ending.visible)
+	assert_true(_hud.ending.text.begins_with("World Collapse"), _hud.ending.text)
+	await _outlast_a_world_ending()
+	assert_false(_hud.ending.visible)
+
+
+func test_a_death_soon_after_a_world_ending_outlasts_its_timer() -> void:
+	_channel.world_ending_received.emit(WorldEnding.Kind.WORLD_COLLAPSE)
+	_channel.wizard_died_received.emit(WizardEnding.Kind.DEVOURED_WILDS)
+	await _outlast_a_world_ending()
+	assert_true(_hud.ending.visible)
+	assert_true(_hud.ending.text.begins_with("Devoured by the Wilds"), _hud.ending.text)
+
+
+func _outlast_a_world_ending() -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	await tree.create_timer(Hud.ENDING_SECONDS + 0.5).timeout
 
 
 func _offer(pending: int) -> void:

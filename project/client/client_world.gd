@@ -19,6 +19,8 @@ signal status_changed
 signal card_choices_changed
 ## The run ended, as a [enum WorldEnding.Kind]; the next one has begun.
 signal run_ended(ending: int)
+## The player's own wizard died, as a [enum WizardEnding.Kind]; it watches until the run ends.
+signal wizard_died(ending: int)
 
 ## How far in the past other wizards are drawn: 3 ticks, 100 ms.
 const INTERPOLATION_TICKS := 3.0
@@ -198,6 +200,7 @@ func setup(channel: WorldChannel, own_peer_id: int) -> void:
 	_channel.state_update_received.connect(_on_state_update_received)
 	_channel.card_choices_received.connect(_on_card_choices_received)
 	_channel.world_ending_received.connect(run_ended.emit)
+	_channel.wizard_died_received.connect(wizard_died.emit)
 	if rooms.is_empty():
 		rooms = RoomCatalog.load_folder()
 	if cards.is_empty():

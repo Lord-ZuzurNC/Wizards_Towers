@@ -36,7 +36,8 @@ var badge := Label.new()
 var prompt := Label.new()
 ## The season, and the time left in it.
 var season := Label.new()
-## Says how the last run ended, for a few seconds after it did.
+## Says how the last run ended, for a few seconds after it did; or how the player's own
+## wizard died, until the run ends.
 var ending := Label.new()
 
 var _world: ClientWorld
@@ -44,6 +45,8 @@ var _numbers := Label.new()
 var _panel := Control.new()
 var _row := HBoxContainer.new()
 var _spell_bar: SpellBar
+## Counts what [member ending] has shown, so a run's timer never hides a later death.
+var _endings_shown := 0
 
 
 func _init(world: ClientWorld) -> void:
@@ -51,6 +54,7 @@ func _init(world: ClientWorld) -> void:
 	_world.status_changed.connect(_refresh_numbers)
 	_world.card_choices_changed.connect(_refresh_choices)
 	_world.run_ended.connect(_on_run_ended)
+	_world.wizard_died.connect(_on_wizard_died)
 	# An opaque band under the text: a world map scrolls on beneath it.
 	var band := ColorRect.new()
 	band.color = BAND_COLOR
@@ -179,7 +183,21 @@ func _effects_text() -> String:
 func _on_run_ended(kind: int) -> void:
 	ending.text = "%s\nA new world begins" % WorldEnding.label(kind)
 	ending.show()
-	get_tree().create_timer(ENDING_SECONDS).timeout.connect(ending.hide)
+	_endings_shown += 1
+	get_tree().create_timer(ENDING_SECONDS).timeout.connect(_hide_ending.bind(_endings_shown))
+
+
+## Stays up: a dead wizard has nothing else to do until the run ends.
+func _on_wizard_died(kind: int) -> void:
+	ending.text = "%s\nWatching until the world ends" % WizardEnding.label(kind)
+	ending.show()
+	_endings_shown += 1
+
+
+## Hides [member ending] unless something else has shown since [param shown].
+func _hide_ending(shown: int) -> void:
+	if shown == _endings_shown:
+		ending.hide()
 
 
 func _prompt_text() -> String:
